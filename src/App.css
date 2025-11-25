@@ -1,0 +1,77 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #000000;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+.ui-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ui-overlay h1 {
+  color: #00ffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+  margin-bottom: 10px;
+  pointer-events: auto;
+  letter-spacing: 0.5px;
+}
+
+.back-button {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  padding: 12px 24px;
+  background: rgba(0, 255, 255, 0.2);
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.back-button:hover {
+  background: rgba(0, 255, 255, 0.4);
+  transform: translateX(-5px);
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+}
+
+.back-button:active {
+  transform: translateX(-3px);
+}
+
+/* Loading indicator (optional) */
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #00ffff;
+  font-size: 24px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  z-index: 100;
+}
