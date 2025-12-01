@@ -35,16 +35,16 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
       minWidth: '250px',
       zIndex: 1000
     }}>
-      <div style={{ 
-        borderBottom: '1px solid #00ffff', 
-        paddingBottom: '8px', 
+      <div style={{
+        borderBottom: '1px solid #00ffff',
+        paddingBottom: '8px',
         marginBottom: '10px',
         fontWeight: 'bold',
         fontSize: '14px'
       }}>
         📷 Camera Debug
       </div>
-      
+
       <div style={{ marginBottom: '5px' }}>
         <strong>Current Position:</strong>
       </div>
@@ -53,14 +53,14 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
         <div>Y: {cameraPosition.y} <span style={{ color: '#666', fontSize: '11px' }}>(Target: 9.72)</span></div>
         <div>Z: {cameraPosition.z} <span style={{ color: '#666', fontSize: '11px' }}>(Target: 6.14)</span></div>
       </div>
-      
+
       <div style={{ marginTop: '10px', marginBottom: '5px' }}>
         <strong>Distance:</strong> <span style={{ color: '#88ffff' }}>{distance}</span>
         <span style={{ color: '#666', fontSize: '11px', marginLeft: '5px' }}>(Blender: 18.09)</span>
       </div>
 
 
-      <button 
+      <button
         onClick={copyToClipboard}
         style={{
           marginTop: '12px',
@@ -80,9 +80,9 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
       </button>
 
 
-      <div style={{ 
-        marginTop: '12px', 
-        fontSize: '10px', 
+      <div style={{
+        marginTop: '12px',
+        fontSize: '10px',
         color: '#888',
         fontStyle: 'italic',
         textAlign: 'center',
@@ -117,7 +117,7 @@ function CameraTracker({ onUpdate }) {
 // Set Initial Blender Camera
 function SetBlenderCamera() {
   const { camera } = useThree()
-  
+
   React.useEffect(() => {
     // Set exact Blender viewport position
     camera.position.set(14.14, 13.09, 19.96)
@@ -125,7 +125,7 @@ function SetBlenderCamera() {
     camera.updateProjectionMatrix()
     console.log('✓ Camera set to Blender position: [14.02, 8.43, 14.80]')
   }, [camera])
-  
+
   return null
 }
 
@@ -145,13 +145,13 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
-        camera={{ 
+        camera={{
           position: [16.02, 9.71, 18.25],  // Exact Blender viewport position
           fov: 50,
           near: 0.1,
           far: 1000
         }}
-        gl={{ 
+        gl={{
           antialias: true,
           toneMapping: 0,
           toneMappingExposure: 1
@@ -165,27 +165,26 @@ function App() {
         <CameraTracker onUpdate={handleCameraUpdate} />
 
 
-        {/* Lighting Setup */}
-        <ambientLight intensity={15} color="#404060" />
-        
-        <hemisphereLight 
-          skyColor="#87ceeb" 
-          groundColor="#2a2a3e" 
-          intensity={0.6} 
+        {/* Lighting Setup - Enhanced for better visibility */}
+        <ambientLight intensity={1.2} color="#6080a0" />
+
+        <hemisphereLight
+          skyColor="#4060ff"
+          groundColor="#2a1a3e"
+          intensity={0.8}
         />
-        
-        <directionalLight 
-          position={[15, 20, 10]} 
-          intensity={1.5} 
+
+        <directionalLight
+          position={[15, 25, 15]}
+          intensity={2.0}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
 
-
-        {/* Accent lighting for neon glow */}
-        {/* <pointLight position={[0, 10, 0]} intensity={40} color="#00ffff" /> */}
-        {/* <pointLight position={[-10, 8, 10]} intensity={10.8} color="#aa00ff" /> */}
+        {/* Fill lights for better overall illumination */}
+        <pointLight position={[-15, 15, 10]} intensity={8} color="#4080ff" />
+        <pointLight position={[15, 12, -10]} intensity={6} color="#8060ff" />
 
 
         {/* Scene */}
@@ -198,7 +197,7 @@ function App() {
 
 
         {/* OrbitControls */}
-        <OrbitControls 
+        <OrbitControls
           target={[1.2, 4, 0]}
           enablePan={true}
           enableZoom={true}
@@ -212,9 +211,9 @@ function App() {
 
         {/* Post-processing for Neon Glow */}
         <EffectComposer>
-          <Bloom 
-            intensity={1.5} 
-            luminanceThreshold={0.7} 
+          <Bloom
+            intensity={1.5}
+            luminanceThreshold={0.7}
             luminanceSmoothing={0.6}
             radius={0.6}
           />
@@ -224,10 +223,11 @@ function App() {
 
       {/* UI Overlays - OUTSIDE Canvas */}
       <div className="ui-overlay">
-        {/* <h1>ACSES - Association of Computer Science & Engineering Students</h1> */}
-        
+        <h1>ACSES</h1>
+        <p className="subtitle">Association of Computer Science & Engineering Students</p>
+
         {currentScene !== 'main-campus' && (
-          <button 
+          <button
             className="back-button"
             onClick={() => setCurrentScene('main-campus')}
           >
@@ -237,8 +237,8 @@ function App() {
       </div>
 
 
-      {/* Camera Debug Panel - OUTSIDE Canvas */}
-      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+      {/* Camera Debug Panel - Hidden for production */}
+      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
     </div>
   )
 }

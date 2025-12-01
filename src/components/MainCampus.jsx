@@ -7,9 +7,9 @@ export default function MainCampus({ onBuildingClick }) {
   const groupRef = useRef()
   const billboardLightRef = useRef()
   const { camera, raycaster, gl } = useThree()
-  
+
   const { scene } = useGLTF('/models/main-campus.glb')
-  
+
   const [hoveredBuilding, setHoveredBuilding] = useState(null)
   const [billboardPosition, setBillboardPosition] = useState(null)
   const mouse = useRef(new THREE.Vector2())
@@ -19,9 +19,9 @@ export default function MainCampus({ onBuildingClick }) {
   // Setup: Find Billboard and give it unique material
   useEffect(() => {
     console.log('Setting up Main Campus scene...')
-    
+
     let billboardFound = false
-    
+
     clonedScene.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true
@@ -31,57 +31,56 @@ export default function MainCampus({ onBuildingClick }) {
         if (child.name === 'Billboard_plane') {
           console.log('✅ Billboard_plane found!')
           billboardFound = true
-          
+
           // Get world position for point light
           const worldPos = new THREE.Vector3()
           child.getWorldPosition(worldPos)
           setBillboardPosition(worldPos)
-          
+
           // IMPORTANT: Clone the material so it's unique to billboard
           if (child.material) {
             child.material = child.material.clone()
-            
+
             // Now modify ONLY the billboard's material
             child.material.emissive = new THREE.Color('#aa00ff')
-            child.material.emissiveIntensity = 4.0
+            child.material.emissiveIntensity = 2.5  // Reduced for better balance with new lighting
             child.material.toneMapped = false
             child.material.needsUpdate = true
             console.log('✅ Billboard material cloned and boosted')
           }
         }
-        // For ALL other purple screens - reduce emissive
+        // For ALL other purple/cyan screens - adjust emissive for new lighting
         else if (child.material && child.material.emissive) {
           const emissiveHex = child.material.emissive.getHex()
-          
-          // If it's purple/magenta
-          if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff) {
+
+          // If it's purple/magenta or cyan
+          if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff || emissiveHex === 0x00ffff) {
             // Clone material for this mesh too (so changes don't affect others)
             child.material = child.material.clone()
-            child.material.emissiveIntensity = 0.3  // Very low
+            child.material.emissiveIntensity = 0.8  // Increased for better visibility
             child.material.toneMapped = true
-            console.log(`Reduced ${child.name} emissive to 0.3`)
+            console.log(`Adjusted ${child.name} emissive to 0.8`)
           }
         }
 
-        // Make buildings clickable
+        // Make buildings clickable - using exact Blender collection names
         const buildingNames = [
           'Event_gallery',
           'About_acses',
-          'About_Acses', 
           'Teams',
-          'ContactUs',
-          'Contact'
+          'ContactUs'
         ]
-        
+
         buildingNames.forEach(name => {
           if (child.name.toLowerCase().includes(name.toLowerCase())) {
             child.userData.clickable = true
             child.userData.buildingType = name.toLowerCase().replace('_', '-')
+            console.log(`✅ Made ${child.name} clickable as ${child.userData.buildingType}`)
           }
         })
       }
     })
-    
+
     if (!billboardFound) {
       console.warn('⚠️ Billboard_plane not found! Check object name in Blender.')
       // Log all mesh names for debugging
@@ -90,7 +89,7 @@ export default function MainCampus({ onBuildingClick }) {
         if (child.isMesh) console.log(`  - ${child.name}`)
       })
     }
-    
+
     console.log('✅ Main Campus setup complete')
   }, [clonedScene])
 
@@ -105,7 +104,7 @@ export default function MainCampus({ onBuildingClick }) {
 
     if (intersects.length > 0) {
       let clickableObject = intersects[0].object
-      
+
       while (clickableObject && !clickableObject.userData.clickable) {
         clickableObject = clickableObject.parent
       }
@@ -116,7 +115,7 @@ export default function MainCampus({ onBuildingClick }) {
         return
       }
     }
-    
+
     setHoveredBuilding(null)
     gl.domElement.style.cursor = 'default'
   }
@@ -124,7 +123,7 @@ export default function MainCampus({ onBuildingClick }) {
   const handleClick = (event) => {
     if (hoveredBuilding && hoveredBuilding.userData.buildingType) {
       console.log('Building clicked:', hoveredBuilding.userData.buildingType)
-      
+
       const buildingMap = {
         'event-gallery': 'event-gallery',
         'about-acses': 'about-acses',
@@ -132,7 +131,7 @@ export default function MainCampus({ onBuildingClick }) {
         'contactus': 'contact-us',
         'contact': 'contact-us'
       }
-      
+
       const sceneId = buildingMap[hoveredBuilding.userData.buildingType]
       if (sceneId) {
         onBuildingClick(sceneId)
@@ -166,26 +165,26 @@ export default function MainCampus({ onBuildingClick }) {
 
   return (
     <>
-      {/* Billboard Purple Point Light */}
+      {/* Billboard Purple Point Light - Adjusted for new global lighting */}
       {billboardPosition && (
-        <pointLight 
+        <pointLight
           ref={billboardLightRef}
           position={[
-            billboardPosition.x + 2, 
-            billboardPosition.y + 2, 
+            billboardPosition.x + 2,
+            billboardPosition.y + 3,
             billboardPosition.z + 2
-          ]} 
-          intensity={20}  // Reduced from 55 for better balance
-          color="#aa00ff" 
-          distance={30}
-          decay={0.1}
+          ]}
+          intensity={15}  // Further reduced to balance with enhanced ambient lighting
+          color="#aa00ff"
+          distance={25}
+          decay={0.2}
         />
       )}
 
       {/* The 3D Model */}
-      <primitive 
+      <primitive
         ref={groupRef}
-        object={clonedScene} 
+        object={clonedScene}
         onPointerMove={handlePointerMove}
         onClick={handleClick}
       />

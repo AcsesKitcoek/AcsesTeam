@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #000000;
+  background: radial-gradient(ellipse at center, #6b4f8a 0%, #3d2a54 35%, #1a0f2e 70%, #0a0512 100%);
   overflow: hidden;
   color: #ffffff;
 }
@@ -27,13 +27,26 @@ body {
 }
 
 .ui-overlay h1 {
-  color: #00ffff;
-  font-size: 24px;
-  font-weight: 700;
-  text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-  margin-bottom: 10px;
+  color: #ff00ff;
+  font-size: 72px;
+  font-weight: 900;
+  text-shadow: 0 0 30px rgba(255, 0, 255, 0.8), 0 0 60px rgba(255, 0, 255, 0.4);
+  margin-bottom: 5px;
   pointer-events: auto;
-  letter-spacing: 0.5px;
+  letter-spacing: 8px;
+  text-align: center;
+}
+
+.ui-overlay .subtitle {
+  color: #00ffff;
+  font-size: 14px;
+  font-weight: 400;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  margin-top: 0;
+  pointer-events: auto;
+  letter-spacing: 2px;
+  text-align: center;
+  opacity: 0.9;
 }
 
 .back-button {
