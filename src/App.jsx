@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import MainCampus from './components/MainCampus'
+import TeamsBuilding from './components/TeamsBuilding'
 import './App.css'
 
 
@@ -49,14 +51,13 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
         <strong>Current Position:</strong>
       </div>
       <div style={{ paddingLeft: '10px', color: '#88ffff' }}>
-        <div>X: {cameraPosition.x} <span style={{ color: '#666', fontSize: '11px' }}>(Target: 13.96)</span></div>
-        <div>Y: {cameraPosition.y} <span style={{ color: '#666', fontSize: '11px' }}>(Target: 9.72)</span></div>
-        <div>Z: {cameraPosition.z} <span style={{ color: '#666', fontSize: '11px' }}>(Target: 6.14)</span></div>
+        <div>X: {cameraPosition.x}</div>
+        <div>Y: {cameraPosition.y}</div>
+        <div>Z: {cameraPosition.z}</div>
       </div>
 
       <div style={{ marginTop: '10px', marginBottom: '5px' }}>
         <strong>Distance:</strong> <span style={{ color: '#88ffff' }}>{distance}</span>
-        <span style={{ color: '#666', fontSize: '11px', marginLeft: '5px' }}>(Blender: 18.09)</span>
       </div>
 
 
@@ -114,39 +115,22 @@ function CameraTracker({ onUpdate }) {
 }
 
 
-// Set Initial Blender Camera
-function SetBlenderCamera() {
-  const { camera } = useThree()
-
-  React.useEffect(() => {
-    // Set exact Blender viewport position
-    camera.position.set(14.14, 13.09, 19.96)
-    camera.lookAt(1.2, 4, 0)
-    camera.updateProjectionMatrix()
-    console.log('✓ Camera set to Blender position: [14.02, 8.43, 14.80]')
-  }, [camera])
-
-  return null
-}
-
-
-function App() {
+// Main Campus Page Component
+function MainCampusPage() {
   const [currentScene, setCurrentScene] = useState('main-campus')
-  const [cameraPos, setCameraPos] = useState({ x: '15.96', y: '8.76', z: '15.45' })
+  const [cameraPos, setCameraPos] = useState({ x: '16.02', y: '9.71', z: '18.25' })
   const [distance, setDistance] = useState('27.74')
-
 
   const handleCameraUpdate = (pos, dist) => {
     setCameraPos(pos)
     setDistance(dist)
   }
 
-
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
         camera={{
-          position: [16.02, 9.71, 18.25],  // Exact Blender viewport position
+          position: [16.02, 9.71, 18.25],
           fov: 50,
           near: 0.1,
           far: 1000
@@ -157,13 +141,8 @@ function App() {
           toneMappingExposure: 1
         }}
       >
-        {/* Set camera to exact Blender position */}
-        <SetBlenderCamera />
-
-
         {/* Track camera position for debug overlay */}
         <CameraTracker onUpdate={handleCameraUpdate} />
-
 
         {/* Lighting Setup - Enhanced for better visibility */}
         <ambientLight intensity={1.2} color="#6080a0" />
@@ -186,15 +165,11 @@ function App() {
         <pointLight position={[-15, 15, 10]} intensity={8} color="#4080ff" />
         <pointLight position={[15, 12, -10]} intensity={6} color="#8060ff" />
 
-
         {/* Scene */}
-        {currentScene === 'main-campus' && (
-          <MainCampus onBuildingClick={(building) => {
-            console.log('Building clicked:', building)
-            setCurrentScene(building)
-          }} />
-        )}
-
+        <MainCampus onBuildingClick={(building) => {
+          console.log('Building clicked:', building)
+          setCurrentScene(building)
+        }} />
 
         {/* OrbitControls */}
         <OrbitControls
@@ -208,7 +183,6 @@ function App() {
           minPolarAngle={Math.PI / 8}
         />
 
-
         {/* Post-processing for Neon Glow */}
         <EffectComposer>
           <Bloom
@@ -219,7 +193,6 @@ function App() {
           />
         </EffectComposer>
       </Canvas>
-
 
       {/* UI Overlays - OUTSIDE Canvas */}
       <div className="ui-overlay">
@@ -236,10 +209,95 @@ function App() {
         )}
       </div>
 
-
       {/* Camera Debug Panel - Hidden for production */}
-      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
+      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
     </div>
+  )
+}
+
+
+// Teams Building Page Component
+function TeamsBuildingPage() {
+  const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' })
+  const [distance, setDistance] = useState('10.00')
+
+  const handleCameraUpdate = (pos, dist) => {
+    setCameraPos(pos)
+    setDistance(dist)
+  }
+
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Canvas
+        camera={{
+          position: [68.63, 36.54, 40.60],  // Initial position - adjust with camera debug
+          fov: 50,
+          near: 0.1,
+          far: 1000
+        }}
+        gl={{
+          antialias: true,
+          toneMapping: 0,
+          toneMappingExposure: 1
+        }}
+      >
+        {/* Track camera position for debug overlay */}
+        <CameraTracker onUpdate={handleCameraUpdate} />
+
+        {/* Basic Lighting - Will enhance later */}
+        <ambientLight intensity={1.0} color="#ffffff" />
+
+        <directionalLight
+          position={[10, 20, 10]}
+          intensity={1.5}
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+        />
+
+        {/* Scene */}
+        <TeamsBuilding />
+
+        {/* OrbitControls */}
+        <OrbitControls
+          target={[0, 17, -31]}
+          enablePan={true}
+          enableZoom={true}
+          enableRotate={true}
+          minDistance={5}
+          maxDistance={150}
+        />
+
+        {/* Post-processing for Neon Glow */}
+        <EffectComposer>
+          <Bloom
+            intensity={1.5}
+            luminanceThreshold={0.7}
+            luminanceSmoothing={0.6}
+            radius={0.6}
+          />
+        </EffectComposer>
+      </Canvas>
+
+      {/* UI Overlays */}
+      <div className="ui-overlay">
+        <h1>TEAMS</h1>
+      </div>
+
+      {/* Camera Debug Panel - ENABLED for finding camera position */}
+      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+    </div>
+  )
+}
+
+
+// Main App Component with Routing
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainCampusPage />} />
+      <Route path="/teams" element={<TeamsBuildingPage />} />
+    </Routes>
   )
 }
 
