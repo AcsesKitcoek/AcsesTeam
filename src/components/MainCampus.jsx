@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
 
+
 export default function MainCampus({ onBuildingClick, onHODClick }) {
   const groupRef = useRef()
   const billboardLightRef = useRef()
@@ -20,7 +21,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
   const [fcPosition, setFcPosition] = useState(null)
   const [animationPhase, setAnimationPhase] = useState('blackout')
   const [flickerCount, setFlickerCount] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const mouse = useRef(new THREE.Vector2())
+  const touch = useRef(new THREE.Vector2())
   const emissiveMeshes = useRef([])
   const animationStartTime = useRef(0)
   const hasLoggedRestore = useRef(false)
@@ -42,9 +45,22 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' }
   }
 
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Setup: Find Billboard, emissive meshes, armatures, and make buildings clickable
   useEffect(() => {
     console.log('🚀 Setting up Main Campus scene...')
+    console.log(`📱 Mobile device detected: ${isMobile}`)
 
     let billboardFound = false
     const emissiveMeshesList = []
@@ -56,8 +72,8 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     clonedScene.traverse((child) => {
       // Handle regular MESHES
       if (child.isMesh) {
-        child.castShadow = true
-        child.receiveShadow = true
+        child.castShadow = !isMobile  // Disable shadows on mobile
+        child.receiveShadow = !isMobile
 
         // Billboard plane - EXACT values preserved
         if (child.name === 'Billboard_plane') {
@@ -121,7 +137,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           }
         }
 
-        // Make buildings and labels clickable
+        // Make buildings and labels clickable/touchable
         Object.keys(labelConfig).forEach((meshName) => {
           if (child.name === meshName || child.name.toLowerCase().includes(meshName.toLowerCase())) {
             const config = labelConfig[meshName]
@@ -145,8 +161,8 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       // Handle SKINNED MESHES (armature characters)
       if (child.isSkinnedMesh) {
         console.log(`👤 Found skinned mesh: ${child.name} (parent: ${child.parent?.name})`)
-        child.castShadow = true
-        child.receiveShadow = true
+        child.castShadow = !isMobile
+        child.receiveShadow = !isMobile
 
         // Force proper material rendering
         if (child.material) {
@@ -255,7 +271,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     }
 
     console.log('✅ Main Campus setup complete')
-  }, [clonedScene])
+  }, [clonedScene, isMobile])
 
   // Dramatic flicker animation
   useFrame((state) => {
@@ -323,8 +339,8 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       setAnimationPhase('done')
     }
 
-    // Hover glow effect for buildings
-    if (hoveredBuilding && animationPhase === 'done') {
+    // Hover glow effect for buildings (desktop only)
+    if (hoveredBuilding && animationPhase === 'done' && !isMobile) {
       if (hoveredBuilding.material) {
         const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5
         hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * pulseIntensity
@@ -332,13 +348,25 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     }
   })
 
-  // Mouse handling
+  // Unified pointer/touch handling
   const handlePointerMove = (event) => {
     if (animationPhase !== 'done') return
+    if (isMobile) return  // Disable hover on mobile
 
     const rect = gl.domElement.getBoundingClientRect()
-    mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-    mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+
+    // Handle both mouse and touch
+    let clientX, clientY
+    if (event.touches && event.touches.length > 0) {
+      clientX = event.touches[0].clientX
+      clientY = event.touches[0].clientY
+    } else {
+      clientX = event.clientX
+      clientY = event.clientY
+    }
+
+    mouse.current.x = ((clientX - rect.left) / rect.width) * 2 - 1
+    mouse.current.y = -((clientY - rect.top) / rect.height) * 2 + 1
 
     raycaster.setFromCamera(mouse.current, camera)
 
@@ -381,32 +409,71 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     gl.domElement.style.cursor = 'default'
   }
 
+  // Touch-friendly click handler
   const handleClick = (event) => {
     if (animationPhase !== 'done') {
       return
     }
 
-    // Check if HOD or FC zone was clicked
-    if (hoveredBuilding === hodZoneRef.current || hoveredBuilding === fcZoneRef.current) {
-      console.log('🚀 Character zone clicked! Calling onHODClick')
-      if (onHODClick) {
-        onHODClick()
-      }
-      return
+    const rect = gl.domElement.getBoundingClientRect()
+
+    // Handle both mouse and touch
+    let clientX, clientY
+    if (event.changedTouches && event.changedTouches.length > 0) {
+      clientX = event.changedTouches[0].clientX
+      clientY = event.changedTouches[0].clientY
+    } else if (event.touches && event.touches.length > 0) {
+      clientX = event.touches[0].clientX
+      clientY = event.touches[0].clientY
+    } else {
+      clientX = event.clientX
+      clientY = event.clientY
     }
 
-    if (hoveredBuilding && hoveredBuilding.userData) {
-      const { route, action, buildingName } = hoveredBuilding.userData
+    touch.current.x = ((clientX - rect.left) / rect.width) * 2 - 1
+    touch.current.y = -((clientY - rect.top) / rect.height) * 2 + 1
 
-      if (action === 'hod') {
+    raycaster.setFromCamera(touch.current, camera)
+
+    // Check scene, HOD zone, and FC zone
+    const sceneIntersects = raycaster.intersectObject(clonedScene, true)
+    const hodZoneIntersects = hodZoneRef.current ? raycaster.intersectObject(hodZoneRef.current) : []
+    const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : []
+    const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects]
+
+    if (allIntersects.length > 0) {
+      const firstIntersect = allIntersects[0].object
+
+      // Check if HOD or FC zone was clicked
+      if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
+        console.log('🚀 Character zone clicked! Calling onHODClick')
         if (onHODClick) {
           onHODClick()
         }
-      } else if (route && route !== 'modal') {
-        navigate(route)
+        return
+      }
 
-        if (onBuildingClick) {
-          onBuildingClick(route)
+      // Otherwise check for clickable buildings
+      let clickableObject = firstIntersect
+
+      while (clickableObject && !clickableObject.userData.clickable) {
+        clickableObject = clickableObject.parent
+      }
+
+      if (clickableObject && clickableObject.userData.clickable) {
+        const { route, action, buildingName } = clickableObject.userData
+        console.log(`👆 Clicked: ${buildingName}`)
+
+        if (action === 'hod') {
+          if (onHODClick) {
+            onHODClick()
+          }
+        } else if (route && route !== 'modal') {
+          navigate(route)
+
+          if (onBuildingClick) {
+            onBuildingClick(route)
+          }
         }
       }
     }
@@ -436,29 +503,31 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           color="#aa00ff"
           distance={30}
           decay={0.3}
-          castShadow
+          castShadow={true}
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
         />
       )}
 
-      {/* The 3D Model */}
+      {/* The 3D Model - Touch and mouse events */}
       <primitive
         ref={groupRef}
         object={clonedScene}
         onPointerMove={handlePointerMove}
         onClick={handleClick}
+        onPointerDown={isMobile ? handleClick : undefined}
       />
 
-      {/* HOD Clickable Zone - FULLY INVISIBLE */}
+      {/* HOD Clickable Zone - LARGER on mobile for easier touching */}
       {hodCabinPosition && (
         <mesh
           ref={hodZoneRef}
           position={[hodCabinPosition.x - 0.2, hodCabinPosition.y + 0.4, hodCabinPosition.z]}
           onPointerMove={handlePointerMove}
           onClick={handleClick}
+          onPointerDown={isMobile ? handleClick : undefined}
         >
-          <boxGeometry args={[3.25, 2.3, 3.1]} />
+          <boxGeometry args={isMobile ? [4, 3, 4] : [3.25, 2.3, 3.1]} />
           <meshBasicMaterial
             transparent
             opacity={0}
@@ -468,15 +537,16 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         </mesh>
       )}
 
-      {/* FC Clickable Zone - FULLY INVISIBLE */}
+      {/* FC Clickable Zone - LARGER on mobile for easier touching */}
       {fcPosition && (
         <mesh
           ref={fcZoneRef}
           position={[fcPosition.x, fcPosition.y + 1, fcPosition.z]}
           onPointerMove={handlePointerMove}
           onClick={handleClick}
+          onPointerDown={isMobile ? handleClick : undefined}
         >
-          <boxGeometry args={[2, 3, 2]} />
+          <boxGeometry args={isMobile ? [2.5, 3.5, 2.5] : [2, 3, 2]} />
           <meshBasicMaterial
             transparent
             opacity={0}

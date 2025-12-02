@@ -1,26 +1,42 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { useGLTF, useTexture } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+
 
 export default function TeamsBuilding() {
     const groupRef = useRef()
+    const { gl } = useThree()
     const [lightPositions, setLightPositions] = useState([])
-    const [animationPhase, setAnimationPhase] = useState('boot') // boot, random-init, sync, complete, done
+    const [animationPhase, setAnimationPhase] = useState('boot')
     const animationStartTime = useRef(0)
     const lightRefs = useRef([])
     const emissiveMeshes = useRef([])
     const screenMeshes = useRef([])
     const activationSchedule = useRef([])
+    const [isMobile, setIsMobile] = useState(false)
 
     const { scene } = useGLTF('/models/towerss.glb')
     const acsesTexture = useTexture('/images/ACSES_Image.jpg')
 
     const clonedScene = React.useMemo(() => scene.clone(), [scene])
 
+    // Detect mobile device
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
+        }
+
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
     // Setup: Configure materials and emissive lighting
     useEffect(() => {
         console.log('🚀 Setting up Teams Building scene...')
+        console.log(`📱 Mobile device detected: ${isMobile}`)
 
         let lightsFound = 0
         let screensFound = 0
@@ -46,7 +62,7 @@ export default function TeamsBuilding() {
                     positions.push({
                         position: worldPos.clone(),
                         name: child.name,
-                        lightIndex: lightsFound - 1  // Store the index for matching with pointLight
+                        lightIndex: lightsFound - 1
                     })
 
                     if (child.material) {
@@ -56,17 +72,15 @@ export default function TeamsBuilding() {
                         child.material.toneMapped = false
                         child.material.needsUpdate = true
 
-                        // Store for animation
                         emissiveList.push({
                             mesh: child,
                             name: child.name,
-                            originalIntensity: 1,
+                            originalIntensity: 1.2,
                             currentIntensity: 0,
                             type: 'ceiling-light',
                             lightIndex: lightsFound - 1
                         })
 
-                        // Set to 0 initially
                         child.material.emissiveIntensity = 0
                     }
                 }
@@ -80,7 +94,6 @@ export default function TeamsBuilding() {
                     if (child.material) {
                         child.material = child.material.clone()
 
-                        // Clone the texture and apply rotation/mirror
                         const rotatedTexture = acsesTexture.clone()
                         rotatedTexture.center.set(0.5, 0.5)
                         rotatedTexture.rotation = Math.PI / 2
@@ -95,14 +108,12 @@ export default function TeamsBuilding() {
                         child.material.color = new THREE.Color('#000000')
                         child.material.needsUpdate = true
 
-                        // Store for animation
                         screenList.push({
                             mesh: child,
                             name: child.name,
                             originalIntensity: 10
                         })
 
-                        // Set to 0 initially
                         child.material.emissiveIntensity = 0
                     }
                 }
@@ -118,7 +129,6 @@ export default function TeamsBuilding() {
                         child.material.toneMapped = false
                         child.material.needsUpdate = true
 
-                        // Store for animation
                         emissiveList.push({
                             mesh: child,
                             name: child.name,
@@ -127,7 +137,6 @@ export default function TeamsBuilding() {
                             type: 'base'
                         })
 
-                        // Set to 0 initially
                         child.material.emissiveIntensity = 0
                     }
                 }
@@ -143,7 +152,7 @@ export default function TeamsBuilding() {
                     }
                 }
 
-                // Main Structure material - dark and moody
+                // Main Structure material - purple-cyan walls
                 if (child.material && child.material.name === 'Material.001') {
                     if (!mainStructureFixed) {
                         console.log(`✅ Main Structure material found`)
@@ -151,11 +160,11 @@ export default function TeamsBuilding() {
                     }
 
                     child.material = child.material.clone()
-                    child.material.metalness = 0.1
-                    child.material.roughness = 0.6
-                    child.material.color = new THREE.Color('#2a2a2a')
-                    child.material.emissive = new THREE.Color('#0a0a0a')
-                    child.material.emissiveIntensity = 0.15
+                    child.material.metalness = 0.3
+                    child.material.roughness = 0.4
+                    child.material.color = new THREE.Color('#3a2050')
+                    child.material.emissive = new THREE.Color('#1a0a30')
+                    child.material.emissiveIntensity = 0.25
                     child.material.needsUpdate = true
                 }
 
@@ -169,7 +178,6 @@ export default function TeamsBuilding() {
                         child.material.toneMapped = false
                         child.material.needsUpdate = true
 
-                        // Store for animation
                         emissiveList.push({
                             mesh: child,
                             name: child.name,
@@ -178,7 +186,6 @@ export default function TeamsBuilding() {
                             type: 'cyan-emissive'
                         })
 
-                        // Set to 0 initially
                         child.material.emissiveIntensity = 0
                     }
                 }
@@ -189,19 +196,18 @@ export default function TeamsBuilding() {
         emissiveMeshes.current = emissiveList
         screenMeshes.current = screenList
 
-        // Create random activation schedule for lights (2-3 lights at random intervals)
+        // Create random activation schedule for lights
         const schedule = []
         const lightIndices = emissiveList
             .map((item, index) => ({ index, type: item.type, lightIndex: item.lightIndex }))
             .filter(item => item.type === 'ceiling-light')
 
-        // Shuffle and create activation times
         const shuffled = [...lightIndices].sort(() => Math.random() - 0.5)
         shuffled.forEach((item, i) => {
             schedule.push({
                 index: item.index,
                 lightIndex: item.lightIndex,
-                activationTime: 0.2 + (i * 0.15) // Stagger by 0.15s each
+                activationTime: 0.2 + (i * 0.15)
             })
         })
 
@@ -212,7 +218,7 @@ export default function TeamsBuilding() {
         console.log(`   - Screens: ${screensFound}`)
         console.log(`   - Base platform: ${baseFound}`)
         console.log(`   - Animation schedule created: ${schedule.length} lights`)
-    }, [clonedScene, acsesTexture])
+    }, [clonedScene, acsesTexture, isMobile])
 
     // System Initialize Animation
     useFrame((state) => {
@@ -223,14 +229,12 @@ export default function TeamsBuilding() {
         const elapsed = state.clock.elapsedTime - animationStartTime.current
 
         if (animationPhase === 'boot') {
-            // Phase 1: Brief blackout (0.3s)
             if (elapsed > 0.3) {
                 console.log('💡 Starting random initialization...')
                 setAnimationPhase('random-init')
             }
         }
         else if (animationPhase === 'random-init') {
-            // Phase 2: Random lights turn on (0.3s - 2.0s)
             const initPhaseTime = elapsed - 0.3
 
             // Activate lights according to schedule
@@ -238,41 +242,37 @@ export default function TeamsBuilding() {
                 if (initPhaseTime >= activationTime) {
                     const light = emissiveMeshes.current[index]
                     if (light && light.mesh.material) {
-                        // Quick flicker effect
                         const timeSinceActivation = initPhaseTime - activationTime
                         if (timeSinceActivation < 0.1) {
-                            // Flicker
                             const flickerValue = Math.random() > 0.5 ? 1 : 0
                             light.mesh.material.emissiveIntensity = light.originalIntensity * flickerValue
 
-                            // Sync pointLight with mesh flicker
                             if (lightRefs.current[lightIndex]) {
-                                lightRefs.current[lightIndex].intensity = 100 * flickerValue
+                                // Reduce intensity for mobile
+                                const targetIntensity = isMobile ? 80 : 120
+                                lightRefs.current[lightIndex].intensity = targetIntensity * flickerValue
                             }
                         } else {
-                            // Stay on
                             light.mesh.material.emissiveIntensity = light.originalIntensity
 
-                            // PointLight stays on
                             if (lightRefs.current[lightIndex]) {
-                                lightRefs.current[lightIndex].intensity = 60
+                                const targetIntensity = isMobile ? 80 : 120
+                                lightRefs.current[lightIndex].intensity = targetIntensity
                             }
                         }
                     }
                 } else {
-                    // Not activated yet - ensure it's off
                     if (lightRefs.current[lightIndex]) {
                         lightRefs.current[lightIndex].intensity = 0
                     }
                 }
             })
 
-            // Activate screens randomly during this phase
+            // Activate screens
             if (initPhaseTime > 0.8 && initPhaseTime < 1.5) {
                 screenMeshes.current.forEach((screen, index) => {
                     const activationTime = 0.8 + (index * 0.1)
                     if (initPhaseTime >= activationTime && initPhaseTime < activationTime + 0.05) {
-                        // Quick flash
                         screen.mesh.material.emissiveIntensity = screen.originalIntensity
                     } else if (initPhaseTime >= activationTime + 0.05) {
                         screen.mesh.material.emissiveIntensity = screen.originalIntensity
@@ -288,29 +288,25 @@ export default function TeamsBuilding() {
             }
         }
         else if (animationPhase === 'sync') {
-            // Phase 3: Everything pulses together once (2.0s - 2.5s)
             const syncTime = elapsed - 2.3
             const pulseDuration = 0.5
 
             if (syncTime < pulseDuration) {
-                // Unified pulse: dim → bright → stable
                 const pulseIntensity = Math.sin((syncTime / pulseDuration) * Math.PI) * 0.3 + 0.7
 
-                // Apply to all emissive meshes
                 emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
                     if (mesh.material) {
                         mesh.material.emissiveIntensity = originalIntensity * pulseIntensity
                     }
                 })
 
-                // Apply to all point lights
+                const targetIntensity = isMobile ? 80 : 120
                 lightRefs.current.forEach((light) => {
                     if (light) {
-                        light.intensity = 100 * pulseIntensity
+                        light.intensity = targetIntensity * pulseIntensity
                     }
                 })
 
-                // Apply to screens
                 screenMeshes.current.forEach(({ mesh, originalIntensity }) => {
                     if (mesh.material) {
                         mesh.material.emissiveIntensity = originalIntensity * pulseIntensity
@@ -322,7 +318,6 @@ export default function TeamsBuilding() {
             }
         }
         else if (animationPhase === 'complete') {
-            // Phase 4: Restore exact values
             console.log('🔧 Restoring exact values...')
 
             emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
@@ -332,9 +327,10 @@ export default function TeamsBuilding() {
                 }
             })
 
+            const targetIntensity = isMobile ? 80 : 120
             lightRefs.current.forEach((light) => {
                 if (light) {
-                    light.intensity = 100
+                    light.intensity = targetIntensity
                 }
             })
 
@@ -352,7 +348,7 @@ export default function TeamsBuilding() {
 
     return (
         <>
-            {/* Ceiling point lights - NOW ANIMATED WITH MESHES */}
+            {/* Ceiling point lights - MOBILE RESPONSIVE */}
             {lightPositions.map((light, index) => (
                 <pointLight
                     key={`ceiling-light-${index}`}
@@ -362,24 +358,24 @@ export default function TeamsBuilding() {
                         light.position.y - 0.8,
                         light.position.z
                     ]}
-                    intensity={0}  // Start at 0, animated in useFrame
+                    intensity={0}
                     color="#eeccff"
-                    distance={30}
+                    distance={isMobile ? 25 : 30}
                     decay={1.8}
-                    castShadow
+                    castShadow={!isMobile}
                 />
             ))}
 
-            {/* Subtle ambient light */}
-            <ambientLight intensity={0.15} color="#0a0a1a" />
+            {/* Ambient light - increased for mobile */}
+            <ambientLight intensity={isMobile ? 0.2 : 0.15} color="#5540a0" />
 
-            {/* Top fill light */}
+            {/* Top fill light - adjusted for mobile */}
             <pointLight
                 position={[0, 50, 0]}
-                intensity={15}
-                color="#eeccff"
-                distance={10}
-                decay={2}
+                intensity={isMobile ? 12 : 20}
+                color="#ddbbff"
+                distance={isMobile ? 20 : 25}
+                decay={1.5}
             />
 
             {/* The 3D Model */}

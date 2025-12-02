@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
@@ -14,7 +14,6 @@ function SolidPurpleBackground() {
   const { scene } = useThree()
 
   React.useEffect(() => {
-    // Match the purple floor color exactly
     scene.background = new THREE.Color('#0a0514')
   }, [scene])
 
@@ -124,14 +123,25 @@ function CameraTracker({ onUpdate }) {
 
 
 // Main Campus Page Component
+// Main Campus Page Component
 function MainCampusPage() {
   const [currentScene, setCurrentScene] = useState('main-campus')
   const [cameraPos, setCameraPos] = useState({ x: '16.02', y: '9.71', z: '18.25' })
   const [distance, setDistance] = useState('27.74')
   const [showHODModal, setShowHODModal] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Detect mobile device
-  const isMobile = window.innerWidth <= 768
+  // Detect mobile device with resize listener
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleCameraUpdate = (pos, dist) => {
     setCameraPos(pos)
@@ -155,29 +165,23 @@ function MainCampusPage() {
           alpha: false
         }}
       >
-        {/* Solid purple background matching floor */}
         <SolidPurpleBackground />
-
-        {/* Fog for depth - same color as background */}
         <fog attach="fog" args={['#0a0514', 40, 80]} />
-
-        {/* Track camera position for debug overlay */}
         <CameraTracker onUpdate={handleCameraUpdate} />
 
-        {/* Lighting Setup - Enhanced for better visibility and shadows */}
-        <ambientLight intensity={1.2} color="#6080a0" />
+        {/* Lighting - adjusted for mobile */}
+        <ambientLight intensity={isMobile ? 1.4 : 1.2} color="#6080a0" />
 
         <hemisphereLight
           skyColor="#4060ff"
           groundColor="#2a1a3e"
-          intensity={0.8}
+          intensity={isMobile ? 1.0 : 0.8}
         />
 
-        {/* Main directional light with enhanced shadow quality */}
         <directionalLight
           position={[15, 25, 15]}
-          intensity={2.0}
-          castShadow
+          intensity={isMobile ? 1.5 : 2.0}
+          castShadow={!isMobile}
           shadow-mapSize-width={4096}
           shadow-mapSize-height={4096}
           shadow-camera-left={-50}
@@ -189,25 +193,23 @@ function MainCampusPage() {
           shadow-bias={-0.0001}
         />
 
-        {/* Fill lights for better overall illumination */}
         <pointLight
           position={[-15, 15, 10]}
-          intensity={8}
+          intensity={isMobile ? 6 : 8}
           color="#4080ff"
-          castShadow
+          castShadow={!isMobile}
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
         <pointLight
           position={[15, 12, -10]}
-          intensity={6}
+          intensity={isMobile ? 4 : 6}
           color="#8060ff"
-          castShadow
+          castShadow={!isMobile}
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
 
-        {/* Scene */}
         <MainCampus
           onBuildingClick={(building) => {
             setCurrentScene(building)
@@ -217,7 +219,6 @@ function MainCampusPage() {
           }}
         />
 
-        {/* OrbitControls - Minimal movement, no azimuth constraints to prevent camera shift */}
         <OrbitControls
           target={[1.2, 4, 0]}
           enablePan={true}
@@ -227,26 +228,25 @@ function MainCampusPage() {
           maxDistance={isMobile ? 60 : 24.5}
           maxPolarAngle={Math.PI / 2.3}
           minPolarAngle={Math.PI / 3.5}
-          panSpeed={0.2}
-          rotateSpeed={0.25}
-          zoomSpeed={0.3}
+          panSpeed={isMobile ? 0.3 : 0.2}
+          rotateSpeed={isMobile ? 0.35 : 0.25}
+          zoomSpeed={isMobile ? 0.4 : 0.3}
           enableDamping={true}
           dampingFactor={0.1}
         />
 
-        {/* Post-processing for Enhanced Neon Glow */}
+        {/* Post-processing for Enhanced Neon Glow - MOBILE BLOOM ENABLED */}
         <EffectComposer>
           <Bloom
-            intensity={0.3}
-            luminanceThreshold={0.95}
+            intensity={isMobile ? 0.35 : 0.3}  // ✅ Increased from 0.25 to 0.35
+            luminanceThreshold={isMobile ? 0.6 : 0.95}  // ✅ Lower threshold = more glow
             luminanceSmoothing={0.5}
-            radius={0.5}
+            radius={isMobile ? 0.6 : 0.5}  // ✅ Increased from 0.4 to 0.6
           />
         </EffectComposer>
 
       </Canvas>
 
-      {/* UI Overlays - OUTSIDE Canvas */}
       <div className="ui-overlay">
         <h1>ACSES</h1>
         <p className="subtitle">Association of Computer Science & Engineering Students</p>
@@ -262,9 +262,8 @@ function MainCampusPage() {
       </div>
 
       {/* Camera Debug Panel - Hidden for production */}
-      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
 
-      {/* HOD Modal - Rendered OUTSIDE Canvas */}
       {showHODModal && (
         <HODModal onClose={() => {
           setShowHODModal(false)
@@ -275,10 +274,23 @@ function MainCampusPage() {
 }
 
 
-// Teams Building Page Component
+// Teams Building Page Component - MOBILE RESPONSIVE
 function TeamsBuildingPage() {
   const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' })
   const [distance, setDistance] = useState('10.00')
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile device with resize listener
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleCameraUpdate = (pos, dist) => {
     setCameraPos(pos)
@@ -289,108 +301,123 @@ function TeamsBuildingPage() {
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
         camera={{
-          position: [67.63, 33.55, 42.28],
-          fov: 50,
+          // Mobile: Farther back for better view
+          position: isMobile ? [80, 40, 50] : [67.63, 33.55, 42.28],
+          fov: isMobile ? 60 : 50,
           near: 0.1,
           far: 1000
         }}
         gl={{
-          antialias: true,
+          antialias: !isMobile,
           toneMapping: 0,
           toneMappingExposure: 1,
           outputColorSpace: THREE.SRGBColorSpace,
-          alpha: false
+          alpha: false,
+          powerPreference: isMobile ? 'low-power' : 'high-performance'
         }}
       >
-        {/* Solid background for Teams Building */}
         <SolidPurpleBackground />
-
-        {/* Fog for Teams Building */}
-        <fog attach="fog" args={['#0a0a1a', 50, 120]} />
-
-        {/* Track camera position for debug overlay */}
+        <fog attach="fog" args={['#0a0a1a', isMobile ? 60 : 50, isMobile ? 140 : 120]} />
         <CameraTracker onUpdate={handleCameraUpdate} />
 
-        {/* Minimal ambient - let ceiling lights do the work */}
-        <ambientLight intensity={0.1} color="#0a0a1a" />
+        {/* Ambient light - increased for mobile */}
+        <ambientLight intensity={isMobile ? 0.2 : 0.1} color="#0a0a1a" />
 
-        {/* Very subtle fill light */}
+        {/* Fill light - adjusted for mobile */}
         <directionalLight
           position={[10, 20, 10]}
-          intensity={0.3}
+          intensity={isMobile ? 0.5 : 0.3}
           color="#ffffff"
         />
 
-        {/* Scene */}
         <TeamsBuilding />
 
-        {/* OrbitControls */}
         <OrbitControls
           target={[0, 17, -31]}
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={30}
-          maxDistance={100}
+          minDistance={isMobile ? 100 : 30}
+          maxDistance={isMobile ? 110 : 100}
+          maxPolarAngle={isMobile ? Math.PI / 2 : Math.PI}
+          minPolarAngle={isMobile ? Math.PI / 6 : 0}
           enableDamping={true}
           dampingFactor={0.1}
-          panSpeed={0.3}
-          rotateSpeed={0.3}
-          zoomSpeed={0.4}
+          panSpeed={isMobile ? 0.4 : 0.3}
+          rotateSpeed={isMobile ? 0.4 : 0.3}
+          zoomSpeed={isMobile ? 0.5 : 0.4}
         />
 
-        {/* Post-processing for Neon Glow - MATCHED to Main Campus */}
         <EffectComposer>
           <Bloom
-            intensity={2}
+            intensity={isMobile ? 1.5 : 2}
             luminanceThreshold={0.9}
             luminanceSmoothing={0.7}
-            radius={0.8}
+            radius={isMobile ? 0.6 : 0.8}
           />
         </EffectComposer>
       </Canvas>
 
-      {/* UI Overlays - MATCHED to Main Campus style */}
       <div className="ui-overlay">
         <h1>TEAMS</h1>
         <p className="subtitle" style={{ padding: '10px' }}>Meet Our Amazing Teams</p>
 
-        {/* Back button - Small, left-aligned */}
         <button
           className="back-button"
           onClick={() => window.location.href = '/'}
           style={{
             position: 'fixed',
-            top: '20px',
-            left: '20px',
-            padding: '8px 16px',
+            top: isMobile ? '10px' : '20px',
+            left: isMobile ? '10px' : '20px',
+            padding: isMobile ? '10px' : '8px 16px',
             background: 'rgba(255, 0, 255, 0.2)',
             border: '2px solid #ff00ff',
             color: '#ff00ff',
-            fontSize: '12px',
+            fontSize: isMobile ? '16px' : '12px',
             fontWeight: '600',
-            borderRadius: '6px',
+            borderRadius: isMobile ? '50%' : '6px',
+            width: isMobile ? '40px' : 'auto',
+            height: isMobile ? '40px' : 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             cursor: 'pointer',
             backdropFilter: 'blur(10px)',
             transition: 'all 0.3s ease',
-            letterSpacing: '1px',
+            letterSpacing: isMobile ? '0' : '1px',
             textShadow: '0 0 10px rgba(255, 0, 255, 0.5)',
             pointerEvents: 'auto',
-            zIndex: 1000
+            zIndex: 1000,
+            touchAction: 'manipulation',
+            WebkitTapHighlightColor: 'transparent'
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(255, 0, 255, 0.4)'
-            e.target.style.transform = 'scale(1.05)'
+            if (!isMobile) {
+              e.target.style.background = 'rgba(255, 0, 255, 0.4)'
+              e.target.style.transform = 'scale(1.05)'
+            }
           }}
           onMouseLeave={(e) => {
+            if (!isMobile) {
+              e.target.style.background = 'rgba(255, 0, 255, 0.2)'
+              e.target.style.transform = 'scale(1)'
+            }
+          }}
+          onTouchStart={(e) => {
+            e.target.style.background = 'rgba(255, 0, 255, 0.4)'
+            e.target.style.transform = 'scale(0.9)'
+          }}
+          onTouchEnd={(e) => {
             e.target.style.background = 'rgba(255, 0, 255, 0.2)'
             e.target.style.transform = 'scale(1)'
           }}
         >
-          ← Back to Campus
+          {isMobile ? '←' : '← Back to Campus'}
         </button>
-
       </div>
+
+      {/* Camera Debug Panel - Hidden for production */}
+      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
     </div>
   )
 }
@@ -429,7 +456,6 @@ function HODModal({ onClose }) {
         boxShadow: '0 0 40px rgba(255, 0, 255, 0.5)',
         position: 'relative'
       }}>
-        {/* Close Button */}
         <button
           onClick={onClose}
           style={{
@@ -461,7 +487,6 @@ function HODModal({ onClose }) {
           ×
         </button>
 
-        {/* Title */}
         <h2 style={{
           color: '#ff00ff',
           fontSize: '32px',
@@ -472,7 +497,6 @@ function HODModal({ onClose }) {
           HOD CABIN
         </h2>
 
-        {/* HOD Info */}
         <div style={{
           marginBottom: '30px',
           padding: '20px',
@@ -509,7 +533,6 @@ function HODModal({ onClose }) {
           </p>
         </div>
 
-        {/* Faculty Coordinator Info */}
         <div style={{
           padding: '20px',
           background: 'rgba(0, 255, 255, 0.1)',
