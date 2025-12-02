@@ -18,6 +18,7 @@ export default function TeamsBuilding() {
         let lightsFound = 0
         let screensFound = 0
         let baseFound = false
+        let mainStructureFixed = false
         const positions = []
 
         clonedScene.traverse((child) => {
@@ -25,16 +26,12 @@ export default function TeamsBuilding() {
                 child.castShadow = true
                 child.receiveShadow = true
 
-                // Log all mesh names for debugging
-                console.log(`Mesh found: ${child.name}`)
+                const meshNameLower = child.name.toLowerCase()
 
-                // Ceiling lights - pattern: Light_11, Light_12, Light_21, etc. (capital L)
-                // These should glow white/bright and emit light
+                // Ceiling lights - pattern: Light_11, Light_12, Light_21, etc.
                 if (child.name.startsWith('Light_')) {
                     lightsFound++
-                    console.log(`✅ Ceiling light found: ${child.name}`)
 
-                    // Get world position for point light
                     const worldPos = new THREE.Vector3()
                     child.getWorldPosition(worldPos)
                     positions.push({
@@ -42,79 +39,90 @@ export default function TeamsBuilding() {
                         name: child.name
                     })
 
-                    // Clone material for unique emissive properties
                     if (child.material) {
                         child.material = child.material.clone()
                         child.material.emissive = new THREE.Color('#ffffff')
+                        child.material.emissiveIntensity = 1
+                        child.material.toneMapped = false
+                        child.material.needsUpdate = true
+                    }
+                }
+
+                // Screens with ACSES texture
+                const screenPatterns = ['screen', 'monitor', 'display', 'panel']
+
+                if (screenPatterns.some(pattern => meshNameLower.includes(pattern))) {
+                    screensFound++
+
+                    if (child.material) {
+                        child.material = child.material.clone()
+
+                        // Clone the texture and apply rotation/mirror
+                        const rotatedTexture = acsesTexture.clone()
+                        rotatedTexture.center.set(0.5, 0.5)
+                        rotatedTexture.rotation = Math.PI / 2
+                        rotatedTexture.repeat.set(-1, 1)
+                        rotatedTexture.needsUpdate = true
+
+                        child.material.map = rotatedTexture
+                        child.material.emissive = new THREE.Color('#00ffff')
+                        child.material.emissiveIntensity = 10
+                        child.material.emissiveMap = rotatedTexture.clone()
+                        child.material.toneMapped = false
+                        child.material.color = new THREE.Color('#000000')
+                        child.material.needsUpdate = true
+                    }
+                }
+
+                // Middle Cyan Base platform
+                if (child.name === 'Middle_Cyan_Base' || meshNameLower.includes('middle_cyan_base')) {
+                    baseFound = true
+
+                    if (child.material) {
+                        child.material = child.material.clone()
+                        child.material.emissive = new THREE.Color('#00ffff')
                         child.material.emissiveIntensity = 2
                         child.material.toneMapped = false
                         child.material.needsUpdate = true
                     }
                 }
 
-                // Screens - look for screen/monitor meshes
-                // Apply ACSES image texture instead of just cyan glow
-                const screenPatterns = ['screen', 'monitor', 'display', 'panel']
-                const meshNameLower = child.name.toLowerCase()
-
-                if (screenPatterns.some(pattern => meshNameLower.includes(pattern))) {
-                    screensFound++
-                    console.log(`✅ Screen found: ${child.name}`)
-
+                // Upper Black Base - subtle white glow
+                if (child.name === 'Upper_Black_Base') {
                     if (child.material) {
                         child.material = child.material.clone()
-
-                        // Apply ACSES image as texture with more glow
-                        child.material.map = acsesTexture
-                        child.material.emissive = new THREE.Color('#00ffff')
-                        child.material.emissiveIntensity = 5
-                        child.material.emissiveMap = acsesTexture
+                        child.material.emissive = new THREE.Color('#ffffff')
+                        child.material.emissiveIntensity = 0.003
                         child.material.toneMapped = false
                         child.material.needsUpdate = true
                     }
                 }
 
-                // Base platform - specifically named 'Middle_Cyan_Base'
-                if (child.name === 'Middle_Cyan_Base' || meshNameLower.includes('middle_cyan_base')) {
-                    baseFound = true
-                    console.log(`✅ Base platform found: ${child.name}`)
-
-                    if (child.material) {
-                        child.material = child.material.clone()
-                        child.material.emissive = new THREE.Color('#00ffff')
-                        child.material.emissiveIntensity = 100
-                        child.material.needsUpdate = true
+                // Main Structure material - dark and moody
+                if (child.material && child.material.name === 'Material.001') {
+                    if (!mainStructureFixed) {
+                        console.log(`✅ Main Structure material found`)
+                        mainStructureFixed = true
                     }
+
+                    child.material = child.material.clone()
+                    child.material.metalness = 0.1
+                    child.material.roughness = 0.6
+                    child.material.color = new THREE.Color('#2a2a2a')
+                    child.material.emissive = new THREE.Color('#0a0a0a')
+                    child.material.emissiveIntensity = 0.15
+                    child.material.needsUpdate = true
                 }
 
-                // Main_Structure - make it highly receptive to light
-                // So it glows/illuminates when ceiling lights shine on it
-                if (child.name === 'Main_Structure' || meshNameLower.includes('main_structure')) {
-                    console.log(`✅ Main Structure found: ${child.name}`)
-
-                    if (child.material) {
-                        child.material = child.material.clone()
-                        // Make it more reflective and receptive to light
-                        child.material.metalness = 0.3
-                        child.material.roughness = 0.4
-                        child.material.envMapIntensity = 1.5
-                        // Add slight emissive to make it glow
-                        child.material.emissive = new THREE.Color('#ffffff')
-                        child.material.emissiveIntensity = 0.1
-                        child.material.needsUpdate = true
-                    }
-                }
-
-                // Check for existing emissive materials (from Blender)
+                // Boost existing cyan emissive materials
                 if (child.material && child.material.emissive) {
                     const emissiveHex = child.material.emissive.getHex()
 
-                    // If it has cyan emissive (0x00ffff), boost it
                     if (emissiveHex === 0x00ffff) {
                         child.material = child.material.clone()
-                        child.material.emissiveIntensity = 5
+                        child.material.emissiveIntensity = 1.25
                         child.material.toneMapped = false
-                        console.log(`Boosted cyan emissive for: ${child.name}`)
+                        child.material.needsUpdate = true
                     }
                 }
             }
@@ -122,29 +130,42 @@ export default function TeamsBuilding() {
 
         setLightPositions(positions)
 
-        console.log(`✅ Teams Building setup complete`)
-        console.log(`   - Ceiling lights found: ${lightsFound}`)
-        console.log(`   - Screens found: ${screensFound}`)
-        console.log(`   - Base platform found: ${baseFound}`)
+        // console.log(`✅ Teams Building setup complete`)
+        // console.log(`   - Ceiling lights: ${lightsFound}`)
+        // console.log(`   - Screens: ${screensFound}`)
+        // console.log(`   - Base platform: ${baseFound}`)
     }, [clonedScene, acsesTexture])
 
     return (
         <>
-            {/* Point lights for ceiling lights - emit actual light */}
+            {/* Ceiling point lights - YOUR PERFECT VALUES */}
             {lightPositions.map((light, index) => (
                 <pointLight
                     key={`ceiling-light-${index}`}
                     position={[
                         light.position.x,
-                        light.position.y - 0.5,  // Slightly below the light mesh
+                        light.position.y - 0.8,
                         light.position.z
                     ]}
-                    intensity={8}
+                    intensity={100}
                     color="#ffffff"
-                    distance={10}
-                    decay={2}
+                    distance={30}
+                    decay={1.8}
+                    castShadow
                 />
             ))}
+
+            {/* Subtle ambient light */}
+            <ambientLight intensity={0.15} color="#0a0a1a" />
+
+            {/* Top fill light */}
+            <pointLight
+                position={[0, 50, 0]}
+                intensity={15}
+                color="#ffffff"
+                distance={10}
+                decay={2}
+            />
 
             {/* The 3D Model */}
             <primitive

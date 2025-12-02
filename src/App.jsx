@@ -251,6 +251,7 @@ function MainCampusPage() {
 
 
 // Teams Building Page Component
+// Teams Building Page Component
 function TeamsBuildingPage() {
   const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' })
   const [distance, setDistance] = useState('10.00')
@@ -264,7 +265,7 @@ function TeamsBuildingPage() {
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
         camera={{
-          position: [67.63, 33.55, 42.28],  // Initial position - adjust with camera debug
+          position: [67.63, 33.55, 42.28],
           fov: 50,
           near: 0.1,
           far: 1000
@@ -278,15 +279,14 @@ function TeamsBuildingPage() {
         {/* Track camera position for debug overlay */}
         <CameraTracker onUpdate={handleCameraUpdate} />
 
-        {/* Basic Lighting - Will enhance later */}
-        <ambientLight intensity={1.0} color="#ffffff" castShadow />
+        {/* Minimal ambient - let ceiling lights do the work */}
+        <ambientLight intensity={0.1} color="#0a0a1a" />
 
+        {/* Very subtle fill light */}
         <directionalLight
           position={[10, 20, 10]}
-          intensity={1.5}
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
+          intensity={0.3}
+          color="#ffffff"
         />
 
         {/* Scene */}
@@ -298,31 +298,75 @@ function TeamsBuildingPage() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={5}
-          maxDistance={150}
+          minDistance={30}
+          maxDistance={100}
+          // Smooth controls like Main Campus
+          enableDamping={true}
+          dampingFactor={0.1}
+          panSpeed={0.3}
+          rotateSpeed={0.3}
+          zoomSpeed={0.4}
         />
 
-        {/* Post-processing for Neon Glow */}
+        {/* Post-processing for Neon Glow - MATCHED to Main Campus */}
         <EffectComposer>
           <Bloom
-            intensity={1.5}
-            luminanceThreshold={0.7}
-            luminanceSmoothing={0.6}
-            radius={0.6}
+            intensity={2}              // Match Main Campus
+            luminanceThreshold={0.9}   // Match Main Campus
+            luminanceSmoothing={0.7}   // Match Main Campus
+            radius={0.8}               // Match Main Campus
           />
         </EffectComposer>
       </Canvas>
 
-      {/* UI Overlays */}
+      {/* UI Overlays - MATCHED to Main Campus style */}
       <div className="ui-overlay">
         <h1>TEAMS</h1>
+        <p className="subtitle" style={{ padding: '10px' }}>Meet Our Amazing Teams</p>
+
+        {/* Back button - Small, left-aligned */}
+        <button
+          className="back-button"
+          onClick={() => window.location.href = '/'}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '20px',  // Changed from right to left
+            padding: '8px 16px',  // Smaller padding
+            background: 'rgba(255, 0, 255, 0.2)',
+            border: '2px solid #ff00ff',
+            color: '#ff00ff',
+            fontSize: '12px',  // Smaller font
+            fontWeight: '600',
+            borderRadius: '6px',  // Slightly smaller radius
+            cursor: 'pointer',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease',
+            letterSpacing: '1px',
+            textShadow: '0 0 10px rgba(255, 0, 255, 0.5)',
+            pointerEvents: 'auto',
+            zIndex: 1000
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'rgba(255, 0, 255, 0.4)'
+            e.target.style.transform = 'scale(1.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'rgba(255, 0, 255, 0.2)'
+            e.target.style.transform = 'scale(1)'
+          }}
+        >
+          ← Back to Campus
+        </button>
+
       </div>
 
-      {/* Camera Debug Panel - ENABLED for finding camera position */}
-      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+      {/* Camera Debug Panel - DISABLED for production */}
+      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
     </div>
   )
 }
+
 
 
 // Main App Component with Routing

@@ -196,7 +196,7 @@ export default function MainCampus({ onBuildingClick }) {
             billboardPosition.y + 3,
             billboardPosition.z + 2
           ]}
-          intensity={30}  // Increased to complement the enhanced billboard glow
+          intensity={25}  // Increased to complement the enhanced billboard glow
           color="#aa00ff"
           distance={30}
           decay={0.3}
