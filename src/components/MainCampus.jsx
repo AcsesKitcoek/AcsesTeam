@@ -33,7 +33,7 @@ export default function MainCampus({ onBuildingClick }) {
 
         // Check if THIS is the Billboard_plane
         if (child.name === 'Billboard_plane') {
-          console.log('✅ Billboard_plane found!')
+          // console.log('✅ Billboard_plane found!')
           billboardFound = true
 
           // Get world position for point light
@@ -54,7 +54,7 @@ export default function MainCampus({ onBuildingClick }) {
             child.material.opacity = 0.95  // Slight transparency for softer glow
             child.material.side = THREE.DoubleSide  // Visible from both sides
             child.material.needsUpdate = true
-            console.log('✅ Billboard material enhanced with bloom glow effect')
+            // console.log('✅ Billboard material enhanced with bloom glow effect')
           }
         }
         // For ALL other purple/cyan screens - adjust emissive for bloom effects
@@ -62,11 +62,11 @@ export default function MainCampus({ onBuildingClick }) {
           const emissiveHex = child.material.emissive.getHex()
 
           // DEBUG: Log all emissive materials to see what we're working with
-          if (emissiveHex !== 0x000000) {  // If it has any emissive color
-            console.log(`🔍 Found emissive material: ${child.name}`)
-            console.log(`   Emissive color (hex): 0x${emissiveHex.toString(16).padStart(6, '0')}`)
-            console.log(`   Current intensity: ${child.material.emissiveIntensity}`)
-          }
+          // if (emissiveHex !== 0x000000) {  // If it has any emissive color
+          //   console.log(`🔍 Found emissive material: ${child.name}`)
+          //   console.log(`   Emissive color (hex): 0x${emissiveHex.toString(16).padStart(6, '0')}`)
+          //   console.log(`   Current intensity: ${child.material.emissiveIntensity}`)
+          // }
 
           // If it's cyan (actual color from model: 0x00e5ff) - subtle bloom effect
           if (emissiveHex === 0x00e5ff || emissiveHex === 0x00ffff) {
@@ -74,14 +74,14 @@ export default function MainCampus({ onBuildingClick }) {
             child.material.emissiveIntensity = 1.7  // Increased for visible bloom
             child.material.toneMapped = false  // Allow bloom to pick it up
             child.material.needsUpdate = true
-            console.log(`✅ ${child.name} - cyan with subtle bloom (intensity: 4.5)`)
+            // console.log(`✅ ${child.name} - cyan with subtle bloom (intensity: 4.5)`)
           }
           // If it's purple/magenta - keep current settings
           else if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff) {
             child.material = child.material.clone()
             child.material.emissiveIntensity = 5  // Higher for visibility
             child.material.toneMapped = true
-            console.log(`✅ ${child.name} - purple emissive to 5`)
+            // console.log(`✅ ${child.name} - purple emissive to 5`)
           }
         }
 
@@ -97,7 +97,7 @@ export default function MainCampus({ onBuildingClick }) {
           if (child.name.toLowerCase().includes(name.toLowerCase())) {
             child.userData.clickable = true
             child.userData.buildingType = name.toLowerCase().replace('_', '-')
-            console.log(`✅ Made ${child.name} clickable as ${child.userData.buildingType}`)
+            // console.log(`✅ Made ${child.name} clickable as ${child.userData.buildingType}`)
           }
         })
       }
@@ -106,7 +106,7 @@ export default function MainCampus({ onBuildingClick }) {
     if (!billboardFound) {
       console.warn('⚠️ Billboard_plane not found! Check object name in Blender.')
       // Log all mesh names for debugging
-      console.log('Available mesh names:')
+      // console.log('Available mesh names:')
       clonedScene.traverse((child) => {
         if (child.isMesh) console.log(`  - ${child.name}`)
       })
@@ -144,7 +144,7 @@ export default function MainCampus({ onBuildingClick }) {
 
   const handleClick = (event) => {
     if (hoveredBuilding && hoveredBuilding.userData.buildingType) {
-      console.log('Building clicked:', hoveredBuilding.userData.buildingType)
+      // console.log('Building clicked:', hoveredBuilding.userData.buildingType)
 
       const buildingMap = {
         'event-gallery': 'event-gallery',

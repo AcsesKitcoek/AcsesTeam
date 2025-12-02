@@ -190,7 +190,7 @@ function MainCampusPage() {
 
         {/* Scene */}
         <MainCampus onBuildingClick={(building) => {
-          console.log('Building clicked:', building)
+          // console.log('Building clicked:', building)
           setCurrentScene(building)
         }} />
 
