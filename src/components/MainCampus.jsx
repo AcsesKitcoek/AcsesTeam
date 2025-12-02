@@ -59,8 +59,8 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
   // Setup: Find Billboard, emissive meshes, armatures, and make buildings clickable
   useEffect(() => {
-    console.log('🚀 Setting up Main Campus scene...')
-    console.log(`📱 Mobile device detected: ${isMobile}`)
+    // console.log('🚀 Setting up Main Campus scene...')
+    // console.log(`📱 Mobile device detected: ${isMobile}`)
 
     let billboardFound = false
     const emissiveMeshesList = []
@@ -160,7 +160,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       // Handle SKINNED MESHES (armature characters)
       if (child.isSkinnedMesh) {
-        console.log(`👤 Found skinned mesh: ${child.name} (parent: ${child.parent?.name})`)
+        // console.log(`👤 Found skinned mesh: ${child.name} (parent: ${child.parent?.name})`)
         child.castShadow = !isMobile
         child.receiveShadow = !isMobile
 
@@ -191,7 +191,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           child.userData.buildingName = 'HOD_character'
           hodPositions.push(worldPos)
           hodArmatureFound = true
-          console.log(`✅ Made HOD skinned mesh ${child.name} clickable`)
+          // console.log(`✅ Made HOD skinned mesh ${child.name} clickable`)
         } else if (parentName.includes('FC')) {
           // FC character
           child.userData.clickable = true
@@ -200,7 +200,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           child.userData.buildingName = 'FC_character'
           fcPositions.push(worldPos)
           fcArmatureFound = true
-          console.log(`✅ Made FC skinned mesh ${child.name} clickable`)
+          // console.log(`✅ Made FC skinned mesh ${child.name} clickable`)
         }
       }
 
@@ -214,11 +214,11 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         if (child.name === 'HOD' || child.name.includes('man_in_suit001')) {
           hodPositions.push(worldPos)
           hodArmatureFound = true
-          console.log(`🎯 Found HOD armature at`, worldPos)
+          // console.log(`🎯 Found HOD armature at`, worldPos)
         } else if (child.name === 'FC' || child.name.includes('FC')) {
           fcPositions.push(worldPos)
           fcArmatureFound = true
-          console.log(`🎯 Found FC armature at`, worldPos)
+          // console.log(`🎯 Found FC armature at`, worldPos)
         }
       }
     })
@@ -234,7 +234,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       avgPos.divideScalar(hodPositions.length)
       setHodCabinPosition(avgPos)
-      console.log('🎯 HOD zone center position:', avgPos)
+      // console.log('🎯 HOD zone center position:', avgPos)
     }
 
     // Calculate average position for FC clickable zone
@@ -248,7 +248,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       avgPos.divideScalar(fcPositions.length)
       setFcPosition(avgPos)
-      console.log('🎯 FC zone center position:', avgPos)
+      // console.log('🎯 FC zone center position:', avgPos)
     }
 
     emissiveMeshes.current = emissiveMeshesList
@@ -270,7 +270,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       console.warn('⚠️ No FC armature found!')
     }
 
-    console.log('✅ Main Campus setup complete')
+    // console.log('✅ Main Campus setup complete')
   }, [clonedScene, isMobile])
 
   // Dramatic flicker animation
@@ -446,7 +446,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       // Check if HOD or FC zone was clicked
       if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
-        console.log('🚀 Character zone clicked! Calling onHODClick')
+        // console.log('🚀 Character zone clicked! Calling onHODClick') 
         if (onHODClick) {
           onHODClick()
         }
@@ -462,7 +462,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       if (clickableObject && clickableObject.userData.clickable) {
         const { route, action, buildingName } = clickableObject.userData
-        console.log(`👆 Clicked: ${buildingName}`)
+        // console.log(`👆 Clicked: ${buildingName}`)
 
         if (action === 'hod') {
           if (onHODClick) {

@@ -35,8 +35,8 @@ export default function TeamsBuilding() {
 
     // Setup: Configure materials and emissive lighting
     useEffect(() => {
-        console.log('🚀 Setting up Teams Building scene...')
-        console.log(`📱 Mobile device detected: ${isMobile}`)
+        // console.log('🚀 Setting up Teams Building scene...')
+        // console.log(`📱 Mobile device detected: ${isMobile}`)
 
         let lightsFound = 0
         let screensFound = 0
@@ -155,7 +155,7 @@ export default function TeamsBuilding() {
                 // Main Structure material - purple-cyan walls
                 if (child.material && child.material.name === 'Material.001') {
                     if (!mainStructureFixed) {
-                        console.log(`✅ Main Structure material found`)
+                        // console.log(`✅ Main Structure material found`)
                         mainStructureFixed = true
                     }
 
@@ -213,11 +213,11 @@ export default function TeamsBuilding() {
 
         activationSchedule.current = schedule
 
-        console.log(`✅ Teams Building setup complete`)
-        console.log(`   - Ceiling lights: ${lightsFound}`)
-        console.log(`   - Screens: ${screensFound}`)
-        console.log(`   - Base platform: ${baseFound}`)
-        console.log(`   - Animation schedule created: ${schedule.length} lights`)
+        // console.log(`✅ Teams Building setup complete`)
+        // console.log(`   - Ceiling lights: ${lightsFound}`)
+        // console.log(`   - Screens: ${screensFound}`)
+        // console.log(`   - Base platform: ${baseFound}`)
+        // console.log(`   - Animation schedule created: ${schedule.length} lights`)
     }, [clonedScene, acsesTexture, isMobile])
 
     // System Initialize Animation
@@ -230,7 +230,7 @@ export default function TeamsBuilding() {
 
         if (animationPhase === 'boot') {
             if (elapsed > 0.3) {
-                console.log('💡 Starting random initialization...')
+                // console.log('💡 Starting random initialization...')
                 setAnimationPhase('random-init')
             }
         }
@@ -283,7 +283,7 @@ export default function TeamsBuilding() {
             }
 
             if (initPhaseTime > 2.0) {
-                console.log('🔄 Synchronizing all systems...')
+                // console.log('🔄 Synchronizing all systems...')
                 setAnimationPhase('sync')
             }
         }
@@ -313,12 +313,12 @@ export default function TeamsBuilding() {
                     }
                 })
             } else {
-                console.log('✨ Sync complete, finalizing...')
+                // console.log('✨ Sync complete, finalizing...')
                 setAnimationPhase('complete')
             }
         }
         else if (animationPhase === 'complete') {
-            console.log('🔧 Restoring exact values...')
+            // console.log('🔧 Restoring exact values...')
 
             emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
                 if (mesh.material) {
@@ -341,7 +341,7 @@ export default function TeamsBuilding() {
                 }
             })
 
-            console.log('🎉 System initialization complete!')
+            // console.log('🎉 System initialization complete!')
             setAnimationPhase('done')
         }
     })
