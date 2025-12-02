@@ -51,8 +51,8 @@ export default function TeamsBuilding() {
 
                     if (child.material) {
                         child.material = child.material.clone()
-                        child.material.emissive = new THREE.Color('#ffffff')
-                        child.material.emissiveIntensity = 1
+                        child.material.emissive = new THREE.Color('#eeccff')
+                        child.material.emissiveIntensity = 1.2
                         child.material.toneMapped = false
                         child.material.needsUpdate = true
 
@@ -255,7 +255,7 @@ export default function TeamsBuilding() {
 
                             // PointLight stays on
                             if (lightRefs.current[lightIndex]) {
-                                lightRefs.current[lightIndex].intensity = 100
+                                lightRefs.current[lightIndex].intensity = 60
                             }
                         }
                     }
@@ -363,7 +363,7 @@ export default function TeamsBuilding() {
                         light.position.z
                     ]}
                     intensity={0}  // Start at 0, animated in useFrame
-                    color="#ffffff"
+                    color="#eeccff"
                     distance={30}
                     decay={1.8}
                     castShadow
@@ -377,7 +377,7 @@ export default function TeamsBuilding() {
             <pointLight
                 position={[0, 50, 0]}
                 intensity={15}
-                color="#ffffff"
+                color="#eeccff"
                 distance={10}
                 decay={2}
             />

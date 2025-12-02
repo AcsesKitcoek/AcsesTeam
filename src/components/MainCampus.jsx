@@ -4,9 +4,11 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
 
-export default function MainCampus({ onBuildingClick }) {
+export default function MainCampus({ onBuildingClick, onHODClick }) {
   const groupRef = useRef()
   const billboardLightRef = useRef()
+  const hodZoneRef = useRef()
+  const fcZoneRef = useRef()
   const { camera, raycaster, gl } = useThree()
   const navigate = useNavigate()
 
@@ -14,14 +16,14 @@ export default function MainCampus({ onBuildingClick }) {
 
   const [hoveredBuilding, setHoveredBuilding] = useState(null)
   const [billboardPosition, setBillboardPosition] = useState(null)
+  const [hodCabinPosition, setHodCabinPosition] = useState(null)
+  const [fcPosition, setFcPosition] = useState(null)
   const [animationPhase, setAnimationPhase] = useState('blackout')
   const [flickerCount, setFlickerCount] = useState(0)
-  const [showHODModal, setShowHODModal] = useState(false)
   const mouse = useRef(new THREE.Vector2())
   const emissiveMeshes = useRef([])
   const animationStartTime = useRef(0)
   const hasLoggedRestore = useRef(false)
-  const buildingLabels = useRef({})
 
   const clonedScene = React.useMemo(() => scene.clone(), [scene])
 
@@ -40,22 +42,26 @@ export default function MainCampus({ onBuildingClick }) {
     'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' }
   }
 
-  // Setup: Find Billboard, emissive meshes, and make buildings clickable
+  // Setup: Find Billboard, emissive meshes, armatures, and make buildings clickable
   useEffect(() => {
     console.log('🚀 Setting up Main Campus scene...')
 
     let billboardFound = false
     const emissiveMeshesList = []
+    let hodArmatureFound = false
+    let fcArmatureFound = false
+    const hodPositions = []
+    const fcPositions = []
 
     clonedScene.traverse((child) => {
+      // Handle regular MESHES
       if (child.isMesh) {
         child.castShadow = true
         child.receiveShadow = true
 
-        // Billboard plane
+        // Billboard plane - EXACT values preserved
         if (child.name === 'Billboard_plane') {
           billboardFound = true
-          console.log('✅ Billboard_plane found!')
 
           const worldPos = new THREE.Vector3()
           child.getWorldPosition(worldPos)
@@ -81,7 +87,7 @@ export default function MainCampus({ onBuildingClick }) {
             })
           }
         }
-        // Other emissive materials
+        // Other emissive materials - EXACT values preserved
         else if (child.material && child.material.emissive) {
           const emissiveHex = child.material.emissive.getHex()
 
@@ -125,12 +131,109 @@ export default function MainCampus({ onBuildingClick }) {
             child.userData.buildingName = meshName
             child.userData.originalEmissive = child.material?.emissive?.clone()
             child.userData.originalIntensity = child.material?.emissiveIntensity || 0
-
-            console.log(`✅ Made ${child.name} clickable`)
           }
         })
+
+        // Collect HOD cabin positions to calculate center
+        if (child.name && child.name.startsWith('HOD_')) {
+          const worldPos = new THREE.Vector3()
+          child.getWorldPosition(worldPos)
+          hodPositions.push(worldPos)
+        }
+      }
+
+      // Handle SKINNED MESHES (armature characters)
+      if (child.isSkinnedMesh) {
+        console.log(`👤 Found skinned mesh: ${child.name} (parent: ${child.parent?.name})`)
+        child.castShadow = true
+        child.receiveShadow = true
+
+        // Force proper material rendering
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(mat => {
+              mat.needsUpdate = true
+              mat.side = THREE.FrontSide
+            })
+          } else {
+            child.material.needsUpdate = true
+            child.material.side = THREE.FrontSide
+          }
+        }
+
+        const worldPos = new THREE.Vector3()
+        child.getWorldPosition(worldPos)
+
+        // Check parent armature name to determine if it's HOD or FC
+        const parentName = child.parent?.name || ''
+
+        if (parentName.includes('man_in_suit001') || parentName.includes('HOD')) {
+          // HOD character
+          child.userData.clickable = true
+          child.userData.route = 'modal'
+          child.userData.action = 'hod'
+          child.userData.buildingName = 'HOD_character'
+          hodPositions.push(worldPos)
+          hodArmatureFound = true
+          console.log(`✅ Made HOD skinned mesh ${child.name} clickable`)
+        } else if (parentName.includes('FC')) {
+          // FC character
+          child.userData.clickable = true
+          child.userData.route = 'modal'
+          child.userData.action = 'hod'
+          child.userData.buildingName = 'FC_character'
+          fcPositions.push(worldPos)
+          fcArmatureFound = true
+          console.log(`✅ Made FC skinned mesh ${child.name} clickable`)
+        }
+      }
+
+      // Handle ARMATURE objects directly (Group/Object3D with name HOD or FC)
+      if ((child.type === 'Object3D' || child.type === 'Group' || child.type === 'Bone') &&
+        (child.name === 'HOD' || child.name === 'FC' || child.name.includes('FC') || child.name.includes('man_in_suit001'))) {
+
+        const worldPos = new THREE.Vector3()
+        child.getWorldPosition(worldPos)
+
+        if (child.name === 'HOD' || child.name.includes('man_in_suit001')) {
+          hodPositions.push(worldPos)
+          hodArmatureFound = true
+          console.log(`🎯 Found HOD armature at`, worldPos)
+        } else if (child.name === 'FC' || child.name.includes('FC')) {
+          fcPositions.push(worldPos)
+          fcArmatureFound = true
+          console.log(`🎯 Found FC armature at`, worldPos)
+        }
       }
     })
+
+    // Calculate average position for HOD clickable zone
+    if (hodPositions.length > 0) {
+      const avgPos = hodPositions.reduce((acc, pos) => {
+        acc.x += pos.x
+        acc.y += pos.y
+        acc.z += pos.z
+        return acc
+      }, new THREE.Vector3(0, 0, 0))
+
+      avgPos.divideScalar(hodPositions.length)
+      setHodCabinPosition(avgPos)
+      console.log('🎯 HOD zone center position:', avgPos)
+    }
+
+    // Calculate average position for FC clickable zone
+    if (fcPositions.length > 0) {
+      const avgPos = fcPositions.reduce((acc, pos) => {
+        acc.x += pos.x
+        acc.y += pos.y
+        acc.z += pos.z
+        return acc
+      }, new THREE.Vector3(0, 0, 0))
+
+      avgPos.divideScalar(fcPositions.length)
+      setFcPosition(avgPos)
+      console.log('🎯 FC zone center position:', avgPos)
+    }
 
     emissiveMeshes.current = emissiveMeshesList
 
@@ -143,6 +246,12 @@ export default function MainCampus({ onBuildingClick }) {
 
     if (!billboardFound) {
       console.warn('⚠️ Billboard_plane not found!')
+    }
+    if (!hodArmatureFound) {
+      console.warn('⚠️ No HOD armature found!')
+    }
+    if (!fcArmatureFound) {
+      console.warn('⚠️ No FC armature found!')
     }
 
     console.log('✅ Main Campus setup complete')
@@ -214,7 +323,7 @@ export default function MainCampus({ onBuildingClick }) {
       setAnimationPhase('done')
     }
 
-    // Hover glow effect (instead of bounce)
+    // Hover glow effect for buildings
     if (hoveredBuilding && animationPhase === 'done') {
       if (hoveredBuilding.material) {
         const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5
@@ -232,15 +341,30 @@ export default function MainCampus({ onBuildingClick }) {
     mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
 
     raycaster.setFromCamera(mouse.current, camera)
-    const intersects = raycaster.intersectObject(clonedScene, true)
+
+    // Check scene, HOD zone, and FC zone
+    const sceneIntersects = raycaster.intersectObject(clonedScene, true)
+    const hodZoneIntersects = hodZoneRef.current ? raycaster.intersectObject(hodZoneRef.current) : []
+    const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : []
+    const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects]
 
     // Reset previous hover
     if (hoveredBuilding && hoveredBuilding.material) {
       hoveredBuilding.material.emissiveIntensity = hoveredBuilding.userData.originalIntensity || 1
     }
 
-    if (intersects.length > 0) {
-      let clickableObject = intersects[0].object
+    if (allIntersects.length > 0) {
+      const firstIntersect = allIntersects[0].object
+
+      // Check if it's the HOD or FC zone
+      if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
+        setHoveredBuilding(firstIntersect)
+        gl.domElement.style.cursor = 'pointer'
+        return
+      }
+
+      // Otherwise check for clickable buildings
+      let clickableObject = firstIntersect
 
       while (clickableObject && !clickableObject.userData.clickable) {
         clickableObject = clickableObject.parent
@@ -258,18 +382,27 @@ export default function MainCampus({ onBuildingClick }) {
   }
 
   const handleClick = (event) => {
-    if (animationPhase !== 'done') return
+    if (animationPhase !== 'done') {
+      return
+    }
+
+    // Check if HOD or FC zone was clicked
+    if (hoveredBuilding === hodZoneRef.current || hoveredBuilding === fcZoneRef.current) {
+      console.log('🚀 Character zone clicked! Calling onHODClick')
+      if (onHODClick) {
+        onHODClick()
+      }
+      return
+    }
 
     if (hoveredBuilding && hoveredBuilding.userData) {
       const { route, action, buildingName } = hoveredBuilding.userData
 
-      console.log('🖱️ Building clicked:', buildingName, '→', route)
-
       if (action === 'hod') {
-        // Show HOD modal
-        setShowHODModal(true)
+        if (onHODClick) {
+          onHODClick()
+        }
       } else if (route && route !== 'modal') {
-        // Navigate to route
         navigate(route)
 
         if (onBuildingClick) {
@@ -290,7 +423,7 @@ export default function MainCampus({ onBuildingClick }) {
 
   return (
     <>
-      {/* Billboard Purple Point Light */}
+      {/* Billboard Purple Point Light - EXACT VALUES PRESERVED */}
       {billboardPosition && (
         <pointLight
           ref={billboardLightRef}
@@ -317,158 +450,42 @@ export default function MainCampus({ onBuildingClick }) {
         onClick={handleClick}
       />
 
-      {/* HOD Modal Overlay */}
-      {showHODModal && (
-        <HODModal onClose={() => setShowHODModal(false)} />
+      {/* HOD Clickable Zone - FULLY INVISIBLE */}
+      {hodCabinPosition && (
+        <mesh
+          ref={hodZoneRef}
+          position={[hodCabinPosition.x - 0.2, hodCabinPosition.y + 0.4, hodCabinPosition.z]}
+          onPointerMove={handlePointerMove}
+          onClick={handleClick}
+        >
+          <boxGeometry args={[3.25, 2.3, 3.1]} />
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            colorWrite={false}
+          />
+        </mesh>
+      )}
+
+      {/* FC Clickable Zone - FULLY INVISIBLE */}
+      {fcPosition && (
+        <mesh
+          ref={fcZoneRef}
+          position={[fcPosition.x, fcPosition.y + 1, fcPosition.z]}
+          onPointerMove={handlePointerMove}
+          onClick={handleClick}
+        >
+          <boxGeometry args={[2, 3, 2]} />
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            colorWrite={false}
+          />
+        </mesh>
       )}
     </>
-  )
-}
-
-// HOD Modal Component
-function HODModal({ onClose }) {
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      background: 'rgba(0, 0, 0, 0.85)',
-      backdropFilter: 'blur(10px)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 2000,
-      pointerEvents: 'auto'
-    }}>
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(42, 0, 84, 0.95), rgba(20, 0, 40, 0.95))',
-        border: '2px solid #ff00ff',
-        borderRadius: '20px',
-        padding: '40px',
-        maxWidth: '600px',
-        width: '90%',
-        boxShadow: '0 0 40px rgba(255, 0, 255, 0.5)',
-        position: 'relative'
-      }}>
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: 'transparent',
-            border: '2px solid #ff00ff',
-            color: '#ff00ff',
-            fontSize: '24px',
-            cursor: 'pointer',
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.3s'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = '#ff00ff'
-            e.target.style.color = '#000'
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'transparent'
-            e.target.style.color = '#ff00ff'
-          }}
-        >
-          ×
-        </button>
-
-        {/* Title */}
-        <h2 style={{
-          color: '#ff00ff',
-          fontSize: '32px',
-          marginBottom: '30px',
-          textAlign: 'center',
-          textShadow: '0 0 20px rgba(255, 0, 255, 0.8)'
-        }}>
-          HOD CABIN
-        </h2>
-
-        {/* HOD Info */}
-        <div style={{
-          marginBottom: '30px',
-          padding: '20px',
-          background: 'rgba(255, 0, 255, 0.1)',
-          borderRadius: '10px',
-          border: '1px solid rgba(255, 0, 255, 0.3)'
-        }}>
-          <h3 style={{
-            color: '#00ffff',
-            fontSize: '20px',
-            marginBottom: '10px'
-          }}>
-            Head of Department
-          </h3>
-          <p style={{
-            color: '#ffffff',
-            fontSize: '16px',
-            marginBottom: '5px'
-          }}>
-            <strong>Name:</strong> Dr. [HOD Name]
-          </p>
-          <p style={{
-            color: '#ffffff',
-            fontSize: '16px',
-            marginBottom: '5px'
-          }}>
-            <strong>Email:</strong> hod@example.com
-          </p>
-          <p style={{
-            color: '#ffffff',
-            fontSize: '16px'
-          }}>
-            <strong>Phone:</strong> +91 XXXXXXXXXX
-          </p>
-        </div>
-
-        {/* Faculty Coordinator Info */}
-        <div style={{
-          padding: '20px',
-          background: 'rgba(0, 255, 255, 0.1)',
-          borderRadius: '10px',
-          border: '1px solid rgba(0, 255, 255, 0.3)'
-        }}>
-          <h3 style={{
-            color: '#00ffff',
-            fontSize: '20px',
-            marginBottom: '10px'
-          }}>
-            Faculty Coordinator
-          </h3>
-          <p style={{
-            color: '#ffffff',
-            fontSize: '16px',
-            marginBottom: '5px'
-          }}>
-            <strong>Name:</strong> Prof. [Faculty Name]
-          </p>
-          <p style={{
-            color: '#ffffff',
-            fontSize: '16px',
-            marginBottom: '5px'
-          }}>
-            <strong>Email:</strong> faculty@example.com
-          </p>
-          <p style={{
-            color: '#ffffff',
-            fontSize: '16px'
-          }}>
-            <strong>Phone:</strong> +91 XXXXXXXXXX
-          </p>
-        </div>
-      </div>
-    </div>
   )
 }
 

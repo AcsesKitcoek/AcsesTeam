@@ -5,13 +5,26 @@ import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import MainCampus from './components/MainCampus'
 import TeamsBuilding from './components/TeamsBuilding'
+import * as THREE from 'three'
 import './App.css'
+
+
+// Solid Purple Background - Matches the floor plane perfectly
+function SolidPurpleBackground() {
+  const { scene } = useThree()
+
+  React.useEffect(() => {
+    // Match the purple floor color exactly
+    scene.background = new THREE.Color('#0a0514')
+  }, [scene])
+
+  return null
+}
 
 
 // Camera Debug Component - OUTSIDE Canvas (HTML overlay)
 function CameraDebugOverlay({ cameraPosition, distance }) {
   const [copied, setCopied] = useState(false)
-
 
   const copyToClipboard = () => {
     const code = `position: [${cameraPosition.x}, ${cameraPosition.y}, ${cameraPosition.z}]`
@@ -19,7 +32,6 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
-
 
   return (
     <div style={{
@@ -60,7 +72,6 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
         <strong>Distance:</strong> <span style={{ color: '#88ffff' }}>{distance}</span>
       </div>
 
-
       <button
         onClick={copyToClipboard}
         style={{
@@ -79,7 +90,6 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
       >
         {copied ? '✓ Copied!' : '📋 Copy Position'}
       </button>
-
 
       <div style={{
         marginTop: '12px',
@@ -101,7 +111,6 @@ function CameraDebugOverlay({ cameraPosition, distance }) {
 function CameraTracker({ onUpdate }) {
   const { camera } = useThree()
 
-
   useFrame(() => {
     onUpdate({
       x: camera.position.x.toFixed(2),
@@ -109,7 +118,6 @@ function CameraTracker({ onUpdate }) {
       z: camera.position.z.toFixed(2)
     }, camera.position.length().toFixed(2))
   })
-
 
   return null
 }
@@ -120,6 +128,10 @@ function MainCampusPage() {
   const [currentScene, setCurrentScene] = useState('main-campus')
   const [cameraPos, setCameraPos] = useState({ x: '16.02', y: '9.71', z: '18.25' })
   const [distance, setDistance] = useState('27.74')
+  const [showHODModal, setShowHODModal] = useState(false)
+
+  // Detect mobile device
+  const isMobile = window.innerWidth <= 768
 
   const handleCameraUpdate = (pos, dist) => {
     setCameraPos(pos)
@@ -130,7 +142,6 @@ function MainCampusPage() {
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
         camera={{
-          // position: [15.08, 15.07, 18.26],
           position: [14.71, 8.68, 18.02],
           fov: 50,
           near: 0.1,
@@ -139,9 +150,17 @@ function MainCampusPage() {
         gl={{
           antialias: true,
           toneMapping: 0,
-          toneMappingExposure: 1
+          toneMappingExposure: 1,
+          outputColorSpace: THREE.SRGBColorSpace,
+          alpha: false
         }}
       >
+        {/* Solid purple background matching floor */}
+        <SolidPurpleBackground />
+
+        {/* Fog for depth - same color as background */}
+        <fog attach="fog" args={['#0a0514', 40, 80]} />
+
         {/* Track camera position for debug overlay */}
         <CameraTracker onUpdate={handleCameraUpdate} />
 
@@ -189,10 +208,14 @@ function MainCampusPage() {
         />
 
         {/* Scene */}
-        <MainCampus onBuildingClick={(building) => {
-          // console.log('Building clicked:', building)
-          setCurrentScene(building)
-        }} />
+        <MainCampus
+          onBuildingClick={(building) => {
+            setCurrentScene(building)
+          }}
+          onHODClick={() => {
+            setShowHODModal(true)
+          }}
+        />
 
         {/* OrbitControls - Minimal movement, no azimuth constraints to prevent camera shift */}
         <OrbitControls
@@ -200,19 +223,13 @@ function MainCampusPage() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          // Distance locked around current 23.82 - very minimal zoom allowed
-          minDistance={23}
-          maxDistance={24.5}
-          // Tight vertical angle limits
+          minDistance={isMobile ? 54.15 : 23}
+          maxDistance={isMobile ? 60 : 24.5}
           maxPolarAngle={Math.PI / 2.3}
           minPolarAngle={Math.PI / 3.5}
-          // No azimuth constraints - they cause camera repositioning
-          // User can rotate horizontally but with slow speed
-          // Very slow movement speeds for fine control
           panSpeed={0.2}
           rotateSpeed={0.25}
           zoomSpeed={0.3}
-          // Smooth damping
           enableDamping={true}
           dampingFactor={0.1}
         />
@@ -220,12 +237,13 @@ function MainCampusPage() {
         {/* Post-processing for Enhanced Neon Glow */}
         <EffectComposer>
           <Bloom
-            intensity={2}  // Increased for stronger glow
-            luminanceThreshold={0.9}  // Lower threshold to catch more glow
-            luminanceSmoothing={0.7}
-            radius={0.8}  // Larger radius for softer, more beautiful glow
+            intensity={0.3}
+            luminanceThreshold={0.95}
+            luminanceSmoothing={0.5}
+            radius={0.5}
           />
         </EffectComposer>
+
       </Canvas>
 
       {/* UI Overlays - OUTSIDE Canvas */}
@@ -244,13 +262,19 @@ function MainCampusPage() {
       </div>
 
       {/* Camera Debug Panel - Hidden for production */}
-      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
+      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+
+      {/* HOD Modal - Rendered OUTSIDE Canvas */}
+      {showHODModal && (
+        <HODModal onClose={() => {
+          setShowHODModal(false)
+        }} />
+      )}
     </div>
   )
 }
 
 
-// Teams Building Page Component
 // Teams Building Page Component
 function TeamsBuildingPage() {
   const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' })
@@ -273,9 +297,17 @@ function TeamsBuildingPage() {
         gl={{
           antialias: true,
           toneMapping: 0,
-          toneMappingExposure: 1
+          toneMappingExposure: 1,
+          outputColorSpace: THREE.SRGBColorSpace,
+          alpha: false
         }}
       >
+        {/* Solid background for Teams Building */}
+        <SolidPurpleBackground />
+
+        {/* Fog for Teams Building */}
+        <fog attach="fog" args={['#0a0a1a', 50, 120]} />
+
         {/* Track camera position for debug overlay */}
         <CameraTracker onUpdate={handleCameraUpdate} />
 
@@ -300,7 +332,6 @@ function TeamsBuildingPage() {
           enableRotate={true}
           minDistance={30}
           maxDistance={100}
-          // Smooth controls like Main Campus
           enableDamping={true}
           dampingFactor={0.1}
           panSpeed={0.3}
@@ -311,10 +342,10 @@ function TeamsBuildingPage() {
         {/* Post-processing for Neon Glow - MATCHED to Main Campus */}
         <EffectComposer>
           <Bloom
-            intensity={2}              // Match Main Campus
-            luminanceThreshold={0.9}   // Match Main Campus
-            luminanceSmoothing={0.7}   // Match Main Campus
-            radius={0.8}               // Match Main Campus
+            intensity={2}
+            luminanceThreshold={0.9}
+            luminanceSmoothing={0.7}
+            radius={0.8}
           />
         </EffectComposer>
       </Canvas>
@@ -331,14 +362,14 @@ function TeamsBuildingPage() {
           style={{
             position: 'fixed',
             top: '20px',
-            left: '20px',  // Changed from right to left
-            padding: '8px 16px',  // Smaller padding
+            left: '20px',
+            padding: '8px 16px',
             background: 'rgba(255, 0, 255, 0.2)',
             border: '2px solid #ff00ff',
             color: '#ff00ff',
-            fontSize: '12px',  // Smaller font
+            fontSize: '12px',
             fontWeight: '600',
-            borderRadius: '6px',  // Slightly smaller radius
+            borderRadius: '6px',
             cursor: 'pointer',
             backdropFilter: 'blur(10px)',
             transition: 'all 0.3s ease',
@@ -360,13 +391,163 @@ function TeamsBuildingPage() {
         </button>
 
       </div>
-
-      {/* Camera Debug Panel - DISABLED for production */}
-      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
     </div>
   )
 }
 
+
+// HOD Modal Component
+function HODModal({ onClose }) {
+  return (
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(10px)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999,
+        pointerEvents: 'auto'
+      }}>
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(42, 0, 84, 0.95), rgba(20, 0, 40, 0.95))',
+        border: '2px solid #ff00ff',
+        borderRadius: '20px',
+        padding: '40px',
+        maxWidth: '600px',
+        width: '90%',
+        boxShadow: '0 0 40px rgba(255, 0, 255, 0.5)',
+        position: 'relative'
+      }}>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'transparent',
+            border: '2px solid #ff00ff',
+            color: '#ff00ff',
+            fontSize: '24px',
+            cursor: 'pointer',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = '#ff00ff'
+            e.target.style.color = '#000'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'transparent'
+            e.target.style.color = '#ff00ff'
+          }}
+        >
+          ×
+        </button>
+
+        {/* Title */}
+        <h2 style={{
+          color: '#ff00ff',
+          fontSize: '32px',
+          marginBottom: '30px',
+          textAlign: 'center',
+          textShadow: '0 0 20px rgba(255, 0, 255, 0.8)'
+        }}>
+          HOD CABIN
+        </h2>
+
+        {/* HOD Info */}
+        <div style={{
+          marginBottom: '30px',
+          padding: '20px',
+          background: 'rgba(255, 0, 255, 0.1)',
+          borderRadius: '10px',
+          border: '1px solid rgba(255, 0, 255, 0.3)'
+        }}>
+          <h3 style={{
+            color: '#00ffff',
+            fontSize: '20px',
+            marginBottom: '10px'
+          }}>
+            Head of Department
+          </h3>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '16px',
+            marginBottom: '5px'
+          }}>
+            <strong>Name:</strong> Dr. [HOD Name]
+          </p>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '16px',
+            marginBottom: '5px'
+          }}>
+            <strong>Email:</strong> hod@example.com
+          </p>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '16px'
+          }}>
+            <strong>Phone:</strong> +91 XXXXXXXXXX
+          </p>
+        </div>
+
+        {/* Faculty Coordinator Info */}
+        <div style={{
+          padding: '20px',
+          background: 'rgba(0, 255, 255, 0.1)',
+          borderRadius: '10px',
+          border: '1px solid rgba(0, 255, 255, 0.3)'
+        }}>
+          <h3 style={{
+            color: '#00ffff',
+            fontSize: '20px',
+            marginBottom: '10px'
+          }}>
+            Faculty Coordinator
+          </h3>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '16px',
+            marginBottom: '5px'
+          }}>
+            <strong>Name:</strong> Prof. [Faculty Name]
+          </p>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '16px',
+            marginBottom: '5px'
+          }}>
+            <strong>Email:</strong> faculty@example.com
+          </p>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '16px'
+          }}>
+            <strong>Phone:</strong> +91 XXXXXXXXXX
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 
 // Main App Component with Routing
@@ -378,6 +559,5 @@ function App() {
     </Routes>
   )
 }
-
 
 export default App
