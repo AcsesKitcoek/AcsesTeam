@@ -24,8 +24,12 @@ export default function MainCampus({ onBuildingClick }) {
 
     clonedScene.traverse((child) => {
       if (child.isMesh) {
+        // Enable shadows for all meshes
         child.castShadow = true
         child.receiveShadow = true
+
+        // Note: The floor mesh in your GLB will automatically receive shadows
+        // Make sure your floor material in Blender has proper settings
 
         // Check if THIS is the Billboard_plane
         if (child.name === 'Billboard_plane') {
@@ -41,25 +45,43 @@ export default function MainCampus({ onBuildingClick }) {
           if (child.material) {
             child.material = child.material.clone()
 
-            // Now modify ONLY the billboard's material
+            // Enhanced material for beautiful bloom glow effect
             child.material.emissive = new THREE.Color('#aa00ff')
-            child.material.emissiveIntensity = 2.5  // Reduced for better balance with new lighting
-            child.material.toneMapped = false
+            child.material.emissiveIntensity = 5.8  // High intensity for strong bloom
+            child.material.color = new THREE.Color('#ff00ff')  // Base color
+            child.material.toneMapped = false  // Bypass tone mapping for bloom
+            child.material.transparent = true
+            child.material.opacity = 0.95  // Slight transparency for softer glow
+            child.material.side = THREE.DoubleSide  // Visible from both sides
             child.material.needsUpdate = true
-            console.log('✅ Billboard material cloned and boosted')
+            console.log('✅ Billboard material enhanced with bloom glow effect')
           }
         }
-        // For ALL other purple/cyan screens - adjust emissive for new lighting
+        // For ALL other purple/cyan screens - adjust emissive for bloom effects
         else if (child.material && child.material.emissive) {
           const emissiveHex = child.material.emissive.getHex()
 
-          // If it's purple/magenta or cyan
-          if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff || emissiveHex === 0x00ffff) {
-            // Clone material for this mesh too (so changes don't affect others)
+          // DEBUG: Log all emissive materials to see what we're working with
+          if (emissiveHex !== 0x000000) {  // If it has any emissive color
+            console.log(`🔍 Found emissive material: ${child.name}`)
+            console.log(`   Emissive color (hex): 0x${emissiveHex.toString(16).padStart(6, '0')}`)
+            console.log(`   Current intensity: ${child.material.emissiveIntensity}`)
+          }
+
+          // If it's cyan (actual color from model: 0x00e5ff) - subtle bloom effect
+          if (emissiveHex === 0x00e5ff || emissiveHex === 0x00ffff) {
             child.material = child.material.clone()
-            child.material.emissiveIntensity = 0.8  // Increased for better visibility
+            child.material.emissiveIntensity = 1.7  // Increased for visible bloom
+            child.material.toneMapped = false  // Allow bloom to pick it up
+            child.material.needsUpdate = true
+            console.log(`✅ ${child.name} - cyan with subtle bloom (intensity: 4.5)`)
+          }
+          // If it's purple/magenta - keep current settings
+          else if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff) {
+            child.material = child.material.clone()
+            child.material.emissiveIntensity = 5  // Higher for visibility
             child.material.toneMapped = true
-            console.log(`Adjusted ${child.name} emissive to 0.8`)
+            console.log(`✅ ${child.name} - purple emissive to 5`)
           }
         }
 
@@ -165,7 +187,7 @@ export default function MainCampus({ onBuildingClick }) {
 
   return (
     <>
-      {/* Billboard Purple Point Light - Adjusted for new global lighting */}
+      {/* Billboard Purple Point Light - Enhanced to match bloom glow */}
       {billboardPosition && (
         <pointLight
           ref={billboardLightRef}
@@ -174,10 +196,13 @@ export default function MainCampus({ onBuildingClick }) {
             billboardPosition.y + 3,
             billboardPosition.z + 2
           ]}
-          intensity={15}  // Further reduced to balance with enhanced ambient lighting
+          intensity={30}  // Increased to complement the enhanced billboard glow
           color="#aa00ff"
-          distance={25}
-          decay={0.2}
+          distance={30}
+          decay={0.3}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
         />
       )}
 

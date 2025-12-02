@@ -130,7 +130,8 @@ function MainCampusPage() {
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
         camera={{
-          position: [16.02, 9.71, 18.25],
+          // position: [15.08, 15.07, 18.26],
+          position: [14.71, 8.68, 18.02],
           fov: 50,
           near: 0.1,
           far: 1000
@@ -144,7 +145,7 @@ function MainCampusPage() {
         {/* Track camera position for debug overlay */}
         <CameraTracker onUpdate={handleCameraUpdate} />
 
-        {/* Lighting Setup - Enhanced for better visibility */}
+        {/* Lighting Setup - Enhanced for better visibility and shadows */}
         <ambientLight intensity={1.2} color="#6080a0" />
 
         <hemisphereLight
@@ -153,17 +154,39 @@ function MainCampusPage() {
           intensity={0.8}
         />
 
+        {/* Main directional light with enhanced shadow quality */}
         <directionalLight
           position={[15, 25, 15]}
           intensity={2.0}
           castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
+          shadow-mapSize-width={4096}
+          shadow-mapSize-height={4096}
+          shadow-camera-left={-50}
+          shadow-camera-right={50}
+          shadow-camera-top={50}
+          shadow-camera-bottom={-50}
+          shadow-camera-near={0.5}
+          shadow-camera-far={100}
+          shadow-bias={-0.0001}
         />
 
         {/* Fill lights for better overall illumination */}
-        <pointLight position={[-15, 15, 10]} intensity={8} color="#4080ff" />
-        <pointLight position={[15, 12, -10]} intensity={6} color="#8060ff" />
+        <pointLight
+          position={[-15, 15, 10]}
+          intensity={8}
+          color="#4080ff"
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+        />
+        <pointLight
+          position={[15, 12, -10]}
+          intensity={6}
+          color="#8060ff"
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+        />
 
         {/* Scene */}
         <MainCampus onBuildingClick={(building) => {
@@ -171,25 +194,36 @@ function MainCampusPage() {
           setCurrentScene(building)
         }} />
 
-        {/* OrbitControls */}
+        {/* OrbitControls - Minimal movement, no azimuth constraints to prevent camera shift */}
         <OrbitControls
           target={[1.2, 4, 0]}
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={12}
-          maxDistance={35}
-          maxPolarAngle={Math.PI / 2.1}
-          minPolarAngle={Math.PI / 8}
+          // Distance locked around current 23.82 - very minimal zoom allowed
+          minDistance={23}
+          maxDistance={24.5}
+          // Tight vertical angle limits
+          maxPolarAngle={Math.PI / 2.3}
+          minPolarAngle={Math.PI / 3.5}
+          // No azimuth constraints - they cause camera repositioning
+          // User can rotate horizontally but with slow speed
+          // Very slow movement speeds for fine control
+          panSpeed={0.2}
+          rotateSpeed={0.25}
+          zoomSpeed={0.3}
+          // Smooth damping
+          enableDamping={true}
+          dampingFactor={0.1}
         />
 
-        {/* Post-processing for Neon Glow */}
+        {/* Post-processing for Enhanced Neon Glow */}
         <EffectComposer>
           <Bloom
-            intensity={1.5}
-            luminanceThreshold={0.7}
-            luminanceSmoothing={0.6}
-            radius={0.6}
+            intensity={2}  // Increased for stronger glow
+            luminanceThreshold={0.9}  // Lower threshold to catch more glow
+            luminanceSmoothing={0.7}
+            radius={0.8}  // Larger radius for softer, more beautiful glow
           />
         </EffectComposer>
       </Canvas>
@@ -210,7 +244,7 @@ function MainCampusPage() {
       </div>
 
       {/* Camera Debug Panel - Hidden for production */}
-      <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+      {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
     </div>
   )
 }
@@ -230,7 +264,7 @@ function TeamsBuildingPage() {
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas
         camera={{
-          position: [68.63, 36.54, 40.60],  // Initial position - adjust with camera debug
+          position: [67.63, 33.55, 42.28],  // Initial position - adjust with camera debug
           fov: 50,
           near: 0.1,
           far: 1000
@@ -245,7 +279,7 @@ function TeamsBuildingPage() {
         <CameraTracker onUpdate={handleCameraUpdate} />
 
         {/* Basic Lighting - Will enhance later */}
-        <ambientLight intensity={1.0} color="#ffffff" />
+        <ambientLight intensity={1.0} color="#ffffff" castShadow />
 
         <directionalLight
           position={[10, 20, 10]}
