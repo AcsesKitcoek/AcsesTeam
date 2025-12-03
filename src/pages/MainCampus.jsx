@@ -1,8 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react'
-import { useGLTF, Text3D, Center } from '@react-three/drei'
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import { Text3D, Center } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
+import { useGLBCache } from '../hooks/useGLBCache'
+import { useMobileDetection } from '../hooks/useMobileDetection'
+import ClickableZone from '../components/scene/ClickableZone'
 
 
 export default function MainCampus({ onBuildingClick, onHODClick }) {
@@ -13,7 +16,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
   const { camera, raycaster, gl } = useThree()
   const navigate = useNavigate()
 
-  const { scene } = useGLTF('/models/main-campus.glb')
+  // Use GLB cache hook for optimized loading
+  const { scene, loading, error } = useGLBCache('/models/main-campus.glb', '1.0.0')
+  const isMobile = useMobileDetection()
 
   const [hoveredBuilding, setHoveredBuilding] = useState(null)
   const [billboardPosition, setBillboardPosition] = useState(null)
@@ -21,17 +26,20 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
   const [fcPosition, setFcPosition] = useState(null)
   const [animationPhase, setAnimationPhase] = useState('blackout')
   const [flickerCount, setFlickerCount] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
+
   const mouse = useRef(new THREE.Vector2())
   const touch = useRef(new THREE.Vector2())
   const emissiveMeshes = useRef([])
   const animationStartTime = useRef(0)
-  const hasLoggedRestore = useRef(false)
 
-  const clonedScene = React.useMemo(() => scene.clone(), [scene])
+  // Memoize cloned scene to prevent re-cloning on every render
+  const clonedScene = useMemo(() => {
+    if (!scene) return null
+    return scene.clone()
+  }, [scene])
 
-  // Building label configuration
-  const labelConfig = {
+  // Building label configuration - memoized
+  const labelConfig = useMemo(() => ({
     'Teams_plane': { text: 'TEAMS', route: '/teams' },
     'Teams_Building': { text: 'TEAMS', route: '/teams' },
     'About_Acses_plane': { text: 'ABOUT US', route: '/about' },
@@ -43,24 +51,11 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     'ContactUs_Building': { text: 'CONTACT', route: '/contact' },
     'HOD_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' },
     'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' }
-  }
-
-  // Detect mobile device
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
-    }
-
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  }), [])
 
   // Setup: Find Billboard, emissive meshes, armatures, and make buildings clickable
   useEffect(() => {
-    // console.log('🚀 Setting up Main Campus scene...')
-    // console.log(`📱 Mobile device detected: ${isMobile}`)
+    if (!clonedScene) return
 
     let billboardFound = false
     const emissiveMeshesList = []
@@ -72,7 +67,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     clonedScene.traverse((child) => {
       // Handle regular MESHES
       if (child.isMesh) {
-        child.castShadow = !isMobile  // Disable shadows on mobile
+        child.castShadow = !isMobile
         child.receiveShadow = !isMobile
 
         // Billboard plane - EXACT values preserved
@@ -160,7 +155,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       // Handle SKINNED MESHES (armature characters)
       if (child.isSkinnedMesh) {
-        // console.log(`👤 Found skinned mesh: ${child.name} (parent: ${child.parent?.name})`)
         child.castShadow = !isMobile
         child.receiveShadow = !isMobile
 
@@ -191,7 +185,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           child.userData.buildingName = 'HOD_character'
           hodPositions.push(worldPos)
           hodArmatureFound = true
-          // console.log(`✅ Made HOD skinned mesh ${child.name} clickable`)
         } else if (parentName.includes('FC')) {
           // FC character
           child.userData.clickable = true
@@ -200,7 +193,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           child.userData.buildingName = 'FC_character'
           fcPositions.push(worldPos)
           fcArmatureFound = true
-          // console.log(`✅ Made FC skinned mesh ${child.name} clickable`)
         }
       }
 
@@ -214,11 +206,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         if (child.name === 'HOD' || child.name.includes('man_in_suit001')) {
           hodPositions.push(worldPos)
           hodArmatureFound = true
-          // console.log(`🎯 Found HOD armature at`, worldPos)
         } else if (child.name === 'FC' || child.name.includes('FC')) {
           fcPositions.push(worldPos)
           fcArmatureFound = true
-          // console.log(`🎯 Found FC armature at`, worldPos)
         }
       }
     })
@@ -234,7 +224,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       avgPos.divideScalar(hodPositions.length)
       setHodCabinPosition(avgPos)
-      // console.log('🎯 HOD zone center position:', avgPos)
     }
 
     // Calculate average position for FC clickable zone
@@ -248,7 +237,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       avgPos.divideScalar(fcPositions.length)
       setFcPosition(avgPos)
-      // console.log('🎯 FC zone center position:', avgPos)
     }
 
     emissiveMeshes.current = emissiveMeshesList
@@ -269,9 +257,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     if (!fcArmatureFound) {
       console.warn('⚠️ No FC armature found!')
     }
-
-    // console.log('✅ Main Campus setup complete')
-  }, [clonedScene, isMobile])
+  }, [clonedScene, isMobile, labelConfig])
 
   // Dramatic flicker animation
   useFrame((state) => {
@@ -348,10 +334,11 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     }
   })
 
-  // Unified pointer/touch handling
-  const handlePointerMove = (event) => {
+  // Unified pointer/touch handling - memoized
+  const handlePointerMove = useCallback((event) => {
     if (animationPhase !== 'done') return
     if (isMobile) return  // Disable hover on mobile
+    if (!clonedScene) return
 
     const rect = gl.domElement.getBoundingClientRect()
 
@@ -407,13 +394,14 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
     setHoveredBuilding(null)
     gl.domElement.style.cursor = 'default'
-  }
+  }, [animationPhase, isMobile, clonedScene, gl, raycaster, camera, hoveredBuilding])
 
-  // Touch-friendly click handler
-  const handleClick = (event) => {
+  // Touch-friendly click handler - memoized
+  const handleClick = useCallback((event) => {
     if (animationPhase !== 'done') {
       return
     }
+    if (!clonedScene) return
 
     const rect = gl.domElement.getBoundingClientRect()
 
@@ -446,7 +434,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       // Check if HOD or FC zone was clicked
       if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
-        // console.log('🚀 Character zone clicked! Calling onHODClick') 
         if (onHODClick) {
           onHODClick()
         }
@@ -462,7 +449,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       if (clickableObject && clickableObject.userData.clickable) {
         const { route, action, buildingName } = clickableObject.userData
-        // console.log(`👆 Clicked: ${buildingName}`)
 
         if (action === 'hod') {
           if (onHODClick) {
@@ -477,16 +463,29 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         }
       }
     }
-  }
+  }, [animationPhase, clonedScene, gl, raycaster, camera, onHODClick, onBuildingClick, navigate])
 
   // Store original positions
   useEffect(() => {
+    if (!clonedScene) return
+
     clonedScene.traverse((child) => {
       if (child.userData.clickable && child.userData.originalY === undefined) {
         child.userData.originalY = child.position.y
       }
     })
   }, [clonedScene])
+
+  // Show loading state
+  if (loading || !clonedScene) {
+    return null
+  }
+
+  // Show error state
+  if (error) {
+    console.error('Failed to load MainCampus model:', error)
+    return null
+  }
 
   return (
     <>
@@ -520,43 +519,27 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
       {/* HOD Clickable Zone - LARGER on mobile for easier touching */}
       {hodCabinPosition && (
-        <mesh
+        <ClickableZone
           ref={hodZoneRef}
           position={[hodCabinPosition.x - 0.2, hodCabinPosition.y + 0.4, hodCabinPosition.z]}
+          size={isMobile ? [4, 3, 4] : [3.25, 2.3, 3.1]}
           onPointerMove={handlePointerMove}
           onClick={handleClick}
           onPointerDown={isMobile ? handleClick : undefined}
-        >
-          <boxGeometry args={isMobile ? [4, 3, 4] : [3.25, 2.3, 3.1]} />
-          <meshBasicMaterial
-            transparent
-            opacity={0}
-            depthWrite={false}
-            colorWrite={false}
-          />
-        </mesh>
+        />
       )}
 
       {/* FC Clickable Zone - LARGER on mobile for easier touching */}
       {fcPosition && (
-        <mesh
+        <ClickableZone
           ref={fcZoneRef}
           position={[fcPosition.x, fcPosition.y + 1, fcPosition.z]}
+          size={isMobile ? [2.5, 3.5, 2.5] : [2, 3, 2]}
           onPointerMove={handlePointerMove}
           onClick={handleClick}
           onPointerDown={isMobile ? handleClick : undefined}
-        >
-          <boxGeometry args={isMobile ? [2.5, 3.5, 2.5] : [2, 3, 2]} />
-          <meshBasicMaterial
-            transparent
-            opacity={0}
-            depthWrite={false}
-            colorWrite={false}
-          />
-        </mesh>
+        />
       )}
     </>
   )
 }
-
-useGLTF.preload('/models/main-campus.glb')

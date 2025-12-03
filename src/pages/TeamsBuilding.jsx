@@ -1,12 +1,14 @@
-import React, { useRef, useEffect, useState } from 'react'
-import { useGLTF, useTexture } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
+import { useTexture } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useGLBCache } from '../hooks/useGLBCache'
+import { useMobileDetection } from '../hooks/useMobileDetection'
+import CeilingLights from '../components/scene/CeilingLights'
 
 
 export default function TeamsBuilding() {
     const groupRef = useRef()
-    const { gl } = useThree()
     const [lightPositions, setLightPositions] = useState([])
     const [animationPhase, setAnimationPhase] = useState('boot')
     const animationStartTime = useRef(0)
@@ -14,29 +16,21 @@ export default function TeamsBuilding() {
     const emissiveMeshes = useRef([])
     const screenMeshes = useRef([])
     const activationSchedule = useRef([])
-    const [isMobile, setIsMobile] = useState(false)
 
-    const { scene } = useGLTF('/models/towerss.glb')
+    // Use GLB cache hook for optimized loading
+    const { scene, loading, error } = useGLBCache('/models/towerss.glb', '1.0.0')
     const acsesTexture = useTexture('/images/ACSES_Image.jpg')
+    const isMobile = useMobileDetection()
 
-    const clonedScene = React.useMemo(() => scene.clone(), [scene])
-
-    // Detect mobile device
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
-        }
-
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
+    // Memoize cloned scene to prevent re-cloning on every render
+    const clonedScene = useMemo(() => {
+        if (!scene) return null
+        return scene.clone()
+    }, [scene])
 
     // Setup: Configure materials and emissive lighting
     useEffect(() => {
-        // console.log('🚀 Setting up Teams Building scene...')
-        // console.log(`📱 Mobile device detected: ${isMobile}`)
+        if (!clonedScene) return
 
         let lightsFound = 0
         let screensFound = 0
@@ -155,7 +149,6 @@ export default function TeamsBuilding() {
                 // Main Structure material - purple-cyan walls
                 if (child.material && child.material.name === 'Material.001') {
                     if (!mainStructureFixed) {
-                        // console.log(`✅ Main Structure material found`)
                         mainStructureFixed = true
                     }
 
@@ -212,12 +205,6 @@ export default function TeamsBuilding() {
         })
 
         activationSchedule.current = schedule
-
-        // console.log(`✅ Teams Building setup complete`)
-        // console.log(`   - Ceiling lights: ${lightsFound}`)
-        // console.log(`   - Screens: ${screensFound}`)
-        // console.log(`   - Base platform: ${baseFound}`)
-        // console.log(`   - Animation schedule created: ${schedule.length} lights`)
     }, [clonedScene, acsesTexture, isMobile])
 
     // System Initialize Animation
@@ -230,7 +217,6 @@ export default function TeamsBuilding() {
 
         if (animationPhase === 'boot') {
             if (elapsed > 0.3) {
-                // console.log('💡 Starting random initialization...')
                 setAnimationPhase('random-init')
             }
         }
@@ -283,7 +269,6 @@ export default function TeamsBuilding() {
             }
 
             if (initPhaseTime > 2.0) {
-                // console.log('🔄 Synchronizing all systems...')
                 setAnimationPhase('sync')
             }
         }
@@ -313,13 +298,10 @@ export default function TeamsBuilding() {
                     }
                 })
             } else {
-                // console.log('✨ Sync complete, finalizing...')
                 setAnimationPhase('complete')
             }
         }
         else if (animationPhase === 'complete') {
-            // console.log('🔧 Restoring exact values...')
-
             emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
                 if (mesh.material) {
                     mesh.material.emissiveIntensity = originalIntensity
@@ -341,30 +323,29 @@ export default function TeamsBuilding() {
                 }
             })
 
-            // console.log('🎉 System initialization complete!')
             setAnimationPhase('done')
         }
     })
 
+    // Show loading state
+    if (loading || !clonedScene) {
+        return null
+    }
+
+    // Show error state
+    if (error) {
+        console.error('Failed to load TeamsBuilding model:', error)
+        return null
+    }
+
     return (
         <>
             {/* Ceiling point lights - MOBILE RESPONSIVE */}
-            {lightPositions.map((light, index) => (
-                <pointLight
-                    key={`ceiling-light-${index}`}
-                    ref={(el) => lightRefs.current[index] = el}
-                    position={[
-                        light.position.x,
-                        light.position.y - 0.8,
-                        light.position.z
-                    ]}
-                    intensity={0}
-                    color="#eeccff"
-                    distance={isMobile ? 25 : 30}
-                    decay={1.8}
-                    castShadow={!isMobile}
-                />
-            ))}
+            <CeilingLights
+                lightPositions={lightPositions}
+                lightRefs={lightRefs}
+                isMobile={isMobile}
+            />
 
             {/* Ambient light - increased for mobile */}
             <ambientLight intensity={isMobile ? 0.2 : 0.15} color="#5540a0" />
@@ -386,6 +367,3 @@ export default function TeamsBuilding() {
         </>
     )
 }
-
-useGLTF.preload('/models/towerss.glb')
-useTexture.preload('/images/ACSES_Image.jpg')
