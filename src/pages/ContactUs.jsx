@@ -180,7 +180,7 @@ export default function ContactUs({ onContactClick }) {
         console.log(`✅ ContactUs Setup: Found ${emissiveList.length} emissive meshes, ${screensFound} screens, ${laptopPosList.length} laptops`)
     }, [clonedScene, isMobile])
 
-    // Dramatic flicker animation (similar to MainCampus)
+    // Smooth office-style power-on animation (professional and welcoming)
     useFrame((state) => {
         if (!animationStartTime.current) {
             animationStartTime.current = state.clock.elapsedTime
@@ -189,84 +189,105 @@ export default function ContactUs({ onContactClick }) {
         const elapsed = state.clock.elapsedTime - animationStartTime.current
 
         if (animationPhase === 'blackout') {
-            // Initial blackout phase
-            if (elapsed > 0.8) {
+            // Brief initial pause
+            if (elapsed > 0.3) {
                 setAnimationPhase('flickering')
-                setFlickerCount(0)
             }
         }
         else if (animationPhase === 'flickering') {
-            // Flickering phase - similar to MainCampus
-            const flickerDuration = 0.6
-            const flickerPhase = (elapsed - 0.8) % flickerDuration
-            const currentFlicker = Math.floor((elapsed - 0.8) / flickerDuration)
-            const maxFlickers = 2  // Two flickers before stabilizing
+            // Phase 1: Ceiling light powers on smoothly (0.3s - 1.2s)
+            const phase1Start = 0.3
+            const phase1Duration = 0.9
+            const phase1Time = elapsed - phase1Start
 
-            if (currentFlicker < maxFlickers) {
-                let intensity = 0
+            if (phase1Time >= 0 && phase1Time < phase1Duration) {
+                // Smooth fade-in for ceiling light with slight warm-up effect
+                const progress = phase1Time / phase1Duration
+                const warmUpCurve = Math.pow(progress, 0.7) // Slightly faster at start
 
-                // Flicker pattern: on -> off -> quick on -> off
-                if (flickerPhase < 0.15) {
-                    intensity = 1
-                } else if (flickerPhase < 0.45) {
-                    intensity = 0
-                } else if (flickerPhase < 0.5) {
-                    intensity = 1
-                } else {
-                    intensity = 0
-                }
-
-                // Apply to all emissive meshes
-                emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                    if (mesh.material) {
-                        mesh.material.emissiveIntensity = originalIntensity * intensity
+                // Ceiling light mesh
+                emissiveMeshes.current.forEach(({ mesh, originalIntensity, type }) => {
+                    if (type === 'ceiling-light' && mesh.material) {
+                        mesh.material.emissiveIntensity = originalIntensity * warmUpCurve
                     }
                 })
 
-                // Apply to top light
+                // Ceiling point light
                 if (topLightRef.current) {
-                    const targetIntensity = isMobile ? 40 : 60
-                    topLightRef.current.intensity = targetIntensity * intensity
+                    const targetIntensity = isMobile ? 40 : 50
+                    topLightRef.current.intensity = targetIntensity * warmUpCurve
                 }
+            }
 
-                // Screens flicker slightly delayed
-                if (flickerPhase > 0.1) {
-                    screenMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                        if (mesh.material) {
-                            mesh.material.emissiveIntensity = originalIntensity * intensity
+            // Phase 2: Screens boot up sequentially (1.2s - 2.5s)
+            const phase2Start = 1.2
+            const phase2Duration = 1.3
+            const phase2Time = elapsed - phase2Start
+
+            if (phase2Time >= 0) {
+                screenMeshes.current.forEach(({ mesh, originalIntensity }, index) => {
+                    if (mesh.material) {
+                        // Stagger screen activation
+                        const screenDelay = index * 0.15
+                        const screenBootTime = phase2Time - screenDelay
+                        const screenBootDuration = 0.4
+
+                        if (screenBootTime >= 0 && screenBootTime < screenBootDuration) {
+                            // Quick boot-up with slight flicker
+                            const bootProgress = screenBootTime / screenBootDuration
+                            const flicker = Math.random() > 0.7 ? 0.9 : 1.0 // Occasional flicker
+                            mesh.material.emissiveIntensity = originalIntensity * bootProgress * flicker
+                        } else if (screenBootTime >= screenBootDuration) {
+                            // Fully on
+                            mesh.material.emissiveIntensity = originalIntensity
                         }
-                    })
-                }
+                    }
+                })
+            }
 
-                if (currentFlicker !== flickerCount) {
-                    setFlickerCount(currentFlicker)
-                }
-            } else {
+            // Phase 3: Other emissive elements fade in (1.0s - 2.0s)
+            const phase3Start = 1.0
+            const phase3Duration = 1.0
+            const phase3Time = elapsed - phase3Start
+
+            if (phase3Time >= 0 && phase3Time < phase3Duration) {
+                const fadeProgress = phase3Time / phase3Duration
+
+                emissiveMeshes.current.forEach(({ mesh, originalIntensity, type }) => {
+                    if (type === 'cyan-emissive' && mesh.material) {
+                        mesh.material.emissiveIntensity = originalIntensity * fadeProgress
+                    }
+                })
+            }
+
+            // Move to complete phase after all animations
+            if (elapsed > 2.5) {
                 setAnimationPhase('stabilizing')
             }
         }
         else if (animationPhase === 'stabilizing') {
-            // Smooth transition to full brightness
-            const stabilizeTime = elapsed - (0.8 + 0.6 * 2)
-            const stabilizeDuration = 0.4
+            // Final stabilization (2.5s - 2.8s)
+            const stabilizeTime = elapsed - 2.5
+            const stabilizeDuration = 0.3
 
             if (stabilizeTime < stabilizeDuration) {
-                const smoothIntensity = Math.min(1, stabilizeTime / stabilizeDuration)
+                // Ensure everything is at full brightness
+                const finalProgress = Math.min(1, stabilizeTime / stabilizeDuration)
 
                 emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
                     if (mesh.material) {
-                        mesh.material.emissiveIntensity = originalIntensity * smoothIntensity
+                        mesh.material.emissiveIntensity = originalIntensity * finalProgress
                     }
                 })
 
                 if (topLightRef.current) {
-                    const targetIntensity = isMobile ? 40 : 60
-                    topLightRef.current.intensity = targetIntensity * smoothIntensity
+                    const targetIntensity = isMobile ? 40 : 50
+                    topLightRef.current.intensity = targetIntensity * finalProgress
                 }
 
                 screenMeshes.current.forEach(({ mesh, originalIntensity }) => {
                     if (mesh.material) {
-                        mesh.material.emissiveIntensity = originalIntensity * smoothIntensity
+                        mesh.material.emissiveIntensity = originalIntensity * finalProgress
                     }
                 })
             } else {
@@ -297,13 +318,20 @@ export default function ContactUs({ onContactClick }) {
             setAnimationPhase('done')
         }
         else if (animationPhase === 'done') {
-            // Subtle continuous flicker for realism (very subtle)
-            const flickerNoise = Math.sin(state.clock.elapsedTime * 10) * 0.03 + 0.97
+            // Very subtle ambient flicker for the ceiling light (like real fluorescent/LED)
+            const ambientFlicker = Math.sin(state.clock.elapsedTime * 8) * 0.02 + 0.98
 
             if (topLightRef.current) {
                 const targetIntensity = isMobile ? 40 : 50
-                topLightRef.current.intensity = targetIntensity * flickerNoise
+                topLightRef.current.intensity = targetIntensity * ambientFlicker
             }
+
+            // Screens have stable glow (no flicker - they're digital)
+            screenMeshes.current.forEach(({ mesh, originalIntensity }) => {
+                if (mesh.material) {
+                    mesh.material.emissiveIntensity = originalIntensity
+                }
+            })
         }
     })
 

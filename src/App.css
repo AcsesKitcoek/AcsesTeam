@@ -103,3 +103,23 @@ body {
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   z-index: 100;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .ui-overlay h1 {
+    font-size: 36px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.4);
+  }
+
+  .ui-overlay .subtitle {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+  }
+
+  .back-button {
+    top: 60px;
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}

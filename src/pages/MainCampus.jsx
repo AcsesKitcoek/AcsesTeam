@@ -514,7 +514,11 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         object={clonedScene}
         onPointerMove={handlePointerMove}
         onClick={handleClick}
-        onPointerDown={isMobile ? handleClick : undefined}
+        onPointerUp={isMobile ? handleClick : undefined}
+        onTouchEnd={isMobile ? (e) => {
+          e.preventDefault()
+          handleClick(e)
+        } : undefined}
       />
 
       {/* HOD Clickable Zone - LARGER on mobile for easier touching */}
@@ -525,7 +529,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           size={isMobile ? [4, 3, 4] : [3.25, 2.3, 3.1]}
           onPointerMove={handlePointerMove}
           onClick={handleClick}
-          onPointerDown={isMobile ? handleClick : undefined}
+          onPointerUp={isMobile ? handleClick : undefined}
         />
       )}
 
@@ -537,7 +541,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           size={isMobile ? [2.5, 3.5, 2.5] : [2, 3, 2]}
           onPointerMove={handlePointerMove}
           onClick={handleClick}
-          onPointerDown={isMobile ? handleClick : undefined}
+          onPointerUp={isMobile ? handleClick : undefined}
         />
       )}
     </>

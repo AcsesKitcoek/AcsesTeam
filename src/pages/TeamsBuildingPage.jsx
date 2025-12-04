@@ -58,15 +58,15 @@ export default function TeamsBuildingPage() {
                     enablePan={true}
                     enableZoom={true}
                     enableRotate={true}
-                    minDistance={isMobile ? 100 : 30}
-                    maxDistance={isMobile ? 110 : 100}
-                    maxPolarAngle={isMobile ? Math.PI / 2 : Math.PI}
-                    minPolarAngle={isMobile ? Math.PI / 6 : 0}
+                    minDistance={isMobile ? 100 : 94}
+                    maxDistance={isMobile ? 110 : 96}
+                    maxPolarAngle={Math.PI / 2.3}
+                    minPolarAngle={Math.PI / 3.5}
+                    panSpeed={isMobile ? 0.3 : 0.2}
+                    rotateSpeed={isMobile ? 0.35 : 0.25}
+                    zoomSpeed={isMobile ? 0.4 : 0.3}
                     enableDamping={true}
                     dampingFactor={0.1}
-                    panSpeed={isMobile ? 0.4 : 0.3}
-                    rotateSpeed={isMobile ? 0.4 : 0.3}
-                    zoomSpeed={isMobile ? 0.5 : 0.4}
                 />
 
                 <EffectComposer>

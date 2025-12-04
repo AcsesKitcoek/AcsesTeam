@@ -49,17 +49,21 @@ const ContactUsModal = React.memo(({ onClose }) => {
                 pointerEvents: 'auto',
                 animation: 'fadeIn 0.3s ease-out'
             }}>
-            <div style={{
-                background: 'linear-gradient(135deg, rgba(42, 0, 84, 0.95), rgba(20, 0, 40, 0.95))',
-                border: '2px solid #aa00ff',
-                borderRadius: '20px',
-                padding: '40px',
-                maxWidth: '500px',
-                width: '90%',
-                boxShadow: '0 0 40px rgba(170, 0, 255, 0.5)',
-                position: 'relative',
-                animation: 'slideUp 0.4s ease-out'
-            }}>
+            <div
+                className="contact-modal-container"
+                style={{
+                    background: 'linear-gradient(135deg, rgba(42, 0, 84, 0.95), rgba(20, 0, 40, 0.95))',
+                    border: '2px solid #aa00ff',
+                    borderRadius: '20px',
+                    padding: '40px',
+                    maxWidth: '500px',
+                    width: '90%',
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
+                    boxShadow: '0 0 40px rgba(170, 0, 255, 0.5)',
+                    position: 'relative',
+                    animation: 'slideUp 0.4s ease-out'
+                }}>
                 {/* Close Button */}
                 <button
                     onClick={onClose}
@@ -248,6 +252,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
 
                     {/* Submit Button */}
                     <button
+                        className="w-full"
                         type="submit"
                         style={{
                             width: '100%',
@@ -262,7 +267,8 @@ const ContactUsModal = React.memo(({ onClose }) => {
                             letterSpacing: '1px',
                             cursor: 'pointer',
                             transition: 'all 0.3s',
-                            boxShadow: '0 4px 15px rgba(170, 0, 255, 0.4)'
+                            boxShadow: '0 4px 15px rgba(170, 0, 255, 0.4)',
+                            whiteSpace: 'nowrap'
                         }}
                         onMouseEnter={(e) => {
                             e.target.style.transform = 'translateY(-2px)'
@@ -296,6 +302,61 @@ const ContactUsModal = React.memo(({ onClose }) => {
                     to {
                         transform: translateY(0);
                         opacity: 1;
+                    }
+                }
+
+                /* Mobile Responsive Styles */
+                @media (max-width: 768px) {
+                    .contact-modal-container {
+                        padding: 24px !important;
+                        border-radius: 16px !important;
+                        width: 95% !important;
+                    }
+
+                    .contact-modal-container h2 {
+                        font-size: 24px !important;
+                        margin-bottom: 8px !important;
+                    }
+
+                    .contact-modal-container p {
+                        font-size: 12px !important;
+                        margin-bottom: 20px !important;
+                    }
+
+                    .contact-modal-container label {
+                        font-size: 12px !important;
+                        margin-bottom: 6px !important;
+                    }
+
+                    .contact-modal-container input,
+                    .contact-modal-container textarea {
+                        padding: 10px 12px !important;
+                        font-size: 13px !important;
+                        border-radius: 8px !important;
+                    }
+
+                    .contact-modal-container textarea {
+                        min-height: 80px !important;
+                    }
+
+                    .contact-modal-container button[type="submit"] {
+                        padding: 12px 20px !important;
+                        font-size: 13px !important;
+                        border-radius: 10px !important;
+                        letter-spacing: 0.5px !important;
+                        white-space: nowrap !important;
+                    }
+
+                    .contact-modal-container button:first-of-type {
+                        width: 32   px !important;
+                        height: 32px !important;
+                        font-size: 20px !important;
+                        top: 16px !important;
+                        right: 16px !important;
+                    }
+
+                    .contact-modal-container > div {
+                        margin-bottom: 16px !important;
                     }
                 }
             `}</style>

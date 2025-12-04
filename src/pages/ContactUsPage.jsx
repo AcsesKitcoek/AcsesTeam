@@ -40,7 +40,7 @@ export default function ContactUsPage() {
             <Canvas
                 camera={{
                     // Adjust based on your ContactUs model size and position
-                    position: isMobile ? [-3.82, 1.26, 1.75] : [-4.22, 1.05, 0.30],
+                    position: isMobile ? [-4.22, 1.05, 0.30] : [-4.22, 1.05, 0.30],
                     fov: isMobile ? 60 : 50,
                     near: 0.1,
                     far: 20
@@ -65,8 +65,8 @@ export default function ContactUsPage() {
                     enablePan={true}
                     enableZoom={true}
                     enableRotate={true}
-                    minDistance={isMobile ? 18 : 2}
-                    maxDistance={isMobile ? 35 : 20}
+                    minDistance={isMobile ? 7 : 2}
+                    maxDistance={isMobile ? 7.2 : 20}
                     maxPolarAngle={isMobile ? Math.PI / 2 : Math.PI}
                     minPolarAngle={isMobile ? Math.PI / 6 : 0}
                     enableDamping={true}
@@ -98,7 +98,7 @@ export default function ContactUsPage() {
             </div>
 
             {/* Camera Debug Panel - Hidden for production */}
-            <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} />
+            {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
 
             {/* Contact Us Modal */}
             {showContactModal && (
