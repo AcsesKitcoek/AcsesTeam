@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import MainCampusPage from './pages/MainCampusPage'
 import TeamsBuildingPage from './pages/TeamsBuildingPage'
 import ContactUsPage from './pages/ContactUsPage'
+import EventGalleryPage from './pages/EventGalleryPage'
 import './App.css'
 
 
@@ -16,6 +17,7 @@ function App() {
       <Route path="/" element={<MainCampusPage />} />
       <Route path="/teams" element={<TeamsBuildingPage />} />
       <Route path="/contact" element={<ContactUsPage />} />
+      <Route path="/events" element={<EventGalleryPage />} />
     </Routes>
   )
 }
