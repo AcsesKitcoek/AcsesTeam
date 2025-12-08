@@ -86,7 +86,7 @@ export default function ContactUsPage() {
                 </EffectComposer>
             </Canvas>
 
-            <div className="ui-overlay">
+            <div className="ui-overlay" style={{ marginTop: isMobile ? '80px' : '0' }}>
                 <h1>CONTACT US</h1>
                 <p className="subtitle" style={{ padding: '10px' }}>Get In Touch With ACSES</p>
 

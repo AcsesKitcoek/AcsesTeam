@@ -79,7 +79,7 @@ export default function TeamsBuildingPage() {
                 </EffectComposer>
             </Canvas>
 
-            <div className="ui-overlay">
+            <div className="ui-overlay" style={{ marginTop: isMobile ? '80px' : '0' }}>
                 <h1>TEAMS</h1>
                 <p className="subtitle" style={{ padding: '10px' }}>Meet Our Amazing Teams</p>
 

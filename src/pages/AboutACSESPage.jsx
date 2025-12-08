@@ -31,7 +31,7 @@ export default function AboutACSESPage() {
         <div style={{ width: '100vw', height: '100vh' }}>
             <Canvas
                 camera={{
-                    position: isMobile ? [0, 5, 15] : [28.45, 18.92, 35.21],
+                    position: isMobile ? [48.21, 18.39, 59.71] : [31.72, 14.12, 33.19],
                     fov: isMobile ? 65 : 40,
                     near: 0.1,
                     far: 1000
@@ -46,7 +46,7 @@ export default function AboutACSESPage() {
                 }}
             >
                 <SolidPurpleBackground />
-                <fog attach="fog" args={['#0a0a1a', isMobile ? 25 : 100, isMobile ? 50 : 100]} />
+                <fog attach="fog" args={['#0a0a1a', isMobile ? 125 : 100, isMobile ? 250 : 100]} />
                 <CameraTracker onUpdate={handleCameraUpdate} />
 
                 {/* Lighting */}
@@ -55,12 +55,12 @@ export default function AboutACSESPage() {
                 <AboutACSES />
 
                 <OrbitControls
-                    target={[-5, 7, 0]}
+                    target={[-3.8, 7, 0]}
                     enablePan={true}
                     enableZoom={true}
                     enableRotate={true}
-                    minDistance={isMobile ? 12 : 30}
-                    maxDistance={isMobile ? 20 : 50}
+                    minDistance={isMobile ? 70 : 40}
+                    maxDistance={isMobile ? 80 : 60}
                     maxPolarAngle={Math.PI / 2.2}
                     minPolarAngle={Math.PI / 4}
                     minAzimuthAngle={-Math.PI / 3}
@@ -82,7 +82,7 @@ export default function AboutACSESPage() {
                 </EffectComposer>
             </Canvas>
 
-            <div className="ui-overlay">
+            <div className="ui-overlay" style={{ marginTop: isMobile ? '80px' : '0' }}>
                 <h1>ABOUT ACSES</h1>
                 <p className="subtitle" style={{ padding: '10px' }}>Discover Our Vision, Mission & Sponsors</p>
 

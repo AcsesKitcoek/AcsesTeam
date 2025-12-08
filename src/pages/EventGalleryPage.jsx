@@ -31,7 +31,7 @@ export default function EventGalleryPage() {
         <div style={{ width: '100vw', height: '100vh' }}>
             <Canvas
                 camera={{
-                    position: isMobile ? [0, 5, 15] : [28.45, 18.92, 35.21],
+                    position: isMobile ? [39.75, 30.74, 48.30] : [28.45, 18.92, 35.21],
                     fov: isMobile ? 65 : 40,
                     near: 0.1,
                     far: 1000
@@ -46,7 +46,7 @@ export default function EventGalleryPage() {
                 }}
             >
                 <SolidPurpleBackground />
-                <fog attach="fog" args={['#0a0a1a', isMobile ? 25 : 100, isMobile ? 50 : 100]} />
+                <fog attach="fog" args={['#0a0a1a', isMobile ? 150 : 100, isMobile ? 250 : 100]} />
                 <CameraTracker onUpdate={handleCameraUpdate} />
 
                 {/* Lighting */}
@@ -59,8 +59,8 @@ export default function EventGalleryPage() {
                     enablePan={true}
                     enableZoom={true}
                     enableRotate={true}
-                    minDistance={isMobile ? 12 : 30}
-                    maxDistance={isMobile ? 20 : 50}
+                    minDistance={isMobile ? 65 : 30}
+                    maxDistance={isMobile ? 70 : 50}
                     maxPolarAngle={Math.PI / 2.2}
                     minPolarAngle={Math.PI / 4}
                     minAzimuthAngle={-Math.PI / 3}
@@ -82,7 +82,7 @@ export default function EventGalleryPage() {
                 </EffectComposer>
             </Canvas>
 
-            <div className="ui-overlay">
+            <div className="ui-overlay" style={{ marginTop: isMobile ? '80px' : '0' }}>
                 <h1>EVENT GALLERY</h1>
                 <p className="subtitle" style={{ padding: '10px' }}>Explore Our Memorable Moments</p>
 
