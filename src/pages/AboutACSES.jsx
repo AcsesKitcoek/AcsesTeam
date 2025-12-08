@@ -1,26 +1,25 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useTexture } from '@react-three/drei'
+import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useGLBCache } from '../hooks/useGLBCache'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 
 
-export default function EventGallery() {
+export default function AboutACSES() {
     const groupRef = useRef()
     const { camera, raycaster, gl } = useThree()
 
     // Use GLB cache hook for optimized loading
-    const { scene, loading, error } = useGLBCache('/models/event-gallery.glb', '1.0.0')
-    const acsesTexture = useTexture('/images/ACSES_Image.jpg')
+    const { scene, loading, error } = useGLBCache('/models/about-acses.glb', '1.0.0')
     const isMobile = useMobileDetection()
 
-    const [hoveredFrame, setHoveredFrame] = useState(null)
+    const [hoveredScreen, setHoveredScreen] = useState(null)
     const [animationPhase, setAnimationPhase] = useState('blackout')
 
     const mouse = useRef(new THREE.Vector2())
     const emissiveMeshes = useRef([])
-    const imagePlaneMeshes = useRef([])  // Separate ref for image planes
+    const screenPlaneMeshes = useRef([])  // Separate ref for screen planes
     const animationStartTime = useRef(0)
 
     // Memoize cloned scene to prevent re-cloning on every render
@@ -29,7 +28,7 @@ export default function EventGallery() {
         return scene.clone()
     }, [scene])
 
-    // Setup: Find emissive meshes and make frames interactive
+    // Setup: Find emissive meshes and make screens interactive
     useEffect(() => {
         if (!clonedScene) return
 
@@ -41,50 +40,28 @@ export default function EventGallery() {
                 child.castShadow = !isMobile
                 child.receiveShadow = !isMobile
 
-                // Platform with cyan glow
-                if (child.name === 'Platform' || child.name === 'platform' || child.name === 'Base_Platform') {
+                // Floor platform - Dark base (no glow)
+                if (child.name === 'Floor_Base') {
                     platformFound = true
 
                     if (child.material) {
                         child.material = child.material.clone()
-                        child.material.emissive = new THREE.Color('#00e5ff')
-                        child.material.emissiveIntensity = 2.5
-                        child.material.color = new THREE.Color('#00ffff')
-                        child.material.toneMapped = false
-                        child.material.transparent = true
-                        child.material.opacity = 0.9
+                        child.material.color = new THREE.Color('#1a1a2e')
+                        child.material.emissive = new THREE.Color('#000000')
+                        child.material.emissiveIntensity = 0
+                        child.material.toneMapped = true
+                        child.material.metalness = 0.3
+                        child.material.roughness = 0.7
                         child.material.needsUpdate = true
-
-                        emissiveMeshesList.push({
-                            mesh: child,
-                            name: 'Platform',
-                            originalIntensity: 2.5,
-                            originalEmissive: new THREE.Color('#00e5ff'),
-                            originalToneMapped: false
-                        })
                     }
                 }
-                // Neon lights on walls
-                else if (child.name.includes('Light') || child.name.includes('Neon') || child.name.includes('Strip')) {
+                // Ceiling lights - Purple/Magenta
+                else if (child.name.match(/^Ceiling_Light_[1-2]$/) || child.name.match(/^Ceiling_Light_Base_[1-2]$/)) {
                     if (child.material) {
                         child.material = child.material.clone()
-
-                        // Check if it's pink/purple or cyan
-                        const materialColor = child.material.color || child.material.emissive
-                        const isWarm = materialColor && (materialColor.r > materialColor.b)
-
-                        if (isWarm) {
-                            // Pink/Purple neon
-                            child.material.emissive = new THREE.Color('#ff00ff')
-                            child.material.emissiveIntensity = 3.5
-                            child.material.color = new THREE.Color('#ff00ff')
-                        } else {
-                            // Cyan neon
-                            child.material.emissive = new THREE.Color('#00e5ff')
-                            child.material.emissiveIntensity = 2.0
-                            child.material.color = new THREE.Color('#00ffff')
-                        }
-
+                        child.material.emissive = new THREE.Color('#ff00ff')
+                        child.material.emissiveIntensity = 3.5
+                        child.material.color = new THREE.Color('#ff00ff')
                         child.material.toneMapped = false
                         child.material.transparent = true
                         child.material.opacity = 0.95
@@ -93,20 +70,41 @@ export default function EventGallery() {
                         emissiveMeshesList.push({
                             mesh: child,
                             name: child.name,
-                            originalIntensity: isWarm ? 3.5 : 2.0,
-                            originalEmissive: child.material.emissive.clone(),
+                            originalIntensity: 3.5,
+                            originalEmissive: new THREE.Color('#ff00ff'),
                             originalToneMapped: false
                         })
                     }
                 }
-                // Image Cases - Purple/Magenta glow for frames - INCREASED FOR BLOOM
-                else if (child.name.match(/^Image_Case_[1-8]$/)) {
+                // Cyan lights on platform - REDUCED FOR LESS BLOOM
+                else if (child.name.match(/^Cyan_Light_[1-2]$/) || child.name === 'Cyan_Light_Base' || child.name === 'Cyan_Light_Cylinder') {
+                    if (child.material) {
+                        child.material = child.material.clone()
+                        child.material.emissive = new THREE.Color('#00e5ff')
+                        child.material.emissiveIntensity = 1.2
+                        child.material.color = new THREE.Color('#00ffff')
+                        child.material.toneMapped = false
+                        child.material.transparent = true
+                        child.material.opacity = 0.95
+                        child.material.needsUpdate = true
+
+                        emissiveMeshesList.push({
+                            mesh: child,
+                            name: child.name,
+                            originalIntensity: 1.2,
+                            originalEmissive: new THREE.Color('#00e5ff'),
+                            originalToneMapped: false
+                        })
+                    }
+                }
+                // Screen Cases/Frames - Purple/Magenta glow for bloom - Case_About, Case_Sponsors, Case_Vision
+                else if (child.name === 'Case_About' || child.name === 'Case_Sponsors' || child.name === 'Case_Vision') {
                     if (child.material) {
                         child.material = child.material.clone()
                         child.material.emissive = new THREE.Color('#ff00ff')
-                        child.material.emissiveIntensity = 1.0  // Increased from 1.5 for better bloom
-                        child.material.color = new THREE.Color('#ff00ff')  // Brighter color
-                        child.material.toneMapped = false  // Important for bloom
+                        child.material.emissiveIntensity = 4.0
+                        child.material.color = new THREE.Color('#ff00ff')
+                        child.material.toneMapped = false
                         child.material.metalness = 0.1
                         child.material.roughness = 1
                         child.material.needsUpdate = true
@@ -114,94 +112,37 @@ export default function EventGallery() {
                         emissiveMeshesList.push({
                             mesh: child,
                             name: child.name,
-                            originalIntensity: 4.0,  // Increased from 1.5
+                            originalIntensity: 4.0,
                             originalEmissive: new THREE.Color('#ff00ff'),
                             originalToneMapped: false
                         })
                     }
                 }
-                // Image Planes - ACSES texture (handled in main animation)
-                else if (child.name.match(/^Image_Plane_[1-8]$/)) {
+                // Screen Planes - Black background for text display - Plane_About, Plane_Sponsors, Plane_Vision
+                else if (child.name === 'Plane_About' || child.name === 'Plane_Sponsors' || child.name === 'Plane_Vision') {
                     if (child.material) {
                         child.material = child.material.clone()
 
-                        // Apply ACSES texture with rotation
-                        const rotatedTexture = acsesTexture.clone()
-                        rotatedTexture.center.set(0.5, 0.5)
-                        rotatedTexture.rotation = -Math.PI * 2
-                        rotatedTexture.repeat.set(-1, 1)
-                        rotatedTexture.needsUpdate = true
-
-                        child.material.map = rotatedTexture
-                        child.material.emissive = new THREE.Color('#00ffff')
+                        // Set up material for black background with no emissive
+                        child.material.color = new THREE.Color('#000000')
+                        child.material.emissive = new THREE.Color('#000000')
                         child.material.emissiveIntensity = 0
-                        child.material.emissiveMap = rotatedTexture.clone()
-                        child.material.toneMapped = false
-                        child.material.color = new THREE.Color('#ffffff')
+                        child.material.toneMapped = true
+                        child.material.metalness = 0
+                        child.material.roughness = 1
                         child.material.needsUpdate = true
 
                         // Make clickable
                         child.userData.clickable = true
-                        child.userData.frameName = child.name
-                        child.userData.originalEmissive = new THREE.Color('#00ffff')
-                        child.userData.originalIntensity = 0.6
+                        child.userData.screenName = child.name
+                        child.userData.originalEmissive = new THREE.Color('#000000')
+                        child.userData.originalIntensity = 0
 
-                        imagePlaneMeshes.current.push({
+                        screenPlaneMeshes.current.push({
                             mesh: child,
                             name: child.name,
-                            originalIntensity: 0.6,
-                            originalEmissive: new THREE.Color('#00ffff')
-                        })
-                    }
-                }
-                // Photo frames - make them interactive (but skip Image_Plane meshes)
-                else if (!child.name.match(/^Image_Plane_[1-8]$/) &&
-                    (child.name.includes('Frame') || child.name.includes('Photo') || child.name.includes('Picture'))) {
-                    child.userData.clickable = true
-                    child.userData.frameName = child.name
-                    child.userData.originalEmissive = child.material?.emissive?.clone()
-                    child.userData.originalIntensity = child.material?.emissiveIntensity || 0
-
-                    // Add subtle glow to frames
-                    if (child.material) {
-                        child.material = child.material.clone()
-                        if (!child.material.emissive) {
-                            child.material.emissive = new THREE.Color('#ffffff')
-                        }
-                        child.material.emissiveIntensity = 0.1
-                        child.material.needsUpdate = true
-                    }
-                }
-                // Handle other emissive materials
-                else if (child.material && child.material.emissive) {
-                    const emissiveHex = child.material.emissive.getHex()
-
-                    if (emissiveHex === 0x00e5ff || emissiveHex === 0x00ffff) {
-                        child.material = child.material.clone()
-                        child.material.emissiveIntensity = 1.7
-                        child.material.toneMapped = false
-                        child.material.needsUpdate = true
-
-                        emissiveMeshesList.push({
-                            mesh: child,
-                            name: child.name,
-                            originalIntensity: 1.7,
-                            originalEmissive: child.material.emissive.clone(),
-                            originalToneMapped: false
-                        })
-                    }
-                    else if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff) {
-                        child.material = child.material.clone()
-                        child.material.emissiveIntensity = 3.5
-                        child.material.toneMapped = false
-                        child.material.needsUpdate = true
-
-                        emissiveMeshesList.push({
-                            mesh: child,
-                            name: child.name,
-                            originalIntensity: 3.5,
-                            originalEmissive: child.material.emissive.clone(),
-                            originalToneMapped: false
+                            originalIntensity: 0,
+                            originalEmissive: new THREE.Color('#000000')
                         })
                     }
                 }
@@ -218,13 +159,13 @@ export default function EventGallery() {
         })
 
         if (!platformFound) {
-            console.warn('⚠️ Platform not found in Gallery model!')
+            console.warn('⚠️ Platform not found in About ACSES model!')
         }
 
-        console.log(`✅ Gallery setup complete: ${emissiveMeshesList.length} emissive meshes found`)
-    }, [clonedScene, isMobile, acsesTexture])
+        console.log(`✅ About ACSES setup complete: ${emissiveMeshesList.length} emissive meshes, ${screenPlaneMeshes.current.length} screen planes found`)
+    }, [clonedScene, isMobile])
 
-    // Radial Expand animation
+    // Wave Sweep animation
     useFrame((state) => {
         if (!animationStartTime.current) {
             animationStartTime.current = state.clock.elapsedTime
@@ -234,36 +175,31 @@ export default function EventGallery() {
 
         if (animationPhase === 'blackout') {
             if (elapsed > 0.5) {
-                setAnimationPhase('radial-expand')
+                setAnimationPhase('wave-sweep')
             }
         }
-        else if (animationPhase === 'radial-expand') {
+        else if (animationPhase === 'wave-sweep') {
             const duration = 2.5
             const progress = Math.min((elapsed - 0.5) / duration, 1)
 
-            const expandRadius = progress * 30 // Max distance from center (adjust based on your scene size)
-
             emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
                 if (mesh.material) {
+                    // Get mesh world position
                     const worldPos = new THREE.Vector3()
                     mesh.getWorldPosition(worldPos)
 
-                    // Distance from scene center (0, 0, 0) - adjust if your platform is at different position
-                    const distanceFromCenter = new THREE.Vector2(worldPos.x, worldPos.z).length()
+                    // Wave travels along X axis from left to right
+                    const wavePosition = (progress * 40) - 20 // Adjust range based on your scene size
+                    const distance = Math.abs(worldPos.x - wavePosition)
 
+                    // Lights turn on when wave reaches them
                     let intensity = 0
-                    if (distanceFromCenter < expandRadius) {
-                        // Smooth wave effect - lights turn on as wave passes
-                        const waveWidth = 5 // Width of the activation wave
-                        const distanceFromWaveFront = expandRadius - distanceFromCenter
-
-                        if (distanceFromWaveFront < waveWidth) {
-                            // In the wave - fade in
-                            intensity = 1 - (distanceFromWaveFront / waveWidth)
-                        } else {
-                            // Already passed - stay on
-                            intensity = 1
-                        }
+                    if (distance < 5) {
+                        // Smooth fade-in within wave radius
+                        intensity = 1 - (distance / 5)
+                    } else if (worldPos.x < wavePosition) {
+                        // Already passed - stay on
+                        intensity = 1
                     }
 
                     mesh.material.emissiveIntensity = originalIntensity * intensity
@@ -284,8 +220,8 @@ export default function EventGallery() {
                 }
             })
 
-            // Set image planes to their original intensity
-            imagePlaneMeshes.current.forEach(({ mesh, originalIntensity, originalEmissive }) => {
+            // Set screen planes to their original intensity
+            screenPlaneMeshes.current.forEach(({ mesh, originalIntensity, originalEmissive }) => {
                 if (mesh.material) {
                     mesh.material.emissiveIntensity = originalIntensity
                     mesh.material.emissive.copy(originalEmissive)
@@ -296,20 +232,20 @@ export default function EventGallery() {
             setAnimationPhase('done')
         }
 
-        // Maintain image plane intensity when done
+        // Maintain screen plane intensity when done
         if (animationPhase === 'done') {
-            imagePlaneMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                if (mesh.material && !hoveredFrame) {
+            screenPlaneMeshes.current.forEach(({ mesh, originalIntensity }) => {
+                if (mesh.material && !hoveredScreen) {
                     mesh.material.emissiveIntensity = originalIntensity
                 }
             })
         }
 
-        // Hover glow effect for frames (desktop only)
-        if (hoveredFrame && animationPhase === 'done' && !isMobile) {
-            if (hoveredFrame.material) {
+        // Hover glow effect for screens (desktop only)
+        if (hoveredScreen && animationPhase === 'done' && !isMobile) {
+            if (hoveredScreen.material) {
                 const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.3 + 0.5
-                hoveredFrame.material.emissiveIntensity = pulseIntensity
+                hoveredScreen.material.emissiveIntensity = pulseIntensity
             }
         }
     })
@@ -338,8 +274,8 @@ export default function EventGallery() {
         const intersects = raycaster.intersectObject(clonedScene, true)
 
         // Reset previous hover
-        if (hoveredFrame && hoveredFrame.material) {
-            hoveredFrame.material.emissiveIntensity = hoveredFrame.userData.originalIntensity || 0.1
+        if (hoveredScreen && hoveredScreen.material) {
+            hoveredScreen.material.emissiveIntensity = hoveredScreen.userData.originalIntensity || 0.1
         }
 
         if (intersects.length > 0) {
@@ -351,17 +287,17 @@ export default function EventGallery() {
             }
 
             if (clickableObject && clickableObject.userData.clickable) {
-                setHoveredFrame(clickableObject)
+                setHoveredScreen(clickableObject)
                 gl.domElement.style.cursor = 'pointer'
                 return
             }
         }
 
-        setHoveredFrame(null)
+        setHoveredScreen(null)
         gl.domElement.style.cursor = 'default'
-    }, [animationPhase, isMobile, clonedScene, gl, raycaster, camera, hoveredFrame])
+    }, [animationPhase, isMobile, clonedScene, gl, raycaster, camera, hoveredScreen])
 
-    // Click handler for frames
+    // Click handler for screens
     const handleClick = useCallback((event) => {
         if (animationPhase !== 'done') return
         if (!clonedScene) return
@@ -395,9 +331,9 @@ export default function EventGallery() {
             }
 
             if (clickableObject && clickableObject.userData.clickable) {
-                const { frameName } = clickableObject.userData
-                console.log(`📸 Clicked on frame: ${frameName}`)
-                // TODO: Open modal or lightbox with full image
+                const { screenName } = clickableObject.userData
+                console.log(`🖥️ Clicked on screen: ${screenName}`)
+                // TODO: Open modal with screen content
             }
         }
     }, [animationPhase, clonedScene, gl, raycaster, camera])
@@ -409,7 +345,7 @@ export default function EventGallery() {
 
     // Show error state
     if (error) {
-        console.error('Failed to load EventGallery model:', error)
+        console.error('Failed to load About ACSES model:', error)
         return null
     }
 
