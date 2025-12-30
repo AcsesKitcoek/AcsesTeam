@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 
-const DB_NAME = 'acses-glb-cache'
+const DB_NAME = 'acses-draco-cache'
 const DB_VERSION = 1
 const STORE_NAME = 'models'
 const CACHE_DURATION = 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
 
 /**
- * Initialize IndexedDB for GLB caching
+ * Initialize IndexedDB for Draco GLB caching
  */
 function initDB() {
     return new Promise((resolve, reject) => {
@@ -32,9 +32,9 @@ function initDB() {
 }
 
 /**
- * Get cached GLB from IndexedDB
+ * Get cached Draco GLB from IndexedDB
  */
-async function getCachedGLB(url) {
+async function getCachedDracoGLB(url) {
     try {
         const db = await initDB()
         const transaction = db.transaction([STORE_NAME], 'readonly')
@@ -53,7 +53,7 @@ async function getCachedGLB(url) {
                 const now = Date.now()
                 if (now > cached.expiresAt) {
                     // Cache expired, delete it
-                    deleteCachedGLB(url)
+                    deleteCachedDracoGLB(url)
                     resolve(null)
                     return
                 }
@@ -63,15 +63,15 @@ async function getCachedGLB(url) {
             request.onerror = () => reject(request.error)
         })
     } catch (error) {
-        console.warn('Failed to get cached GLB:', error)
+        console.warn('Failed to get cached Draco GLB:', error)
         return null
     }
 }
 
 /**
- * Store GLB in IndexedDB cache
+ * Store Draco GLB in IndexedDB cache
  */
-async function setCachedGLB(url, arrayBuffer, version = '1.0.0') {
+async function setCachedDracoGLB(url, arrayBuffer, version = '1.0.0') {
     try {
         const db = await initDB()
         const transaction = db.transaction([STORE_NAME], 'readwrite')
@@ -91,14 +91,14 @@ async function setCachedGLB(url, arrayBuffer, version = '1.0.0') {
             request.onerror = () => reject(request.error)
         })
     } catch (error) {
-        console.warn('Failed to cache GLB:', error)
+        console.warn('Failed to cache Draco GLB:', error)
     }
 }
 
 /**
- * Delete cached GLB from IndexedDB
+ * Delete cached Draco GLB from IndexedDB
  */
-async function deleteCachedGLB(url) {
+async function deleteCachedDracoGLB(url) {
     try {
         const db = await initDB()
         const transaction = db.transaction([STORE_NAME], 'readwrite')
@@ -110,14 +110,14 @@ async function deleteCachedGLB(url) {
             request.onerror = () => reject(request.error)
         })
     } catch (error) {
-        console.warn('Failed to delete cached GLB:', error)
+        console.warn('Failed to delete cached Draco GLB:', error)
     }
 }
 
 /**
- * Clear all cached GLB models
+ * Clear all cached Draco GLB models
  */
-export async function clearGLBCache() {
+export async function clearDracoCache() {
     try {
         const db = await initDB()
         const transaction = db.transaction([STORE_NAME], 'readwrite')
@@ -126,78 +126,89 @@ export async function clearGLBCache() {
         return new Promise((resolve, reject) => {
             const request = store.clear()
             request.onsuccess = () => {
-                console.log('GLB cache cleared successfully')
+                console.log('Draco cache cleared successfully')
                 resolve()
             }
             request.onerror = () => reject(request.error)
         })
     } catch (error) {
-        console.error('Failed to clear GLB cache:', error)
+        console.error('Failed to clear Draco cache:', error)
     }
 }
 
 /**
- * Custom hook to load GLB models with IndexedDB caching
- * @param {string} url - URL of the GLB model
- * @param {string} version - Version string for cache busting
- * @param {boolean} useCache - Whether to use caching (default: true). Set to false to bypass cache for testing.
- * @returns {Object} GLTF scene object
+ * Custom hook to load Draco-compressed GLB models with IndexedDB caching
+ * @param {string} url - URL of the Draco-compressed GLB model
+ * @param {string} version - Version string for cache busting (default: '1.0.0')
+ * @param {boolean} useCache - Whether to use caching (default: true)
+ * @param {string} dracoDecoderPath - Path to Draco decoder files (default: '/draco/gltf/')
+ * @returns {Object} { scene, loading, error, progress }
  */
-export function useGLBCache(url, version = '1.0.0', useCache = true) {
-    const [cachedData, setCachedData] = useState(null)
+export function useDracoLoader(url, version = '1.0.0', useCache = false, dracoDecoderPath = '/draco/gltf/') {
+    const [scene, setScene] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [progress, setProgress] = useState(0)
 
     useEffect(() => {
         let isMounted = true
+        let dracoLoader = null
 
         async function loadModel() {
             try {
                 setLoading(true)
                 setError(null)
+                setProgress(0)
 
-                // Skip cache if disabled
-                if (!useCache) {
-                    console.log(`⚠️ Cache disabled - Fetching ${url} directly from network`)
-                    await fetchAndCache(false) // Don't cache when useCache is false
-                    return
-                }
+                // Initialize DRACO loader
+                dracoLoader = new DRACOLoader()
+                dracoLoader.setDecoderPath(dracoDecoderPath)
+                dracoLoader.setDecoderConfig({ type: 'js' })
 
-                // Try to get from cache first
-                const cached = await getCachedGLB(url)
+                // Try to get from cache first if caching is enabled
+                if (useCache) {
+                    const cached = await getCachedDracoGLB(url)
 
-                if (cached && cached.version === version) {
-                    // Cache hit! Load from cached ArrayBuffer
-                    console.log(`✅ Loading ${url} from cache`)
-                    const loader = new GLTFLoader()
+                    if (cached && cached.version === version) {
+                        // Cache hit! Load from cached ArrayBuffer
+                        console.log(`✅ Loading Draco model from cache: ${url}`)
+                        const gltfLoader = new GLTFLoader()
+                        gltfLoader.setDRACOLoader(dracoLoader)
 
-                    loader.parse(
-                        cached.data,
-                        '',
-                        (gltf) => {
-                            if (isMounted) {
-                                setCachedData(gltf)
-                                setLoading(false)
+                        gltfLoader.parse(
+                            cached.data,
+                            '',
+                            (gltf) => {
+                                if (isMounted) {
+                                    setScene(gltf.scene)
+                                    setLoading(false)
+                                    setProgress(100)
+                                }
+                                dracoLoader.dispose()
+                            },
+                            (err) => {
+                                console.error('Failed to parse cached Draco GLB:', err)
+                                // If parsing fails, fetch fresh
+                                fetchAndCache()
                             }
-                        },
-                        (err) => {
-                            console.error('Failed to parse cached GLB:', err)
-                            // If parsing fails, fetch fresh
-                            fetchAndCache()
-                        }
-                    )
-                } else {
-                    // Cache miss or version mismatch
-                    if (cached && cached.version !== version) {
+                        )
+                        return
+                    } else if (cached && cached.version !== version) {
                         console.log(`🔄 Version mismatch for ${url}, fetching new version`)
-                        await deleteCachedGLB(url)
-                    } else {
-                        console.log(`📥 Fetching ${url} from network`)
+                        await deleteCachedDracoGLB(url)
                     }
-                    await fetchAndCache()
                 }
+
+                // Cache miss or caching disabled - fetch from network
+                if (!useCache) {
+                    console.log(`⚠️ Cache disabled - Fetching Draco model directly: ${url}`)
+                } else {
+                    console.log(`📥 Fetching Draco model from network: ${url}`)
+                }
+
+                await fetchAndCache()
             } catch (err) {
-                console.error('Error loading GLB:', err)
+                console.error('Error loading Draco model:', err)
                 if (isMounted) {
                     setError(err)
                     setLoading(false)
@@ -205,7 +216,7 @@ export function useGLBCache(url, version = '1.0.0', useCache = true) {
             }
         }
 
-        async function fetchAndCache(shouldCache = true) {
+        async function fetchAndCache() {
             try {
                 // Fetch from network
                 const response = await fetch(url)
@@ -215,26 +226,37 @@ export function useGLBCache(url, version = '1.0.0', useCache = true) {
 
                 const arrayBuffer = await response.arrayBuffer()
 
-                // Cache the ArrayBuffer only if caching is enabled
-                if (shouldCache && useCache) {
-                    await setCachedGLB(url, arrayBuffer, version)
+                // Cache the ArrayBuffer if caching is enabled
+                if (useCache) {
+                    await setCachedDracoGLB(url, arrayBuffer, version)
                 }
 
-                // Parse and return
-                const loader = new GLTFLoader()
-                loader.parse(
+                // Parse with Draco loader
+                const gltfLoader = new GLTFLoader()
+                gltfLoader.setDRACOLoader(dracoLoader)
+
+                gltfLoader.parse(
                     arrayBuffer,
                     '',
                     (gltf) => {
                         if (isMounted) {
-                            setCachedData(gltf)
+                            console.log(`✅ Draco model loaded successfully: ${url}`)
+                            setScene(gltf.scene)
                             setLoading(false)
+                            setProgress(100)
+                        }
+                        if (dracoLoader) {
+                            dracoLoader.dispose()
                         }
                     },
                     (err) => {
                         if (isMounted) {
+                            console.error(`❌ Failed to parse Draco model: ${url}`, err)
                             setError(err)
                             setLoading(false)
+                        }
+                        if (dracoLoader) {
+                            dracoLoader.dispose()
                         }
                     }
                 )
@@ -243,6 +265,9 @@ export function useGLBCache(url, version = '1.0.0', useCache = true) {
                     setError(err)
                     setLoading(false)
                 }
+                if (dracoLoader) {
+                    dracoLoader.dispose()
+                }
             }
         }
 
@@ -250,30 +275,35 @@ export function useGLBCache(url, version = '1.0.0', useCache = true) {
 
         return () => {
             isMounted = false
+            if (dracoLoader) {
+                dracoLoader.dispose()
+            }
         }
-    }, [url, version, useCache])
+    }, [url, version, useCache, dracoDecoderPath])
 
-    return { scene: cachedData?.scene, loading, error }
+    return { scene, loading, error, progress }
 }
 
 /**
- * Preload a GLB model into cache
- * @param {string} url - URL of the GLB model
+ * Preload a Draco-compressed GLB model into cache
+ * @param {string} url - URL of the Draco-compressed GLB model
  * @param {string} version - Version string
+ * @param {string} dracoDecoderPath - Path to Draco decoder files
+ * @returns {Promise<Object>} Promise that resolves with the loaded scene
  */
-export async function preloadGLB(url, version = '1.0.0') {
+export async function preloadDracoGLB(url, version = '1.0.0', dracoDecoderPath = '/draco/gltf/') {
     try {
-        const cached = await getCachedGLB(url)
+        const cached = await getCachedDracoGLB(url)
 
         if (cached && cached.version === version) {
             console.log(`✅ ${url} already cached`)
             return
         }
 
-        console.log(`📥 Preloading ${url}`)
+        console.log(`📥 Preloading Draco model: ${url}`)
         const response = await fetch(url)
         const arrayBuffer = await response.arrayBuffer()
-        await setCachedGLB(url, arrayBuffer, version)
+        await setCachedDracoGLB(url, arrayBuffer, version)
         console.log(`✅ ${url} cached successfully`)
     } catch (error) {
         console.error(`Failed to preload ${url}:`, error)

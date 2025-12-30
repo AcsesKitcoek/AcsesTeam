@@ -3,7 +3,7 @@ import { Text3D, Center } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
-import { useGLBCache } from '../hooks/useGLBCache'
+import { useDracoLoader } from '../hooks/useDracoLoader'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import ClickableZone from '../components/scene/ClickableZone'
 
@@ -16,8 +16,8 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
   const { camera, raycaster, gl } = useThree()
   const navigate = useNavigate()
 
-  // Use GLB cache hook for optimized loading
-  const { scene, loading, error } = useGLBCache('/models/main-campus.glb', '1.0.0')
+  // Use Draco loader for compressed model loading
+  const { scene, loading, error } = useDracoLoader('/models/main-campus.glb')
   const isMobile = useMobileDetection()
 
   const [hoveredBuilding, setHoveredBuilding] = useState(null)

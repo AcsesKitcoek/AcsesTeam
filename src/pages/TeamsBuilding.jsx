@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useGLBCache } from '../hooks/useGLBCache'
+import { useDracoLoader } from '../hooks/useDracoLoader'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import CeilingLights from '../components/scene/CeilingLights'
 
@@ -17,8 +17,8 @@ export default function TeamsBuilding() {
     const screenMeshes = useRef([])
     const activationSchedule = useRef([])
 
-    // Use GLB cache hook for optimized loading
-    const { scene, loading, error } = useGLBCache('/models/towerss.glb', '1.0.0')
+    // Use Draco loader for compressed model loading
+    const { scene, loading, error } = useDracoLoader('/models/towerss.glb')
     const acsesTexture = useTexture('/images/ACSES_Image.jpg')
     const isMobile = useMobileDetection()
 

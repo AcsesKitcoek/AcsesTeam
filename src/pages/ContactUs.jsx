@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useGLBCache } from '../hooks/useGLBCache'
+import { useDracoLoader } from '../hooks/useDracoLoader'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import ContactUsIndicator from '../components/scene/ContactUsIndicator'
 
@@ -15,8 +15,8 @@ export default function ContactUs({ onContactClick }) {
     const [flickerCount, setFlickerCount] = useState(0)
     const [laptopPositions, setLaptopPositions] = useState([])
 
-    // Use GLB cache hook for optimized loading
-    const { scene, loading, error } = useGLBCache('/models/contactUs.glb', '1.0.0')
+    // Use Draco loader for compressed model loading
+    const { scene, loading, error } = useDracoLoader('/models/contactUs.glb')
     const isMobile = useMobileDetection()
 
     // Memoize cloned scene to prevent re-cloning on every render

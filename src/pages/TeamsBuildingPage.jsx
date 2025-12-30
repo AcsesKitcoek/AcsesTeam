@@ -55,18 +55,10 @@ export default function TeamsBuildingPage() {
 
                 <OrbitControls
                     target={[0, 17, -31]}
-                    enablePan={true}
-                    enableZoom={true}
-                    enableRotate={true}
-                    minDistance={isMobile ? 100 : 94}
-                    maxDistance={isMobile ? 110 : 96}
-                    maxPolarAngle={Math.PI / 2.3}
-                    minPolarAngle={Math.PI / 3.5}
-                    panSpeed={isMobile ? 0.3 : 0.2}
-                    rotateSpeed={isMobile ? 0.35 : 0.25}
-                    zoomSpeed={isMobile ? 0.4 : 0.3}
-                    enableDamping={true}
-                    dampingFactor={0.1}
+                    enablePan={false}
+                    enableZoom={false}
+                    enableRotate={false}
+                    enableDamping={false}
                 />
 
                 <EffectComposer>

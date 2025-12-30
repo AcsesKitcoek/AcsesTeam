@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
-import { useGLBCache } from '../hooks/useGLBCache'
+import { useDracoLoader } from '../hooks/useDracoLoader'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 
 
@@ -10,8 +10,8 @@ export default function AboutACSES() {
     const groupRef = useRef()
     const { camera, raycaster, gl } = useThree()
 
-    // Use GLB cache hook for optimized loading
-    const { scene, loading, error } = useGLBCache('/models/about-acses.glb', '1.0.0')
+    // Use Draco loader for compressed model loading
+    const { scene, loading, error } = useDracoLoader('/models/about-acses.glb')
     const isMobile = useMobileDetection()
 
     const [hoveredScreen, setHoveredScreen] = useState(null)

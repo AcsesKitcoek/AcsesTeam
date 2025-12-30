@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { useGLBCache } from '../hooks/useGLBCache'
+import { useDracoLoader } from '../hooks/useDracoLoader'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 
 
@@ -10,8 +10,8 @@ export default function EventGallery() {
     const groupRef = useRef()
     const { camera, raycaster, gl } = useThree()
 
-    // Use GLB cache hook for optimized loading
-    const { scene, loading, error } = useGLBCache('/models/event-gallery.glb', '1.0.0')
+    // Use Draco loader for compressed model loading
+    const { scene, loading, error } = useDracoLoader('/models/event-gallery.glb')
     const acsesTexture = useTexture('/images/ACSES_Image.jpg')
     const isMobile = useMobileDetection()
 

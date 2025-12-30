@@ -56,20 +56,10 @@ export default function EventGalleryPage() {
 
                 <OrbitControls
                     target={[-5, 7, 0]}
-                    enablePan={true}
-                    enableZoom={true}
-                    enableRotate={true}
-                    minDistance={isMobile ? 65 : 30}
-                    maxDistance={isMobile ? 70 : 50}
-                    maxPolarAngle={Math.PI / 2.2}
-                    minPolarAngle={Math.PI / 4}
-                    minAzimuthAngle={-Math.PI / 3}
-                    maxAzimuthAngle={Math.PI / 3}
-                    panSpeed={isMobile ? 0.4 : 0.3}
-                    rotateSpeed={isMobile ? 0.4 : 0.3}
-                    zoomSpeed={isMobile ? 0.5 : 0.4}
-                    enableDamping={true}
-                    dampingFactor={0.1}
+                    enablePan={false}
+                    enableZoom={false}
+                    enableRotate={false}
+                    enableDamping={false}
                 />
 
                 <EffectComposer>

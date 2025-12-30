@@ -62,18 +62,10 @@ export default function ContactUsPage() {
 
                 <OrbitControls
                     target={[0, 1.2, 0.26]}
-                    enablePan={true}
-                    enableZoom={true}
-                    enableRotate={true}
-                    minDistance={isMobile ? 7 : 2}
-                    maxDistance={isMobile ? 7.2 : 20}
-                    maxPolarAngle={isMobile ? Math.PI / 2 : Math.PI}
-                    minPolarAngle={isMobile ? Math.PI / 6 : 0}
-                    enableDamping={true}
-                    dampingFactor={0.1}
-                    panSpeed={isMobile ? 0.4 : 0.3}
-                    rotateSpeed={isMobile ? 0.4 : 0.3}
-                    zoomSpeed={isMobile ? 0.5 : 0.4}
+                    enablePan={false}
+                    enableZoom={false}
+                    enableRotate={false}
+                    enableDamping={false}
                 />
 
                 <EffectComposer>

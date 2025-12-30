@@ -71,18 +71,10 @@ export default function MainCampusPage() {
 
                 <OrbitControls
                     target={[1.2, 4, 0]}
-                    enablePan={true}
-                    enableZoom={true}
-                    enableRotate={true}
-                    minDistance={isMobile ? 54.15 : 23}
-                    maxDistance={isMobile ? 60 : 24.5}
-                    maxPolarAngle={Math.PI / 2.3}
-                    minPolarAngle={Math.PI / 3.5}
-                    panSpeed={isMobile ? 0.3 : 0.2}
-                    rotateSpeed={isMobile ? 0.35 : 0.25}
-                    zoomSpeed={isMobile ? 0.4 : 0.3}
-                    enableDamping={true}
-                    dampingFactor={0.1}
+                    enablePan={false}
+                    enableZoom={false}
+                    enableRotate={false}
+                    enableDamping={false}
                 />
 
                 {/* Post-processing for Enhanced Neon Glow - MOBILE BLOOM ENABLED */}
