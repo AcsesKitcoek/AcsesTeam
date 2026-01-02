@@ -40,7 +40,7 @@ export default function ContactUsPage() {
             <Canvas
                 camera={{
                     // Adjust based on your ContactUs model size and position
-                    position: isMobile ? [-4.22, 1.05, 0.30] : [-4.22, 1.05, 0.30],
+                    position: isMobile ? [-6.69, 1.50, 0.27] : [-4.22, 1.05, 0.30],
                     fov: isMobile ? 60 : 50,
                     near: 0.1,
                     far: 20
@@ -63,8 +63,8 @@ export default function ContactUsPage() {
                 <OrbitControls
                     target={[0, 1.2, 0.26]}
                     enablePan={false}
-                    enableZoom={false}
-                    enableRotate={false}
+                    enableZoom={true}
+                    enableRotate={true}
                     enableDamping={false}
                 />
 

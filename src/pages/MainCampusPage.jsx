@@ -44,8 +44,8 @@ export default function MainCampusPage() {
         <div style={{ width: '100vw', height: '100vh' }}>
             <Canvas
                 camera={{
-                    position: [14.71, 8.68, 18.02],
-                    fov: 50,
+                    position: isMobile ? [28, 18, 34] : [14.71, 8.68, 18.02],
+                    fov: isMobile ? 60 : 50,
                     near: 0.1,
                     far: 1000
                 }}
@@ -58,7 +58,7 @@ export default function MainCampusPage() {
                 }}
             >
                 <SolidPurpleBackground />
-                <fog attach="fog" args={['#0a0514', 40, 80]} />
+                <fog attach="fog" args={['#0a0514', isMobile ? 50 : 40, isMobile ? 100 : 80]} />
                 <CameraTracker onUpdate={handleCameraUpdate} />
 
                 {/* Lighting */}

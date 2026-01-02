@@ -9,6 +9,11 @@ body {
   background: radial-gradient(ellipse at center, #6b4f8a 0%, #3d2a54 35%, #1a0f2e 70%, #0a0512 100%);
   overflow: hidden;
   color: #ffffff;
+  touch-action: none;
+  /* Prevent mobile zoom and pan gestures */
+  -webkit-user-select: none;
+  /* Prevent text selection on iOS */
+  user-select: none;
 }
 
 #root {

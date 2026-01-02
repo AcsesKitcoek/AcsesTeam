@@ -8,6 +8,9 @@ body {
   font-family: 'Inter', sans-serif;
   background: #000000;
   overflow: hidden;
+  touch-action: none; /* Prevent mobile zoom and pan gestures */
+  -webkit-user-select: none; /* Prevent text selection on iOS */
+  user-select: none;
 }
 
 #root {
