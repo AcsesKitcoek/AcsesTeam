@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useNavigate } from 'react-router-dom'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
@@ -17,6 +18,7 @@ export default function EventGalleryPage() {
     const [distance, setDistance] = useState('0.00')
     const platformLightRef = useRef()
     const isMobile = useMobileDetection()
+    const navigate = useNavigate()
 
     const handleCameraUpdate = useCallback((pos, dist) => {
         setCameraPos(pos)
@@ -24,8 +26,8 @@ export default function EventGalleryPage() {
     }, [])
 
     const handleBackClick = useCallback(() => {
-        window.location.href = '/'
-    }, [])
+        navigate('/')
+    }, [navigate])
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -52,7 +54,9 @@ export default function EventGalleryPage() {
                 {/* Lighting */}
                 <GalleryLighting isMobile={isMobile} platformLightRef={platformLightRef} />
 
-                <EventGallery />
+                <Suspense fallback={null}>
+                    <EventGallery />
+                </Suspense>
 
                 <OrbitControls
                     target={[-5, 7, 0]}

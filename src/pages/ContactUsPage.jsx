@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useNavigate } from 'react-router-dom'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
@@ -17,6 +18,7 @@ export default function ContactUsPage() {
     const [distance, setDistance] = useState('10.00')
     const [showContactModal, setShowContactModal] = useState(false)
     const isMobile = useMobileDetection()
+    const navigate = useNavigate()
 
     const handleCameraUpdate = useCallback((pos, dist) => {
         setCameraPos(pos)
@@ -24,8 +26,8 @@ export default function ContactUsPage() {
     }, [])
 
     const handleBackClick = useCallback(() => {
-        window.location.href = '/'
-    }, [])
+        navigate('/')
+    }, [navigate])
 
     const handleContactClick = useCallback(() => {
         setShowContactModal(true)
@@ -58,13 +60,15 @@ export default function ContactUsPage() {
                 <fog attach="fog" args={['#0a0a1a', isMobile ? 30 : 25, isMobile ? 60 : 50]} />
                 <CameraTracker onUpdate={handleCameraUpdate} />
 
-                <ContactUs onContactClick={handleContactClick} />
+                <Suspense fallback={null}>
+                    <ContactUs onContactClick={handleContactClick} />
+                </Suspense>
 
                 <OrbitControls
                     target={[0, 1.2, 0.26]}
                     enablePan={false}
-                    enableZoom={true}
-                    enableRotate={true}
+                    enableZoom={false}
+                    enableRotate={false}
                     enableDamping={false}
                 />
 

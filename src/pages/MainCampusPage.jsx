@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
@@ -64,10 +64,12 @@ export default function MainCampusPage() {
                 {/* Lighting */}
                 <MainCampusLighting isMobile={isMobile} />
 
-                <MainCampus
-                    onBuildingClick={handleBuildingClick}
-                    onHODClick={handleHODClick}
-                />
+                <Suspense fallback={null}>
+                    <MainCampus
+                        onBuildingClick={handleBuildingClick}
+                        onHODClick={handleHODClick}
+                    />
+                </Suspense>
 
                 <OrbitControls
                     target={[1.2, 4, 0]}

@@ -1,44 +1,38 @@
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { Text3D, Center } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
-import { useNavigate } from 'react-router-dom'
-import * as THREE from 'three'
-import { useDracoLoader } from '../hooks/useDracoLoader'
-import { useMobileDetection } from '../hooks/useMobileDetection'
-import ClickableZone from '../components/scene/ClickableZone'
-
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useNavigate } from 'react-router-dom';
+import * as THREE from 'three';
+import { useMobileDetection } from '../hooks/useMobileDetection';
+import ClickableZone from '../components/scene/ClickableZone';
+import { ModelWrapper } from '../components/scene/ModelWrapper'; // Updated import
 
 export default function MainCampus({ onBuildingClick, onHODClick }) {
-  const groupRef = useRef()
-  const billboardLightRef = useRef()
-  const hodZoneRef = useRef()
-  const fcZoneRef = useRef()
-  const { camera, raycaster, gl } = useThree()
-  const navigate = useNavigate()
+  const groupRef = useRef(); // This ref will point to the model's scene from ModelWrapper
+  const billboardLightRef = useRef();
+  const hodZoneRef = useRef();
+  const fcZoneRef = useRef();
+  const { camera, raycaster, gl } = useThree();
+  const navigate = useNavigate();
 
-  // Use Draco loader for compressed model loading
-  const { scene, loading, error } = useDracoLoader('/models/main-campus.glb')
-  const isMobile = useMobileDetection()
+  // The custom useDracoLoader hook is no longer needed.
+  // const { scene, loading, error } = useDracoLoader('/models/main-campus.glb');
+  const isMobile = useMobileDetection();
 
-  const [hoveredBuilding, setHoveredBuilding] = useState(null)
-  const [billboardPosition, setBillboardPosition] = useState(null)
-  const [hodCabinPosition, setHodCabinPosition] = useState(null)
-  const [fcPosition, setFcPosition] = useState(null)
-  const [animationPhase, setAnimationPhase] = useState('blackout')
-  const [flickerCount, setFlickerCount] = useState(0)
+  const [hoveredBuilding, setHoveredBuilding] = useState(null);
+  const [billboardPosition, setBillboardPosition] = useState(null);
+  const [hodCabinPosition, setHodCabinPosition] = useState(null);
+  const [fcPosition, setFcPosition] = useState(null);
+  const [animationPhase, setAnimationPhase] = useState('blackout');
+  const [flickerCount, setFlickerCount] = useState(0);
 
-  const mouse = useRef(new THREE.Vector2())
-  const touch = useRef(new THREE.Vector2())
-  const emissiveMeshes = useRef([])
-  const animationStartTime = useRef(0)
+  const mouse = useRef(new THREE.Vector2());
+  const touch = useRef(new THREE.Vector2());
+  const emissiveMeshes = useRef([]);
+  const animationStartTime = useRef(0);
 
-  // Memoize cloned scene to prevent re-cloning on every render
-  const clonedScene = useMemo(() => {
-    if (!scene) return null
-    return scene.clone()
-  }, [scene])
+  // The clonedScene memo is no longer needed; we will use the ref directly.
+  // const clonedScene = useMemo(() => { ... });
 
-  // Building label configuration - memoized
   const labelConfig = useMemo(() => ({
     'Teams_plane': { text: 'TEAMS', route: '/teams' },
     'Teams_Building': { text: 'TEAMS', route: '/teams' },
@@ -51,43 +45,44 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     'ContactUs_Building': { text: 'CONTACT', route: '/contact' },
     'HOD_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' },
     'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' }
-  }), [])
+  }), []);
 
-  // Setup: Find Billboard, emissive meshes, armatures, and make buildings clickable
+  // Setup: This effect now depends on the ref to the model's scene.
   useEffect(() => {
-    if (!clonedScene) return
+    const modelScene = groupRef.current;
+    if (!modelScene) return;
 
-    let billboardFound = false
-    const emissiveMeshesList = []
-    let hodArmatureFound = false
-    let fcArmatureFound = false
-    const hodPositions = []
-    const fcPositions = []
+    let billboardFound = false;
+    const emissiveMeshesList = [];
+    let hodArmatureFound = false;
+    let fcArmatureFound = false;
+    const hodPositions = [];
+    const fcPositions = [];
 
-    clonedScene.traverse((child) => {
-      // Handle regular MESHES
+    // The traversal logic is preserved but operates on the ref's current value
+    modelScene.traverse((child) => {
+      // NOTE: The basic castShadow, receiveShadow, and material.needsUpdate
+      // are already handled by ModelWrapper. We keep the specific material logic here.
+
       if (child.isMesh) {
-        child.castShadow = !isMobile
-        child.receiveShadow = !isMobile
-
         // Billboard plane - EXACT values preserved
         if (child.name === 'Billboard_plane') {
-          billboardFound = true
+          billboardFound = true;
 
-          const worldPos = new THREE.Vector3()
-          child.getWorldPosition(worldPos)
-          setBillboardPosition(worldPos)
+          const worldPos = new THREE.Vector3();
+          child.getWorldPosition(worldPos);
+          setBillboardPosition(worldPos);
 
           if (child.material) {
-            child.material = child.material.clone()
-            child.material.emissive = new THREE.Color('#aa00ff')
-            child.material.emissiveIntensity = 5.8
-            child.material.color = new THREE.Color('#ff00ff')
-            child.material.toneMapped = false
-            child.material.transparent = true
-            child.material.opacity = 0.95
-            child.material.side = THREE.DoubleSide
-            child.material.needsUpdate = true
+            child.material = child.material.clone();
+            child.material.emissive = new THREE.Color('#aa00ff');
+            child.material.emissiveIntensity = 5.8;
+            child.material.color = new THREE.Color('#ff00ff');
+            child.material.toneMapped = false;
+            child.material.transparent = true;
+            child.material.opacity = 0.95;
+            child.material.side = THREE.DoubleSide;
+            child.material.needsUpdate = true;
 
             emissiveMeshesList.push({
               mesh: child,
@@ -95,18 +90,18 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
               originalIntensity: 5.8,
               originalEmissive: new THREE.Color('#aa00ff'),
               originalToneMapped: false
-            })
+            });
           }
         }
         // Other emissive materials - EXACT values preserved
         else if (child.material && child.material.emissive) {
-          const emissiveHex = child.material.emissive.getHex()
+          const emissiveHex = child.material.emissive.getHex();
 
           if (emissiveHex === 0x00e5ff || emissiveHex === 0x00ffff) {
-            child.material = child.material.clone()
-            child.material.emissiveIntensity = 1.7
-            child.material.toneMapped = false
-            child.material.needsUpdate = true
+            child.material = child.material.clone();
+            child.material.emissiveIntensity = 1.7;
+            child.material.toneMapped = false;
+            child.material.needsUpdate = true;
 
             emissiveMeshesList.push({
               mesh: child,
@@ -114,13 +109,13 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
               originalIntensity: 1.7,
               originalEmissive: child.material.emissive.clone(),
               originalToneMapped: false
-            })
+            });
           }
           else if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff) {
-            child.material = child.material.clone()
-            child.material.emissiveIntensity = 5
-            child.material.toneMapped = true
-            child.material.needsUpdate = true
+            child.material = child.material.clone();
+            child.material.emissiveIntensity = 5;
+            child.material.toneMapped = true;
+            child.material.needsUpdate = true;
 
             emissiveMeshesList.push({
               mesh: child,
@@ -128,138 +123,106 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
               originalIntensity: 5,
               originalEmissive: child.material.emissive.clone(),
               originalToneMapped: true
-            })
+            });
           }
         }
 
-        // Make buildings and labels clickable/touchable
         Object.keys(labelConfig).forEach((meshName) => {
           if (child.name === meshName || child.name.toLowerCase().includes(meshName.toLowerCase())) {
-            const config = labelConfig[meshName]
-            child.userData.clickable = true
-            child.userData.route = config.route
-            child.userData.action = config.action
-            child.userData.buildingName = meshName
-            child.userData.originalEmissive = child.material?.emissive?.clone()
-            child.userData.originalIntensity = child.material?.emissiveIntensity || 0
+            const config = labelConfig[meshName];
+            child.userData.clickable = true;
+            child.userData.route = config.route;
+            child.userData.action = config.action;
+            child.userData.buildingName = meshName;
+            child.userData.originalEmissive = child.material?.emissive?.clone();
+            child.userData.originalIntensity = child.material?.emissiveIntensity || 0;
           }
-        })
+        });
 
-        // Collect HOD cabin positions to calculate center
         if (child.name && child.name.startsWith('HOD_')) {
-          const worldPos = new THREE.Vector3()
-          child.getWorldPosition(worldPos)
-          hodPositions.push(worldPos)
+          const worldPos = new THREE.Vector3();
+          child.getWorldPosition(worldPos);
+          hodPositions.push(worldPos);
         }
       }
 
-      // Handle SKINNED MESHES (armature characters)
       if (child.isSkinnedMesh) {
-        child.castShadow = !isMobile
-        child.receiveShadow = !isMobile
-
-        // Force proper material rendering
         if (child.material) {
           if (Array.isArray(child.material)) {
             child.material.forEach(mat => {
-              mat.needsUpdate = true
-              mat.side = THREE.FrontSide
-            })
+              mat.needsUpdate = true;
+              mat.side = THREE.FrontSide;
+            });
           } else {
-            child.material.needsUpdate = true
-            child.material.side = THREE.FrontSide
+            child.material.needsUpdate = true;
+            child.material.side = THREE.FrontSide;
           }
         }
 
-        const worldPos = new THREE.Vector3()
-        child.getWorldPosition(worldPos)
-
-        // Check parent armature name to determine if it's HOD or FC
-        const parentName = child.parent?.name || ''
+        const worldPos = new THREE.Vector3();
+        child.getWorldPosition(worldPos);
+        const parentName = child.parent?.name || '';
 
         if (parentName.includes('man_in_suit001') || parentName.includes('HOD')) {
-          // HOD character
-          child.userData.clickable = true
-          child.userData.route = 'modal'
-          child.userData.action = 'hod'
-          child.userData.buildingName = 'HOD_character'
-          hodPositions.push(worldPos)
-          hodArmatureFound = true
+          child.userData.clickable = true;
+          child.userData.route = 'modal';
+          child.userData.action = 'hod';
+          child.userData.buildingName = 'HOD_character';
+          hodPositions.push(worldPos);
+          hodArmatureFound = true;
         } else if (parentName.includes('FC')) {
-          // FC character
-          child.userData.clickable = true
-          child.userData.route = 'modal'
-          child.userData.action = 'hod'
-          child.userData.buildingName = 'FC_character'
-          fcPositions.push(worldPos)
-          fcArmatureFound = true
+          child.userData.clickable = true;
+          child.userData.route = 'modal';
+          child.userData.action = 'hod';
+          child.userData.buildingName = 'FC_character';
+          fcPositions.push(worldPos);
+          fcArmatureFound = true;
         }
       }
 
-      // Handle ARMATURE objects directly (Group/Object3D with name HOD or FC)
       if ((child.type === 'Object3D' || child.type === 'Group' || child.type === 'Bone') &&
         (child.name === 'HOD' || child.name === 'FC' || child.name.includes('FC') || child.name.includes('man_in_suit001'))) {
 
-        const worldPos = new THREE.Vector3()
-        child.getWorldPosition(worldPos)
+        const worldPos = new THREE.Vector3();
+        child.getWorldPosition(worldPos);
 
         if (child.name === 'HOD' || child.name.includes('man_in_suit001')) {
-          hodPositions.push(worldPos)
-          hodArmatureFound = true
+          hodPositions.push(worldPos);
+          hodArmatureFound = true;
         } else if (child.name === 'FC' || child.name.includes('FC')) {
-          fcPositions.push(worldPos)
-          fcArmatureFound = true
+          fcPositions.push(worldPos);
+          fcArmatureFound = true;
         }
       }
-    })
+    });
 
-    // Calculate average position for HOD clickable zone
     if (hodPositions.length > 0) {
-      const avgPos = hodPositions.reduce((acc, pos) => {
-        acc.x += pos.x
-        acc.y += pos.y
-        acc.z += pos.z
-        return acc
-      }, new THREE.Vector3(0, 0, 0))
-
-      avgPos.divideScalar(hodPositions.length)
-      setHodCabinPosition(avgPos)
+      const avgPos = hodPositions.reduce((acc, pos) => acc.add(pos), new THREE.Vector3(0, 0, 0));
+      avgPos.divideScalar(hodPositions.length);
+      setHodCabinPosition(avgPos);
     }
 
-    // Calculate average position for FC clickable zone
     if (fcPositions.length > 0) {
-      const avgPos = fcPositions.reduce((acc, pos) => {
-        acc.x += pos.x
-        acc.y += pos.y
-        acc.z += pos.z
-        return acc
-      }, new THREE.Vector3(0, 0, 0))
-
-      avgPos.divideScalar(fcPositions.length)
-      setFcPosition(avgPos)
+      const avgPos = fcPositions.reduce((acc, pos) => acc.add(pos), new THREE.Vector3(0, 0, 0));
+      avgPos.divideScalar(fcPositions.length);
+      setFcPosition(avgPos);
     }
 
-    emissiveMeshes.current = emissiveMeshesList
+    emissiveMeshes.current = emissiveMeshesList;
 
-    // Set all lights to zero initially
     emissiveMeshesList.forEach(({ mesh }) => {
       if (mesh.material) {
-        mesh.material.emissiveIntensity = 0
+        mesh.material.emissiveIntensity = 0;
       }
-    })
+    });
 
-    if (!billboardFound) {
-      console.warn('⚠️ Billboard_plane not found!')
-    }
-    if (!hodArmatureFound) {
-      console.warn('⚠️ No HOD armature found!')
-    }
-    if (!fcArmatureFound) {
-      console.warn('⚠️ No FC armature found!')
-    }
-  }, [clonedScene, isMobile, labelConfig])
+    if (!billboardFound) console.warn('⚠️ Billboard_plane not found!');
+    if (!hodArmatureFound) console.warn('⚠️ No HOD armature found!');
+    if (!fcArmatureFound) console.warn('⚠️ No FC armature found!');
 
-  // Dramatic flicker animation
+  }, [groupRef.current, isMobile, labelConfig]); // Depend on the ref's current value
+
+  // ... (useFrame animation logic remains unchanged)
   useFrame((state) => {
     if (!animationStartTime.current) {
       animationStartTime.current = state.clock.elapsedTime
@@ -325,171 +288,119 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       setAnimationPhase('done')
     }
 
-    // Hover glow effect for buildings (desktop only)
     if (hoveredBuilding && animationPhase === 'done' && !isMobile) {
       if (hoveredBuilding.material) {
         const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5
         hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * pulseIntensity
       }
     }
-  })
+  });
 
-  // Unified pointer/touch handling - memoized
+
+  // ... (handlePointerMove and handleClick logic remains largely unchanged, but references groupRef.current)
   const handlePointerMove = useCallback((event) => {
-    if (animationPhase !== 'done') return
-    if (isMobile) return  // Disable hover on mobile
-    if (!clonedScene) return
+    const modelScene = groupRef.current;
+    if (animationPhase !== 'done' || isMobile || !modelScene) return;
 
-    const rect = gl.domElement.getBoundingClientRect()
-
-    // Handle both mouse and touch
-    let clientX, clientY
+    const rect = gl.domElement.getBoundingClientRect();
+    let clientX, clientY;
     if (event.touches && event.touches.length > 0) {
-      clientX = event.touches[0].clientX
-      clientY = event.touches[0].clientY
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
     } else {
-      clientX = event.clientX
-      clientY = event.clientY
+      clientX = event.clientX;
+      clientY = event.clientY;
     }
+    mouse.current.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.current.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse.current, camera);
 
-    mouse.current.x = ((clientX - rect.left) / rect.width) * 2 - 1
-    mouse.current.y = -((clientY - rect.top) / rect.height) * 2 + 1
+    const sceneIntersects = raycaster.intersectObject(modelScene, true);
+    const hodZoneIntersects = hodZoneRef.current ? raycaster.intersectObject(hodZoneRef.current) : [];
+    const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : [];
+    const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects];
 
-    raycaster.setFromCamera(mouse.current, camera)
-
-    // Check scene, HOD zone, and FC zone
-    const sceneIntersects = raycaster.intersectObject(clonedScene, true)
-    const hodZoneIntersects = hodZoneRef.current ? raycaster.intersectObject(hodZoneRef.current) : []
-    const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : []
-    const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects]
-
-    // Reset previous hover
     if (hoveredBuilding && hoveredBuilding.material) {
-      hoveredBuilding.material.emissiveIntensity = hoveredBuilding.userData.originalIntensity || 1
+      hoveredBuilding.material.emissiveIntensity = hoveredBuilding.userData.originalIntensity || 1;
     }
 
     if (allIntersects.length > 0) {
-      const firstIntersect = allIntersects[0].object
-
-      // Check if it's the HOD or FC zone
+      const firstIntersect = allIntersects[0].object;
       if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
-        setHoveredBuilding(firstIntersect)
-        gl.domElement.style.cursor = 'pointer'
-        return
+        setHoveredBuilding(firstIntersect);
+        gl.domElement.style.cursor = 'pointer';
+        return;
       }
 
-      // Otherwise check for clickable buildings
-      let clickableObject = firstIntersect
-
+      let clickableObject = firstIntersect;
       while (clickableObject && !clickableObject.userData.clickable) {
-        clickableObject = clickableObject.parent
+        clickableObject = clickableObject.parent;
       }
-
       if (clickableObject && clickableObject.userData.clickable) {
-        setHoveredBuilding(clickableObject)
-        gl.domElement.style.cursor = 'pointer'
-        return
+        setHoveredBuilding(clickableObject);
+        gl.domElement.style.cursor = 'pointer';
+        return;
       }
     }
 
-    setHoveredBuilding(null)
-    gl.domElement.style.cursor = 'default'
-  }, [animationPhase, isMobile, clonedScene, gl, raycaster, camera, hoveredBuilding])
+    setHoveredBuilding(null);
+    gl.domElement.style.cursor = 'default';
+  }, [animationPhase, isMobile, gl, raycaster, camera, hoveredBuilding]);
 
-  // Touch-friendly click handler - memoized
   const handleClick = useCallback((event) => {
-    if (animationPhase !== 'done') {
-      return
-    }
-    if (!clonedScene) return
+    const modelScene = groupRef.current;
+    if (animationPhase !== 'done' || !modelScene) return;
 
-    const rect = gl.domElement.getBoundingClientRect()
-
-    // Handle both mouse and touch
-    let clientX, clientY
+    const rect = gl.domElement.getBoundingClientRect();
+    let clientX, clientY;
     if (event.changedTouches && event.changedTouches.length > 0) {
-      clientX = event.changedTouches[0].clientX
-      clientY = event.changedTouches[0].clientY
-    } else if (event.touches && event.touches.length > 0) {
-      clientX = event.touches[0].clientX
-      clientY = event.touches[0].clientY
+      clientX = event.changedTouches[0].clientX;
+      clientY = event.changedTouches[0].clientY;
     } else {
-      clientX = event.clientX
-      clientY = event.clientY
+      clientX = event.clientX;
+      clientY = event.clientY;
     }
+    touch.current.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    touch.current.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(touch.current, camera);
 
-    touch.current.x = ((clientX - rect.left) / rect.width) * 2 - 1
-    touch.current.y = -((clientY - rect.top) / rect.height) * 2 + 1
-
-    raycaster.setFromCamera(touch.current, camera)
-
-    // Check scene, HOD zone, and FC zone
-    const sceneIntersects = raycaster.intersectObject(clonedScene, true)
-    const hodZoneIntersects = hodZoneRef.current ? raycaster.intersectObject(hodZoneRef.current) : []
-    const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : []
-    const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects]
+    const sceneIntersects = raycaster.intersectObject(modelScene, true);
+    const hodZoneIntersects = hodZoneRef.current ? raycaster.intersectObject(hodZoneRef.current) : [];
+    const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : [];
+    const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects];
 
     if (allIntersects.length > 0) {
-      const firstIntersect = allIntersects[0].object
-
-      // Check if HOD or FC zone was clicked
+      const firstIntersect = allIntersects[0].object;
       if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
-        if (onHODClick) {
-          onHODClick()
-        }
-        return
+        if (onHODClick) onHODClick();
+        return;
       }
 
-      // Otherwise check for clickable buildings
-      let clickableObject = firstIntersect
-
+      let clickableObject = firstIntersect;
       while (clickableObject && !clickableObject.userData.clickable) {
-        clickableObject = clickableObject.parent
+        clickableObject = clickableObject.parent;
       }
-
       if (clickableObject && clickableObject.userData.clickable) {
-        const { route, action, buildingName } = clickableObject.userData
-
+        const { route, action } = clickableObject.userData;
         if (action === 'hod') {
-          if (onHODClick) {
-            onHODClick()
-          }
+          if (onHODClick) onHODClick();
         } else if (route && route !== 'modal') {
-          navigate(route)
-
-          if (onBuildingClick) {
-            onBuildingClick(route)
-          }
+          navigate(route);
+if (onBuildingClick) onBuildingClick(route);
         }
       }
     }
-  }, [animationPhase, clonedScene, gl, raycaster, camera, onHODClick, onBuildingClick, navigate])
+  }, [animationPhase, gl, raycaster, camera, onHODClick, onBuildingClick, navigate]);
 
-  // Store original positions
-  useEffect(() => {
-    if (!clonedScene) return
+  // This effect is no longer needed as the ref handles the scene object
+  // useEffect(() => { ... });
 
-    clonedScene.traverse((child) => {
-      if (child.userData.clickable && child.userData.originalY === undefined) {
-        child.userData.originalY = child.position.y
-      }
-    })
-  }, [clonedScene])
-
-  // Show loading state
-  if (loading || !clonedScene) {
-    return null
-  }
-
-  // Show error state
-  if (error) {
-    console.error('Failed to load MainCampus model:', error)
-    return null
-  }
+  // Loading and error states are now handled by Suspense in App.jsx
+  // if (loading || !clonedScene) { ... }
+  // if (error) { ... }
 
   return (
     <>
-      {/* Billboard Purple Point Light - EXACT VALUES PRESERVED */}
       {billboardPosition && (
         <pointLight
           ref={billboardLightRef}
@@ -508,20 +419,16 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         />
       )}
 
-      {/* The 3D Model - Touch and mouse events */}
-      <primitive
+      {/* Use the ModelWrapper to load the model and attach the ref and event handlers */}
+      <ModelWrapper
         ref={groupRef}
-        object={clonedScene}
+        url="/models/main-campus.glb"
         onPointerMove={handlePointerMove}
         onClick={handleClick}
         onPointerUp={isMobile ? handleClick : undefined}
-        onTouchEnd={isMobile ? (e) => {
-          e.preventDefault()
-          handleClick(e)
-        } : undefined}
+        onTouchEnd={isMobile ? (e) => { e.preventDefault(); handleClick(e); } : undefined}
       />
 
-      {/* HOD Clickable Zone - LARGER on mobile for easier touching */}
       {hodCabinPosition && (
         <ClickableZone
           ref={hodZoneRef}
@@ -533,7 +440,6 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         />
       )}
 
-      {/* FC Clickable Zone - LARGER on mobile for easier touching */}
       {fcPosition && (
         <ClickableZone
           ref={fcZoneRef}
@@ -545,5 +451,5 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         />
       )}
     </>
-  )
+  );
 }
