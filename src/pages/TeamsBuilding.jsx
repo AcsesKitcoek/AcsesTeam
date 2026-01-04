@@ -1,71 +1,62 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { useTexture } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
-import { useDracoLoader } from '../hooks/useDracoLoader'
-import { useMobileDetection } from '../hooks/useMobileDetection'
-import CeilingLights from '../components/scene/CeilingLights'
-
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { useGLTF, useTexture } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { useMobileDetection } from '../hooks/useMobileDetection';
+import CeilingLights from '../components/scene/CeilingLights';
+import { ModelWrapper } from '../components/scene/ModelWrapper';
 
 export default function TeamsBuilding() {
-    const groupRef = useRef()
-    const [lightPositions, setLightPositions] = useState([])
-    const [animationPhase, setAnimationPhase] = useState('boot')
-    const animationStartTime = useRef(0)
-    const lightRefs = useRef([])
-    const emissiveMeshes = useRef([])
-    const screenMeshes = useRef([])
-    const activationSchedule = useRef([])
+    const groupRef = useRef();
+    const [lightPositions, setLightPositions] = useState([]);
+    const [animationPhase, setAnimationPhase] = useState('boot');
+    const animationStartTime = useRef(0);
+    const lightRefs = useRef([]);
+    const emissiveMeshes = useRef([]);
+    const screenMeshes = useRef([]);
+    const activationSchedule = useRef([]);
 
-    // Use Draco loader for compressed model loading
-    const { scene, loading, error } = useDracoLoader('/models/towerss.glb')
-    const acsesTexture = useTexture('/images/ACSES_Image.jpg')
-    const isMobile = useMobileDetection()
-
-    // Memoize cloned scene to prevent re-cloning on every render
-    const clonedScene = useMemo(() => {
-        if (!scene) return null
-        return scene.clone()
-    }, [scene])
+    // Use modern, suspense-based hooks. These pull from the preloaded cache.
+    const [acsesTexture] = useTexture(['/images/ACSES_Image.jpg']);
+    const isMobile = useMobileDetection();
 
     // Setup: Configure materials and emissive lighting
     useEffect(() => {
-        if (!clonedScene) return
+        const modelScene = groupRef.current;
+        if (!modelScene) return;
 
-        let lightsFound = 0
-        let screensFound = 0
-        let baseFound = false
-        let mainStructureFixed = false
-        const positions = []
-        const emissiveList = []
-        const screenList = []
+        let lightsFound = 0;
+        let screensFound = 0;
+        let baseFound = false;
+        let mainStructureFixed = false;
+        const positions = [];
+        const emissiveList = [];
+        const screenList = [];
 
-        clonedScene.traverse((child) => {
+        modelScene.traverse((child) => {
             if (child.isMesh) {
-                child.castShadow = true
-                child.receiveShadow = true
+                // Base shadow properties are handled by ModelWrapper, but we can keep them here for specificity
+                child.castShadow = true;
+                child.receiveShadow = true;
 
-                const meshNameLower = child.name.toLowerCase()
+                const meshNameLower = child.name.toLowerCase();
 
-                // Ceiling lights - pattern: Light_11, Light_12, Light_21, etc.
+                // Ceiling lights
                 if (child.name.startsWith('Light_')) {
-                    lightsFound++
-
-                    const worldPos = new THREE.Vector3()
-                    child.getWorldPosition(worldPos)
+                    lightsFound++;
+                    const worldPos = new THREE.Vector3();
+                    child.getWorldPosition(worldPos);
                     positions.push({
                         position: worldPos.clone(),
                         name: child.name,
                         lightIndex: lightsFound - 1
-                    })
-
+                    });
                     if (child.material) {
-                        child.material = child.material.clone()
-                        child.material.emissive = new THREE.Color('#eeccff')
-                        child.material.emissiveIntensity = 1.2
-                        child.material.toneMapped = false
-                        child.material.needsUpdate = true
-
+                        child.material = child.material.clone();
+                        child.material.emissive = new THREE.Color('#eeccff');
+                        child.material.emissiveIntensity = 1.2;
+                        child.material.toneMapped = false;
+                        child.material.needsUpdate = true;
                         emissiveList.push({
                             mesh: child,
                             name: child.name,
@@ -73,297 +64,202 @@ export default function TeamsBuilding() {
                             currentIntensity: 0,
                             type: 'ceiling-light',
                             lightIndex: lightsFound - 1
-                        })
-
-                        child.material.emissiveIntensity = 0
+                        });
+                        child.material.emissiveIntensity = 0;
                     }
                 }
 
                 // Screens with ACSES texture
-                const screenPatterns = ['screen', 'monitor', 'display', 'panel']
-
+                const screenPatterns = ['screen', 'monitor', 'display', 'panel'];
                 if (screenPatterns.some(pattern => meshNameLower.includes(pattern))) {
-                    screensFound++
-
+                    screensFound++;
                     if (child.material) {
-                        child.material = child.material.clone()
-
-                        const rotatedTexture = acsesTexture.clone()
-                        rotatedTexture.center.set(0.5, 0.5)
-                        rotatedTexture.rotation = Math.PI / 2
-                        rotatedTexture.repeat.set(-1, 1)
-                        rotatedTexture.needsUpdate = true
-
-                        child.material.map = rotatedTexture
-                        child.material.emissive = new THREE.Color('#00ffff')
-                        child.material.emissiveIntensity = 10
-                        child.material.emissiveMap = rotatedTexture.clone()
-                        child.material.toneMapped = false
-                        child.material.color = new THREE.Color('#000000')
-                        child.material.needsUpdate = true
-
+                        child.material = child.material.clone();
+                        const rotatedTexture = acsesTexture.clone();
+                        rotatedTexture.center.set(0.5, 0.5);
+                        rotatedTexture.rotation = Math.PI / 2;
+                        rotatedTexture.repeat.set(-1, 1);
+                        rotatedTexture.needsUpdate = true;
+                        child.material.map = rotatedTexture;
+                        child.material.emissive = new THREE.Color('#00ffff');
+                        child.material.emissiveIntensity = 10;
+                        child.material.emissiveMap = rotatedTexture.clone();
+                        child.material.toneMapped = false;
+                        child.material.color = new THREE.Color('#000000');
+                        child.material.needsUpdate = true;
                         screenList.push({
                             mesh: child,
                             name: child.name,
                             originalIntensity: 10
-                        })
-
-                        child.material.emissiveIntensity = 0
+                        });
+                        child.material.emissiveIntensity = 0;
                     }
                 }
 
                 // Middle Cyan Base platform
                 if (child.name === 'Middle_Cyan_Base' || meshNameLower.includes('middle_cyan_base')) {
-                    baseFound = true
-
+                    baseFound = true;
                     if (child.material) {
-                        child.material = child.material.clone()
-                        child.material.emissive = new THREE.Color('#00ffff')
-                        child.material.emissiveIntensity = 2
-                        child.material.toneMapped = false
-                        child.material.needsUpdate = true
-
+                        child.material = child.material.clone();
+                        child.material.emissive = new THREE.Color('#00ffff');
+                        child.material.emissiveIntensity = 2;
+                        child.material.toneMapped = false;
+                        child.material.needsUpdate = true;
                         emissiveList.push({
                             mesh: child,
                             name: child.name,
                             originalIntensity: 2,
                             currentIntensity: 0,
                             type: 'base'
-                        })
-
-                        child.material.emissiveIntensity = 0
+                        });
+                        child.material.emissiveIntensity = 0;
                     }
                 }
 
-                // Upper Black Base - subtle white glow
+                // Other specific material adjustments from original file...
                 if (child.name === 'Upper_Black_Base') {
                     if (child.material) {
-                        child.material = child.material.clone()
-                        child.material.emissive = new THREE.Color('#ffffff')
-                        child.material.emissiveIntensity = 0.003
-                        child.material.toneMapped = false
-                        child.material.needsUpdate = true
+                        child.material = child.material.clone();
+                        child.material.emissive = new THREE.Color('#ffffff');
+                        child.material.emissiveIntensity = 0.003;
+                        child.material.toneMapped = false;
+                        child.material.needsUpdate = true;
                     }
                 }
-
-                // Main Structure material - purple-cyan walls
                 if (child.material && child.material.name === 'Material.001') {
                     if (!mainStructureFixed) {
-                        mainStructureFixed = true
+                        mainStructureFixed = true;
+                        child.material = child.material.clone();
+                        child.material.metalness = 0.3;
+                        child.material.roughness = 0.4;
+                        child.material.color = new THREE.Color('#3a2050');
+                        child.material.emissive = new THREE.Color('#1a0a30');
+                        child.material.emissiveIntensity = 0.25;
+                        child.material.needsUpdate = true;
                     }
-
-                    child.material = child.material.clone()
-                    child.material.metalness = 0.3
-                    child.material.roughness = 0.4
-                    child.material.color = new THREE.Color('#3a2050')
-                    child.material.emissive = new THREE.Color('#1a0a30')
-                    child.material.emissiveIntensity = 0.25
-                    child.material.needsUpdate = true
                 }
-
-                // Boost existing cyan emissive materials
                 if (child.material && child.material.emissive) {
-                    const emissiveHex = child.material.emissive.getHex()
-
+                    const emissiveHex = child.material.emissive.getHex();
                     if (emissiveHex === 0x00ffff) {
-                        child.material = child.material.clone()
-                        child.material.emissiveIntensity = 1.25
-                        child.material.toneMapped = false
-                        child.material.needsUpdate = true
-
+                        child.material = child.material.clone();
+                        child.material.emissiveIntensity = 1.25;
+                        child.material.toneMapped = false;
+                        child.material.needsUpdate = true;
                         emissiveList.push({
                             mesh: child,
                             name: child.name,
                             originalIntensity: 1.25,
                             currentIntensity: 0,
                             type: 'cyan-emissive'
-                        })
-
-                        child.material.emissiveIntensity = 0
+                        });
+                        child.material.emissiveIntensity = 0;
                     }
                 }
             }
-        })
+        });
 
-        setLightPositions(positions)
-        emissiveMeshes.current = emissiveList
-        screenMeshes.current = screenList
+        setLightPositions(positions);
+        emissiveMeshes.current = emissiveList;
+        screenMeshes.current = screenList;
 
-        // Create random activation schedule for lights
-        const schedule = []
+        const schedule = [];
         const lightIndices = emissiveList
             .map((item, index) => ({ index, type: item.type, lightIndex: item.lightIndex }))
-            .filter(item => item.type === 'ceiling-light')
-
-        const shuffled = [...lightIndices].sort(() => Math.random() - 0.5)
+            .filter(item => item.type === 'ceiling-light');
+        const shuffled = [...lightIndices].sort(() => Math.random() - 0.5);
         shuffled.forEach((item, i) => {
             schedule.push({
                 index: item.index,
                 lightIndex: item.lightIndex,
                 activationTime: 0.2 + (i * 0.15)
-            })
-        })
+            });
+        });
+        activationSchedule.current = schedule;
+    }, [groupRef.current, acsesTexture, isMobile]);
 
-        activationSchedule.current = schedule
-    }, [clonedScene, acsesTexture, isMobile])
-
-    // System Initialize Animation
+    // System Initialize Animation (remains the same)
     useFrame((state) => {
         if (!animationStartTime.current) {
-            animationStartTime.current = state.clock.elapsedTime
+            animationStartTime.current = state.clock.elapsedTime;
         }
-
-        const elapsed = state.clock.elapsedTime - animationStartTime.current
+        const elapsed = state.clock.elapsedTime - animationStartTime.current;
 
         if (animationPhase === 'boot') {
-            if (elapsed > 0.3) {
-                setAnimationPhase('random-init')
-            }
-        }
-        else if (animationPhase === 'random-init') {
-            const initPhaseTime = elapsed - 0.3
-
-            // Activate lights according to schedule
+            if (elapsed > 0.3) setAnimationPhase('random-init');
+        } else if (animationPhase === 'random-init') {
+            const initPhaseTime = elapsed - 0.3;
             activationSchedule.current.forEach(({ index, lightIndex, activationTime }) => {
                 if (initPhaseTime >= activationTime) {
-                    const light = emissiveMeshes.current[index]
+                    const light = emissiveMeshes.current[index];
                     if (light && light.mesh.material) {
-                        const timeSinceActivation = initPhaseTime - activationTime
+                        const timeSinceActivation = initPhaseTime - activationTime;
                         if (timeSinceActivation < 0.1) {
-                            const flickerValue = Math.random() > 0.5 ? 1 : 0
-                            light.mesh.material.emissiveIntensity = light.originalIntensity * flickerValue
-
+                            const flickerValue = Math.random() > 0.5 ? 1 : 0;
+                            light.mesh.material.emissiveIntensity = light.originalIntensity * flickerValue;
                             if (lightRefs.current[lightIndex]) {
-                                // Reduce intensity for mobile
-                                const targetIntensity = isMobile ? 80 : 120
-                                lightRefs.current[lightIndex].intensity = targetIntensity * flickerValue
+                                lightRefs.current[lightIndex].intensity = (isMobile ? 80 : 120) * flickerValue;
                             }
                         } else {
-                            light.mesh.material.emissiveIntensity = light.originalIntensity
-
+                            light.mesh.material.emissiveIntensity = light.originalIntensity;
                             if (lightRefs.current[lightIndex]) {
-                                const targetIntensity = isMobile ? 80 : 120
-                                lightRefs.current[lightIndex].intensity = targetIntensity
+                                lightRefs.current[lightIndex].intensity = isMobile ? 80 : 120;
                             }
                         }
                     }
                 } else {
-                    if (lightRefs.current[lightIndex]) {
-                        lightRefs.current[lightIndex].intensity = 0
-                    }
+                    if (lightRefs.current[lightIndex]) lightRefs.current[lightIndex].intensity = 0;
                 }
-            })
-
-            // Activate screens
+            });
             if (initPhaseTime > 0.8 && initPhaseTime < 1.5) {
                 screenMeshes.current.forEach((screen, index) => {
-                    const activationTime = 0.8 + (index * 0.1)
-                    if (initPhaseTime >= activationTime && initPhaseTime < activationTime + 0.05) {
-                        screen.mesh.material.emissiveIntensity = screen.originalIntensity
-                    } else if (initPhaseTime >= activationTime + 0.05) {
-                        screen.mesh.material.emissiveIntensity = screen.originalIntensity
+                    const activationTime = 0.8 + (index * 0.1);
+                    if (initPhaseTime >= activationTime) {
+                        screen.mesh.material.emissiveIntensity = screen.originalIntensity;
                     } else {
-                        screen.mesh.material.emissiveIntensity = 0
+                        screen.mesh.material.emissiveIntensity = 0;
                     }
-                })
+                });
             }
-
-            if (initPhaseTime > 2.0) {
-                setAnimationPhase('sync')
-            }
-        }
-        else if (animationPhase === 'sync') {
-            const syncTime = elapsed - 2.3
-            const pulseDuration = 0.5
-
+            if (initPhaseTime > 2.0) setAnimationPhase('sync');
+        } else if (animationPhase === 'sync') {
+            const syncTime = elapsed - 2.3;
+            const pulseDuration = 0.5;
             if (syncTime < pulseDuration) {
-                const pulseIntensity = Math.sin((syncTime / pulseDuration) * Math.PI) * 0.3 + 0.7
-
+                const pulseIntensity = Math.sin((syncTime / pulseDuration) * Math.PI) * 0.3 + 0.7;
                 emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                    if (mesh.material) {
-                        mesh.material.emissiveIntensity = originalIntensity * pulseIntensity
-                    }
-                })
-
-                const targetIntensity = isMobile ? 80 : 120
+                    if (mesh.material) mesh.material.emissiveIntensity = originalIntensity * pulseIntensity;
+                });
                 lightRefs.current.forEach((light) => {
-                    if (light) {
-                        light.intensity = targetIntensity * pulseIntensity
-                    }
-                })
-
+                    if (light) light.intensity = (isMobile ? 80 : 120) * pulseIntensity;
+                });
                 screenMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                    if (mesh.material) {
-                        mesh.material.emissiveIntensity = originalIntensity * pulseIntensity
-                    }
-                })
+                    if (mesh.material) mesh.material.emissiveIntensity = originalIntensity * pulseIntensity;
+                });
             } else {
-                setAnimationPhase('complete')
+                setAnimationPhase('complete');
             }
-        }
-        else if (animationPhase === 'complete') {
+        } else if (animationPhase === 'complete') {
             emissiveMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                if (mesh.material) {
-                    mesh.material.emissiveIntensity = originalIntensity
-                    mesh.material.needsUpdate = true
-                }
-            })
-
-            const targetIntensity = isMobile ? 80 : 120
+                if (mesh.material) mesh.material.emissiveIntensity = originalIntensity;
+            });
             lightRefs.current.forEach((light) => {
-                if (light) {
-                    light.intensity = targetIntensity
-                }
-            })
-
+                if (light) light.intensity = isMobile ? 80 : 120;
+            });
             screenMeshes.current.forEach(({ mesh, originalIntensity }) => {
-                if (mesh.material) {
-                    mesh.material.emissiveIntensity = originalIntensity
-                    mesh.material.needsUpdate = true
-                }
-            })
-
-            setAnimationPhase('done')
+                if (mesh.material) mesh.material.emissiveIntensity = originalIntensity;
+            });
+            setAnimationPhase('done');
         }
-    })
-
-    // Show loading state
-    if (loading || !clonedScene) {
-        return null
-    }
-
-    // Show error state
-    if (error) {
-        console.error('Failed to load TeamsBuilding model:', error)
-        return null
-    }
+    });
 
     return (
         <>
-            {/* Ceiling point lights - MOBILE RESPONSIVE */}
-            <CeilingLights
-                lightPositions={lightPositions}
-                lightRefs={lightRefs}
-                isMobile={isMobile}
-            />
-
-            {/* Ambient light - increased for mobile */}
+            <CeilingLights lightPositions={lightPositions} lightRefs={lightRefs} isMobile={isMobile} />
             <ambientLight intensity={isMobile ? 0.2 : 0.15} color="#5540a0" />
-
-            {/* Top fill light - adjusted for mobile */}
-            <pointLight
-                position={[0, 50, 0]}
-                intensity={isMobile ? 12 : 20}
-                color="#ddbbff"
-                distance={isMobile ? 20 : 25}
-                decay={1.5}
-            />
-
-            {/* The 3D Model */}
-            <primitive
-                ref={groupRef}
-                object={clonedScene}
-            />
+            <pointLight position={[0, 50, 0]} intensity={isMobile ? 12 : 20} color="#ddbbff" distance={isMobile ? 20 : 25} decay={1.5} />
+            
+            {/* The 3D Model is now loaded via the modern ModelWrapper */}
+            <ModelWrapper ref={groupRef} url="/models/towerss.glb" />
         </>
-    )
+    );
 }

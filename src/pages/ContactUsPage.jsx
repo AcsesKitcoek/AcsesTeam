@@ -67,8 +67,8 @@ export default function ContactUsPage() {
                 <OrbitControls
                     target={[0, 1.2, 0.26]}
                     enablePan={false}
-                    enableZoom={true}
-                    enableRotate={true}
+                    enableZoom={false}
+                    enableRotate={false}
                     enableDamping={false}
                 />
 

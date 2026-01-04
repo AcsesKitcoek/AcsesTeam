@@ -1,15 +1,15 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useGLTF, useProgress } from '@react-three/drei';
+import { useGLTF, useTexture } from '@react-three/drei';
 import MainCampusPage from './pages/MainCampusPage';
 import TeamsBuildingPage from './pages/TeamsBuildingPage';
 import ContactUsPage from './pages/ContactUsPage';
 import EventGalleryPage from './pages/EventGalleryPage';
 import AboutACSESPage from './pages/AboutACSESPage';
+import { SmartLoader } from './components/ui/SmartLoader'; // Import the new SmartLoader
 import './App.css';
 
 // --- Global Asset Preloader ---
-// An array of all model paths that need to be preloaded.
 const modelUrls = [
   '/models/main-campus.glb',
   '/models/towerss.glb',
@@ -17,42 +17,14 @@ const modelUrls = [
   '/models/event-gallery.glb',
   '/models/about-acses.glb',
 ];
+const textureUrls = ['/images/ACSES_Image.jpg'];
 
-// Preload all the models. This will start downloading them in the background.
-// Note: This assumes your Draco decoder is configured globally for useGLTF.
-// If not, you might need to pass the decoder instance, but typically this is configured once.
+// Preload all assets. This will start downloading them in the background.
 useGLTF.preload(modelUrls);
+useTexture.preload(textureUrls);
 
 /**
- * Custom Cyberpunk Loader Component
- */
-function CustomLoader() {
-  const { progress, active } = useProgress();
-
-  return (
-    <div className={`loader-container ${!active ? 'finished' : ''}`}>
-      <div className="loader-content">
-        <div className="loader-rings">
-          <div className="ring ring-outer"></div>
-          <div className="ring ring-inner"></div>
-        </div>
-        <div className="loader-text">
-          <h2 className="loader-title">ACSES</h2>
-          <span className="loader-percentage">{progress.toFixed(0)}%</span>
-          <div className="loader-bar-container">
-            <div
-              className="loader-bar-progress"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Main App Component with Routing and Global Preloader
+ * Main App Component with Routing and the new Smart Loader system.
  */
 function App() {
   return (
@@ -65,7 +37,8 @@ function App() {
         <Route path="/about" element={<AboutACSESPage />} />
       </Routes>
 
-      <CustomLoader />
+      {/* Render the new, self-contained Smart Loader */}
+      <SmartLoader />
     </>
   );
 }

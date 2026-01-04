@@ -1,0 +1,235 @@
+/* src/components/ui/SmartLoader.css */
+
+.smart-loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #1a0f2e 0%, #0a0512 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.8s ease-out, visibility 0.8s;
+  visibility: visible;
+  opacity: 1;
+}
+
+.smart-loader-container.finished {
+  pointer-events: none;
+  animation: containerFadeOut 0.8s forwards 0.4s;
+}
+
+@keyframes containerFadeOut {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.smart-loader-container.finished .shutter {
+  animation: shutterOpen 1s cubic-bezier(0.85, 0, 0.15, 1) forwards;
+}
+
+.smart-loader-container.finished .loader-content {
+  animation: glitchOut 0.5s ease-out forwards;
+}
+
+.shutter {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #0a0512;
+  z-index: 5;
+  border-bottom: 2px solid #ff00ff;
+  border-top: 2px solid #ff00ff;
+}
+
+.shutter-top {
+  top: 0;
+  border-top: none;
+  box-shadow: 0 5px 15px rgba(255, 0, 255, 0.3);
+}
+
+.shutter-bottom {
+  bottom: 0;
+  border-bottom: none;
+  box-shadow: 0 -5px 15px rgba(255, 0, 255, 0.3);
+}
+
+.loader-content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  height: 400px;
+  z-index: 10;
+}
+
+.loader-rings {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: none; /* Explicitly remove any background to prevent artifacts */
+}
+
+.ring-outer {
+  width: 320px;
+  height: 320px;
+  border-top-color: rgba(0, 255, 255, 0.5);
+  border-bottom-color: rgba(0, 255, 255, 0.5);
+  animation: rotateClockwise 4s linear infinite;
+}
+
+.ring-inner {
+  width: 260px;
+  height: 260px;
+  border-left-color: rgba(255, 0, 255, 0.5);
+  border-right-color: rgba(255, 0, 255, 0.5);
+  animation: rotateCounterClockwise 3s linear infinite;
+}
+
+/* Circular Progress SVG */
+.progress-svg {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 4;
+}
+
+.progress-circle-bar {
+  fill: none;
+  stroke: #00ffff;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 880; /* Circumference of a circle with r=140 */
+  stroke-dashoffset: 880;
+  transition: stroke-dashoffset 0.4s ease-out;
+  filter: drop-shadow(0 0 8px #00ffff);
+}
+
+.loader-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  /* Making text non-interactive to not block clicks if it ever overlaps with UI */
+  pointer-events: none; 
+}
+
+.loader-title {
+  font-size: 56px;
+  font-weight: 900;
+  color: #ff00ff;
+  letter-spacing: 12px;
+  text-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.4);
+  animation: neonFlicker 2s infinite alternate;
+  margin-bottom: 5px;
+}
+
+.loader-percentage {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  letter-spacing: 4px;
+  font-weight: bold;
+}
+
+@keyframes rotateClockwise {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes rotateCounterClockwise {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.4);
+  }
+  20%, 22%, 24%, 55% {
+    opacity: 0.8;
+    text-shadow: none;
+  }
+}
+
+@keyframes shutterOpen {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--shutter-translate));
+    opacity: 0;
+  }
+}
+
+.shutter-top {
+  --shutter-translate: -100%;
+}
+
+.shutter-bottom {
+  --shutter-translate: 100%;
+}
+
+@keyframes glitchOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: scale(1.1) translate(-10px, 5px);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: scale(0.9) translate(10px, -5px);
+    filter: hue-rotate(180deg);
+  }
+  60% {
+    transform: scale(1.2) translate(-5px, -10px);
+    filter: hue-rotate(270deg);
+  }
+  80% {
+    transform: scale(0.8) translate(5px, 10px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
