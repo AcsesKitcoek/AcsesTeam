@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useNavigate } from 'react-router-dom'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
@@ -15,6 +16,7 @@ export default function TeamsBuildingPage() {
     const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' })
     const [distance, setDistance] = useState('10.00')
     const isMobile = useMobileDetection()
+    const navigate = useNavigate()
 
     const handleCameraUpdate = useCallback((pos, dist) => {
         setCameraPos(pos)
@@ -22,8 +24,8 @@ export default function TeamsBuildingPage() {
     }, [])
 
     const handleBackClick = useCallback(() => {
-        window.location.href = '/'
-    }, [])
+        navigate('/')
+    }, [navigate])
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -51,7 +53,9 @@ export default function TeamsBuildingPage() {
                 {/* Lighting */}
                 <TeamsBuildingLighting isMobile={isMobile} />
 
-                <TeamsBuilding />
+                <Suspense fallback={null}>
+                    <TeamsBuilding />
+                </Suspense>
 
                 <OrbitControls
                     target={[0, 17, -31]}

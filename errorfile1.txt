@@ -1,0 +1,30 @@
+react_devtools_backend_compact.js:1 Uncaught Error: Invalid argument not valid semver ('' received)
+    at validateAndParse (react_devtools_backe…_compact.js:1:10728)
+    at esm_compareVersions (react_devtools_backe…_compact.js:1:10292)
+    at gte (react_devtools_backe…_compact.js:1:12350)
+    at k.registerRendererInterface (react_devtools_backe…_compact.js:1:46078)
+    at registerRendererInterface (react_devtools_backe…_compact.js:1:46404)
+    at react_devtools_backe…_compact.js:1:46973
+    at Map.forEach (<anonymous>)
+    at initBackend (react_devtools_backe…_compact.js:1:46956)
+    at activateBackend (backendManager.js:1:13128)
+    at backendManager.js:1:14182
+
+2
+@react-three_postpro….js?v=33dfa73c:1036 Uncaught TypeError: Cannot read properties of null (reading 'alpha')
+    at EffectComposer.addPass (@react-three_postpro…?v=33dfa73c:1036:63)
+    at @react-three_postpro…v=33dfa73c:17120:32
+    at react-stack-bottom-frame (chunk-OBZFDLTY.js?v=33dfa73c:10534:20)
+    at runWithFiberInDEV (chunk-OBZFDLTY.js?v=33dfa73c:915:18)
+    at commitHookEffectListMount (chunk-OBZFDLTY.js?v=33dfa73c:6955:123)
+    at commitHookLayoutEffects (chunk-OBZFDLTY.js?v=33dfa73c:6931:60)
+    at commitLayoutEffectOnFiber (chunk-OBZFDLTY.js?v=33dfa73c:7378:26)
+    at recursivelyTraverseLayoutEffects (chunk-OBZFDLTY.js?v=33dfa73c:8104:13)
+    at commitLayoutEffectOnFiber (chunk-OBZFDLTY.js?v=33dfa73c:7515:13)
+    at recursivelyTraverseLayoutEffects (chunk-OBZFDLTY.js?v=33dfa73c:8104:13)
+installHook.js:1 An error occurred in the <CanvasImpl> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+chunk-5GZSDJLD.js?v=33dfa73c:40704 THREE.WebGLRenderer: Context Lost.
+﻿
