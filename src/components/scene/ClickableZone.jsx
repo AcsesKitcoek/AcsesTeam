@@ -5,7 +5,7 @@ import React from 'react'
  * Creates an invisible clickable/hoverable zone for interactions
  */
 const ClickableZone = React.memo(
-    React.forwardRef(({ position, size, onClick, onPointerMove, onPointerDown }, ref) => {
+    React.forwardRef(({ position, size, onClick, onPointerMove, onPointerDown, debug, color = 'red' }, ref) => {
         return (
             <mesh
                 ref={ref}
@@ -16,10 +16,11 @@ const ClickableZone = React.memo(
             >
                 <boxGeometry args={size} />
                 <meshBasicMaterial
-                    transparent
-                    opacity={0}
+                    transparent={!debug}
+                    opacity={debug ? 0 : 0}
                     depthWrite={false}
                     colorWrite={false}
+                    color={color}
                 />
             </mesh>
         )

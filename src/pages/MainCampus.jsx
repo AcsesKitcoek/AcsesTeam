@@ -24,12 +24,14 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
   const [fcPosition, setFcPosition] = useState(null);
   const [animationPhase, setAnimationPhase] = useState('blackout');
   const [flickerCount, setFlickerCount] = useState(0);
+  const [svgLightPosition, setSvgLightPosition] = useState(null);
 
   const mouse = useRef(new THREE.Vector2());
   const touch = useRef(new THREE.Vector2());
   const emissiveMeshes = useRef([]);
   const animationStartTime = useRef(0);
   const prevHovered = useRef(null);
+  const svgMeshMap = useRef({});
 
   // The clonedScene memo is no longer needed; we will use the ref directly.
   // const clonedScene = useMemo(() => { ... });
@@ -43,7 +45,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     'Event_gallary_name': { text: 'EVENTS', route: '/events' },
     'Event_gallary_building': { text: 'EVENTS', route: '/events' },
     'Contact_us_plane': { text: 'CONTACT', route: '/contact' },
-    'ContactUs_Building': { text: 'CONTACT', route: '/contact' },
+    'Contact_us_Building': { text: 'CONTACT', route: '/contact' },
     'HOD_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' },
     'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' },
     'Event_gallary_svg': { text: 'EVENTS', route: '/events' },
@@ -81,7 +83,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
             child.material.emissive = new THREE.Color('#aa00ff');
 
-            child.material.emissiveIntensity = 2.0;
+            child.material.emissiveIntensity = 1.0;
 
             child.material.color = new THREE.Color('#ff00ff');
 
@@ -174,6 +176,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
             child.userData.buildingName = meshName;
             child.userData.originalEmissive = child.material?.emissive?.clone();
             child.userData.originalIntensity = child.material?.emissiveIntensity || 0;
+            if (config.route && child.name.endsWith('_svg')) {
+              svgMeshMap.current[config.route] = child;
+            }
           }
         });
 
@@ -315,9 +320,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         if (mesh.material) {
           if (buildingNameMeshes.includes(mesh.name)) {
             // Hardcode final intensity for SVGs
-            mesh.material.emissiveIntensity = 2.0;
+            mesh.material.emissiveIntensity = 1.0;
             // Also update userData so hover is correct
-            mesh.userData.originalIntensity = 2.0;
+            mesh.userData.originalIntensity = 1.0;
           } else {
             // Use default final intensity for other meshes
             mesh.material.emissiveIntensity = originalIntensity;
@@ -336,26 +341,53 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       setAnimationPhase('done')
     }
 
-    // --- New Hover Logic ---
-    if (prevHovered.current !== hoveredBuilding) {
-      if (prevHovered.current && prevHovered.current.material) {
-        prevHovered.current.material.emissiveIntensity = prevHovered.current.userData.originalIntensity || 1;
+    // --- Unified Hover Logic ---
+    // 1. Determine which SVG to activate based on the hovered building's route
+    let svgToActivate = null;
+    if (hoveredBuilding && hoveredBuilding.userData.route) {
+      const route = hoveredBuilding.userData.route;
+      svgToActivate = svgMeshMap.current[route] || null;
+    }
+
+    // 2. Loop through all known SVGs to update their state
+    Object.values(svgMeshMap.current).forEach(svgMesh => {
+      if (svgMesh === svgToActivate) {
+        // This is the active SVG, turn it ON
+        svgMesh.material.emissiveIntensity = 5.8;
+      } else {
+        // This is an inactive SVG, turn it OFF
+        svgMesh.material.emissiveIntensity = 1.0;
+      }
+    });
+
+    // 3. Manage the dynamic point light
+    if (svgToActivate) {
+      const box = new THREE.Box3().setFromObject(svgToActivate);
+      const center = box.getCenter(new THREE.Vector3());
+      // Set light position only if it has changed to avoid re-renders
+      if (!svgLightPosition || !svgLightPosition.equals(center)) {
+        setSvgLightPosition(center);
+      }
+    } else {
+      if (svgLightPosition) {
+        setSvgLightPosition(null);
       }
     }
 
-    if (hoveredBuilding && animationPhase === 'done' && !isMobile) {
-      if (hoveredBuilding.material) {
-        const isSvg = hoveredBuilding.name.endsWith('_svg');
-        if (isSvg) {
-          hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * 1.5;
-        } else {
-          const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5;
-          hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * pulseIntensity;
-        }
+    // 4. Handle hover effect for non-SVG buildings (the pulsing)
+    if (prevHovered.current !== hoveredBuilding) {
+      // Reset the previously hovered non-SVG building
+      if (prevHovered.current && prevHovered.current.material && !prevHovered.current.name.endsWith('_svg')) {
+        prevHovered.current.material.emissiveIntensity = prevHovered.current.userData.originalIntensity || 1;
       }
     }
+    // Apply pulse to the currently hovered non-SVG building
+    if (hoveredBuilding && hoveredBuilding.material && !hoveredBuilding.name.endsWith('_svg')) {
+      const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5;
+      hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * pulseIntensity;
+    }
     prevHovered.current = hoveredBuilding;
-    // --- End New Hover Logic ---
+    // --- End Unified Hover Logic ---
   });
 
 
@@ -382,30 +414,34 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : [];
     const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects];
 
-
-
     if (allIntersects.length > 0) {
       const firstIntersect = allIntersects[0].object;
+
+      // Check for special clickable zones first
       if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
         setHoveredBuilding(firstIntersect);
         gl.domElement.style.cursor = 'pointer';
         return;
       }
 
+      // Traverse up to find the object with userData
       let clickableObject = firstIntersect;
       while (clickableObject && !clickableObject.userData.clickable) {
         clickableObject = clickableObject.parent;
       }
-      if (clickableObject && clickableObject.userData.clickable) {
+
+      if (clickableObject) {
         setHoveredBuilding(clickableObject);
         gl.domElement.style.cursor = 'pointer';
-        return;
+      } else {
+        setHoveredBuilding(null);
+        gl.domElement.style.cursor = 'default';
       }
+    } else {
+      setHoveredBuilding(null);
+      gl.domElement.style.cursor = 'default';
     }
-
-    setHoveredBuilding(null);
-    gl.domElement.style.cursor = 'default';
-  }, [animationPhase, isMobile, gl, raycaster, camera, hoveredBuilding]);
+  }, [animationPhase, isMobile, gl, raycaster, camera]);
 
   const handleClick = useCallback((event) => {
     const modelScene = groupRef.current;
@@ -476,6 +512,16 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           castShadow={true}
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
+        />
+      )}
+
+      {svgLightPosition && (
+        <pointLight
+          position={[svgLightPosition.x, svgLightPosition.y, svgLightPosition.z + 0.5]}
+          intensity={10}
+          color="#ff00ff"
+          distance={10}
+          decay={0.5}
         />
       )}
 

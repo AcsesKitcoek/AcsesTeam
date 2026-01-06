@@ -8,13 +8,15 @@ import TeamsBuilding from './TeamsBuilding'
 import SolidPurpleBackground from '../components/scene/SolidPurpleBackground'
 import CameraTracker from '../components/scene/CameraTracker'
 import TeamsBuildingLighting from '../components/scene/TeamsBuildingLighting'
-import BackButton from '../components/ui/BackButton'
-import { useMobileDetection } from '../hooks/useMobileDetection'
+import BackButton from '../components/ui/BackButton';
+import TeamDebugOverlay from '../components/ui/TeamDebugOverlay'; // Import the new overlay
+import { useMobileDetection } from '../hooks/useMobileDetection';
 
 
 export default function TeamsBuildingPage() {
     const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' })
     const [distance, setDistance] = useState('10.00')
+    const [debugBox, setDebugBox] = useState(null); // State for the debug box
     const isMobile = useMobileDetection()
     const navigate = useNavigate()
 
@@ -26,6 +28,11 @@ export default function TeamsBuildingPage() {
     const handleBackClick = useCallback(() => {
         navigate('/')
     }, [navigate])
+
+    const handleTeamClick = useCallback((teamName, box) => {
+        alert(`Clicked on ${teamName} team room!`);
+        setDebugBox(box); // Set the debug box info
+    }, []);
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -54,7 +61,7 @@ export default function TeamsBuildingPage() {
                 <TeamsBuildingLighting isMobile={isMobile} />
 
                 <Suspense fallback={null}>
-                    <TeamsBuilding />
+                    <TeamsBuilding onTeamClick={handleTeamClick} />
                 </Suspense>
 
                 <OrbitControls
@@ -86,8 +93,9 @@ export default function TeamsBuildingPage() {
                 />
             </div>
 
-            {/* Camera Debug Panel - Hidden for production */}
+            {/* Debug Overlays */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
+            {/* <TeamDebugOverlay box={debugBox} /> */}
         </div>
     )
 }
