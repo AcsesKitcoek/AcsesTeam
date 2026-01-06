@@ -29,6 +29,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
   const touch = useRef(new THREE.Vector2());
   const emissiveMeshes = useRef([]);
   const animationStartTime = useRef(0);
+  const prevHovered = useRef(null);
 
   // The clonedScene memo is no longer needed; we will use the ref directly.
   // const clonedScene = useMemo(() => { ... });
@@ -44,7 +45,11 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     'Contact_us_plane': { text: 'CONTACT', route: '/contact' },
     'ContactUs_Building': { text: 'CONTACT', route: '/contact' },
     'HOD_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' },
-    'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' }
+    'hod_cabin': { text: 'HOD CABIN', route: 'modal', action: 'hod' },
+    'Event_gallary_svg': { text: 'EVENTS', route: '/events' },
+    'About_Acses_svg': { text: 'ABOUT US', route: '/about' },
+    'Teams_svg': { text: 'TEAMS', route: '/teams' },
+    'Contact_us_svg': { text: 'CONTACT', route: '/contact' }
   }), []);
 
   // Setup: This effect now depends on the ref to the model's scene.
@@ -65,13 +70,44 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       // are already handled by ModelWrapper. We keep the specific material logic here.
 
       if (child.isMesh) {
+
+        const buildingNameMeshes = ['Event_gallary_svg', 'About_Acses_svg', 'Teams_svg', 'Contact_us_svg'];
+
+        if (buildingNameMeshes.includes(child.name)) {
+
+          if (child.material) {
+
+            child.material = child.material.clone();
+
+            child.material.emissive = new THREE.Color('#aa00ff');
+
+            child.material.emissiveIntensity = 2.0;
+
+            child.material.color = new THREE.Color('#ff00ff');
+
+            child.material.toneMapped = false;
+
+            child.material.needsUpdate = true;
+
+          }
+
+        }
+
         // Billboard plane - EXACT values preserved
+
         if (child.name === 'Billboard_plane') {
+
           billboardFound = true;
 
+
+
           const worldPos = new THREE.Vector3();
+
           child.getWorldPosition(worldPos);
+
           setBillboardPosition(worldPos);
+
+
 
           if (child.material) {
             child.material = child.material.clone();
@@ -93,7 +129,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
             });
           }
         }
+
         // Other emissive materials - EXACT values preserved
+
         else if (child.material && child.material.emissive) {
           const emissiveHex = child.material.emissive.getHex();
 
@@ -272,12 +310,22 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       }
     }
     else if (animationPhase === 'complete') {
+      const buildingNameMeshes = ['Event_gallary_svg', 'About_Acses_svg', 'Teams_svg', 'Contact_us_svg'];
       emissiveMeshes.current.forEach(({ mesh, originalIntensity, originalEmissive, originalToneMapped }) => {
         if (mesh.material) {
-          mesh.material.emissiveIntensity = originalIntensity
-          mesh.material.emissive.copy(originalEmissive)
-          mesh.material.toneMapped = originalToneMapped
-          mesh.material.needsUpdate = true
+          if (buildingNameMeshes.includes(mesh.name)) {
+            // Hardcode final intensity for SVGs
+            mesh.material.emissiveIntensity = 2.0;
+            // Also update userData so hover is correct
+            mesh.userData.originalIntensity = 2.0;
+          } else {
+            // Use default final intensity for other meshes
+            mesh.material.emissiveIntensity = originalIntensity;
+          }
+
+          mesh.material.emissive.copy(originalEmissive);
+          mesh.material.toneMapped = originalToneMapped;
+          mesh.material.needsUpdate = true;
         }
       })
 
@@ -288,12 +336,26 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       setAnimationPhase('done')
     }
 
-    if (hoveredBuilding && animationPhase === 'done' && !isMobile) {
-      if (hoveredBuilding.material) {
-        const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5
-        hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * pulseIntensity
+    // --- New Hover Logic ---
+    if (prevHovered.current !== hoveredBuilding) {
+      if (prevHovered.current && prevHovered.current.material) {
+        prevHovered.current.material.emissiveIntensity = prevHovered.current.userData.originalIntensity || 1;
       }
     }
+
+    if (hoveredBuilding && animationPhase === 'done' && !isMobile) {
+      if (hoveredBuilding.material) {
+        const isSvg = hoveredBuilding.name.endsWith('_svg');
+        if (isSvg) {
+          hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * 1.5;
+        } else {
+          const pulseIntensity = Math.sin(state.clock.elapsedTime * 5) * 0.5 + 1.5;
+          hoveredBuilding.material.emissiveIntensity = (hoveredBuilding.userData.originalIntensity || 1) * pulseIntensity;
+        }
+      }
+    }
+    prevHovered.current = hoveredBuilding;
+    // --- End New Hover Logic ---
   });
 
 
@@ -320,9 +382,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
     const fcZoneIntersects = fcZoneRef.current ? raycaster.intersectObject(fcZoneRef.current) : [];
     const allIntersects = [...hodZoneIntersects, ...fcZoneIntersects, ...sceneIntersects];
 
-    if (hoveredBuilding && hoveredBuilding.material) {
-      hoveredBuilding.material.emissiveIntensity = hoveredBuilding.userData.originalIntensity || 1;
-    }
+
 
     if (allIntersects.length > 0) {
       const firstIntersect = allIntersects[0].object;
@@ -386,7 +446,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
           if (onHODClick) onHODClick();
         } else if (route && route !== 'modal') {
           navigate(route);
-if (onBuildingClick) onBuildingClick(route);
+          if (onBuildingClick) onBuildingClick(route);
         }
       }
     }
