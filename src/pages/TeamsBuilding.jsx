@@ -7,7 +7,7 @@ import CeilingLights from '../components/scene/CeilingLights';
 import { ModelWrapper } from '../components/scene/ModelWrapper';
 import ClickableZone from '../components/scene/ClickableZone';
 
-export default function TeamsBuilding({ onTeamClick }) {
+export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) {
     const groupRef = useRef();
     const [lightPositions, setLightPositions] = useState([]);
     const [animationPhase, setAnimationPhase] = useState('boot');
@@ -35,6 +35,18 @@ export default function TeamsBuilding({ onTeamClick }) {
     useEffect(() => {
         const modelScene = groupRef.current;
         if (!modelScene) return;
+
+        // Apply base material to SVG meshes
+        modelScene.traverse((child) => {
+            if (child.isMesh && child.name.endsWith('_svg')) {
+                child.material = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color('#ff00ff'), // Magenta color
+                    emissive: new THREE.Color('#aa00ff'), // Emissive part for glow
+                    emissiveIntensity: 1.0, // Small intensity to make it visible
+                    toneMapped: false,
+                });
+            }
+        });
 
         // --- Standard scene setup (animations, materials, etc.) ---
         let lightsFound = 0;
@@ -296,6 +308,9 @@ export default function TeamsBuilding({ onTeamClick }) {
                     position={zone.toArray()}
                     size={teamZoneConfig.size}
                     onClick={() => onTeamClick(team, { position: zone, size: teamZoneConfig.size })}
+                    onPointerEnter={(e) => { console.log(`Entering zone: ${team}`); onZoneHover(true, team, e); }}
+                    onPointerLeave={(e) => { console.log(`Leaving zone: ${team}`); onZoneHover(false, team, e); }}
+                    onPointerMove={(e) => onZoneMove(e)}
                     debug
                     color={teamZoneConfig.colors[team]}
                 />
