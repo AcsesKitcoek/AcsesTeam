@@ -182,13 +182,13 @@ export default function TeamsBuilding({ onTeamClick }) {
         // Set hardcoded positions based on user's manual adjustment and logs
         setTeamZones({
             Management: new THREE.Vector3(18, 39, 0.22), // User's value
-            Technical: newTeamZones.Technical || new THREE.Vector3(0, 0, 0),
-            Design: newTeamZones.Design || new THREE.Vector3(0, 0, 0),
-            Registration: newTeamZones.Registration || new THREE.Vector3(0, 0, 0),
-            Media: newTeamZones.Media || new THREE.Vector3(0, 0, 0),
-            Publicity: newTeamZones.Publicity || new THREE.Vector3(0, 0, 0),
-            Documentation: newTeamZones.Documentation || new THREE.Vector3(0, 0, 0),
-            Logistics: newTeamZones.Logistics || new THREE.Vector3(0, 0, 0),
+            Technical: new THREE.Vector3(30.68, 39, -11.7),
+            Design: new THREE.Vector3(18, 28.2, 0.22),
+            Registration: new THREE.Vector3(30.68, 28.3, -11.7),
+            Media: new THREE.Vector3(18, 17.5, 0.22),
+            Publicity: new THREE.Vector3(30.68, 17.5, -11.7),
+            Documentation: new THREE.Vector3(18, 6.63, 0.22),
+            Logistics: new THREE.Vector3(30.68, 6.63, -11.7),
         });
 
     }, [groupRef.current, acsesTexture, isMobile]);
