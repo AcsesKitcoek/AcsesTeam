@@ -21,7 +21,7 @@ const ClickableZone = React.memo(
                     transparent={!debug}
                     opacity={debug ? 0.3 : 0}
                     depthWrite={false}
-                    colorWrite={debug}
+                    colorWrite={false}
                     color={color}
                 />
             </mesh>
