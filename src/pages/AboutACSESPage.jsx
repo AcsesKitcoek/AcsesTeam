@@ -78,7 +78,7 @@ export default function AboutACSESPage() {
 
             <div className="ui-overlay" style={{ marginTop: isMobile ? '80px' : '0' }}>
                 <h1>ABOUT ACSES</h1>
-                <p className="subtitle" style={{ padding: '10px' }}>Discover Our Vision, Mission & Sponsors</p>
+                <p className="subtitle" style={{ padding: '10px' }}>Discover Our Vision & Mission</p>
 
                 <BackButton
                     onClick={handleBackClick}
