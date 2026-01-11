@@ -11,7 +11,9 @@ import TeamsBuildingLighting from '../components/scene/TeamsBuildingLighting'
 import BackButton from '../components/ui/BackButton';
 import TeamDebugOverlay from '../components/ui/TeamDebugOverlay';
 import Tooltip from '../components/ui/Tooltip'; // Import the new Tooltip
+import TeamSidePanel from '../components/ui/TeamSidePanel';
 import { useMobileDetection } from '../hooks/useMobileDetection';
+import { TEAM_DATA } from '../assets/teamInfo'
 
 
 export default function TeamsBuildingPage() {
@@ -19,6 +21,8 @@ export default function TeamsBuildingPage() {
     const [distance, setDistance] = useState('10.00');
     const [debugBox, setDebugBox] = useState(null);
     const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
+    const [selectedTeam, setSelectedTeam] = useState(null);
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
     const isMobile = useMobileDetection();
     const navigate = useNavigate();
 
@@ -34,13 +38,20 @@ export default function TeamsBuildingPage() {
     const handleTeamClick = useCallback((teamName, box) => {
         console.log(`Clicked on ${teamName}`);
         setDebugBox(box);
-    }, []);
+
+        // Get team data and open panel
+        const teamData = TEAM_DATA[teamName];
+        if (teamData) {
+            setSelectedTeam(teamData);
+            setIsPanelOpen(true);
+        }
+    }, [TEAM_DATA]);
 
     const handleZoneHover = useCallback((isHovering, teamName, event) => {
         if (isHovering) {
             setTooltip({
                 visible: true,
-                text: `View ${teamName} Details`,
+                text: `View ${teamName} Team Details`,
                 x: event.clientX,
                 y: event.clientY,
             });
@@ -119,6 +130,34 @@ export default function TeamsBuildingPage() {
             </div>
 
             {/* <TeamDebugOverlay box={debugBox} /> */}
+
+            {/* Backdrop Blur Overlay */}
+            {isPanelOpen && (
+                <div
+                    className="backdrop-blur-overlay"
+                    onClick={() => setIsPanelOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        zIndex: 999,
+                        cursor: 'pointer',
+                        pointerEvents: 'auto'
+                    }}
+                />
+            )}
+
+            {/* Team Side Panel */}
+            <TeamSidePanel
+                isOpen={isPanelOpen}
+                onClose={() => setIsPanelOpen(false)}
+                teamData={selectedTeam}
+            />
         </div>
     )
 }

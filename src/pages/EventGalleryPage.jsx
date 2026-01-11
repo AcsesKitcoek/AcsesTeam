@@ -33,7 +33,7 @@ export default function EventGalleryPage() {
         <div style={{ width: '100vw', height: '100vh' }}>
             <Canvas
                 camera={{
-                    position: isMobile ? [39.75, 30.74, 48.30] : [28.45, 18.92, 35.21],
+                    position: isMobile ? [34.69, 48.77, 41.51] : [23.45, 36.43, 28.35],
                     fov: isMobile ? 65 : 40,
                     near: 0.1,
                     far: 1000
@@ -55,14 +55,14 @@ export default function EventGalleryPage() {
                 <GalleryLighting isMobile={isMobile} platformLightRef={platformLightRef} />
 
                 <Suspense fallback={null}>
-                    <EventGallery />
+                    <EventGallery onFrameSelect={(name) => console.log('EventGalleryPage: Frame selected ->', name)} />
                 </Suspense>
 
                 <OrbitControls
-                    target={[-5, 7, 0]}
-                    enablePan={false}
-                    enableZoom={false}
-                    enableRotate={false}
+                    target={[-5, 11, 0]}
+                    enablePan={true}
+                    enableZoom={true}
+                    enableRotate={true}
                     enableDamping={false}
                 />
 

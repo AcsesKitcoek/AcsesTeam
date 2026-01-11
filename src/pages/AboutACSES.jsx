@@ -53,7 +53,7 @@ export default function AboutACSES() {
                         emissiveMeshesList.push({ mesh: child, name: child.name, originalIntensity: 1.2, originalEmissive: new THREE.Color('#00e5ff'), originalToneMapped: false });
                     }
                 }
-                else if (child.name === 'Case_About' || child.name === 'Case_Sponsors' || child.name === 'Case_Vision') {
+                else if (child.name === 'Case_About' || child.name === 'Case_Video' || child.name === 'Case_Vision') {
                     if (child.material) {
                         child.material = child.material.clone();
                         child.material.emissive = new THREE.Color('#ff00ff');
@@ -62,7 +62,7 @@ export default function AboutACSES() {
                         emissiveMeshesList.push({ mesh: child, name: child.name, originalIntensity: 4.0, originalEmissive: new THREE.Color('#ff00ff'), originalToneMapped: false });
                     }
                 }
-                else if (child.name === 'Plane_About' || child.name === 'Plane_Sponsors' || child.name === 'Plane_Vision') {
+                else if (child.name === 'Plane_About' || child.name === 'Plane_Video' || child.name === 'Plane_Vision') {
                     if (child.material) {
                         child.material = child.material.clone();
                         child.material.color = new THREE.Color('#000000');
