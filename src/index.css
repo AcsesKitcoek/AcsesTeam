@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Megazine Poster';
+  src: url('/font/megazine-poster/MegazinePosterDEMO-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +13,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Megazine Poster', sans-serif;
   background: #000000;
   overflow: hidden;
   touch-action: none; /* Prevent mobile zoom and pan gestures */
@@ -16,4 +24,13 @@ body {
 #root {
   width: 100vw;
   height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6, .subtitle, .modal-title, .panel-title, .section-title, .panel-team-name, .panel-event-name, .photo-modal-title {
+  font-family: 'Megazine Poster', sans-serif;
+  letter-spacing: 1px;
+}
+
+button, .member-name, .section-text, .panel-text, .modal-text {
+  font-family: 'Megazine Poster', sans-serif;
 }

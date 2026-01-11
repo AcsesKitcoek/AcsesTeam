@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Megazine Poster', sans-serif;
   background: radial-gradient(ellipse at center, #6b4f8a 0%, #3d2a54 35%, #1a0f2e 70%, #0a0512 100%);
   overflow: hidden;
   color: #ffffff;
@@ -36,6 +36,7 @@ body {
 }
 
 .ui-overlay h1 {
+  font-family: 'Megazine Poster', sans-serif;
   color: #ff00ff;
   font-size: 72px;
   font-weight: 900;
@@ -53,6 +54,7 @@ body {
 }
 
 .ui-overlay .subtitle {
+  font-family: 'Megazine Poster', sans-serif;
   color: #00ffff;
   font-size: 14px;
   font-weight: 400;
@@ -70,6 +72,7 @@ body {
 }
 
 .back-button {
+  font-family: 'Megazine Poster', sans-serif;
   position: fixed;
   top: 80px;
   left: 20px;

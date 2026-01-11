@@ -9,6 +9,8 @@ import SolidPurpleBackground from '../components/scene/SolidPurpleBackground'
 import CameraTracker from '../components/scene/CameraTracker'
 import AboutLighting from '../components/scene/AboutLighting'
 import BackButton from '../components/ui/BackButton'
+import AboutSidePanel from '../components/ui/AboutSidePanel'
+import TeamPhotoModal from '../components/ui/TeamPhotoModal'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
 
@@ -16,6 +18,9 @@ import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
 export default function AboutACSESPage() {
     const [cameraPos, setCameraPos] = useState({ x: '0.00', y: '0.00', z: '0.00' })
     const [distance, setDistance] = useState('0.00')
+    const [selectedSection, setSelectedSection] = useState(null)
+    const [isPanelOpen, setIsPanelOpen] = useState(false)
+    const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
     const platformLightRef = useRef()
     const isMobile = useMobileDetection()
     const navigate = useNavigate()
@@ -28,6 +33,24 @@ export default function AboutACSESPage() {
     const handleBackClick = useCallback(() => {
         navigate('/')
     }, [navigate])
+
+    const handleSectionSelect = useCallback((section) => {
+        if (section === 'about' || section === 'vision') {
+            setSelectedSection(section);
+            setIsPanelOpen(true);
+        } else if (section === 'video') {
+            setIsPhotoModalOpen(true);
+        }
+    }, []);
+
+    const handleClosePanel = useCallback(() => {
+        setIsPanelOpen(false);
+        setTimeout(() => setSelectedSection(null), 500); // Wait for transition
+    }, []);
+
+    const handleClosePhotoModal = useCallback(() => {
+        setIsPhotoModalOpen(false);
+    }, []);
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -55,7 +78,7 @@ export default function AboutACSESPage() {
                 <AboutLighting isMobile={isMobile} platformLightRef={platformLightRef} />
 
                 <Suspense fallback={null}>
-                    <AboutACSES />
+                    <AboutACSES onSectionSelect={handleSectionSelect} />
                 </Suspense>
 
                 <OrbitControls
@@ -86,6 +109,17 @@ export default function AboutACSESPage() {
                     label="← Back to Campus"
                 />
             </div>
+            
+            <AboutSidePanel 
+                isOpen={isPanelOpen} 
+                onClose={handleClosePanel} 
+                section={selectedSection} 
+            />
+
+            <TeamPhotoModal
+                isOpen={isPhotoModalOpen}
+                onClose={handleClosePhotoModal}
+            />
 
             {/* Camera Debug Panel - Hidden for production */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}

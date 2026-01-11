@@ -141,6 +141,7 @@
 }
 
 .loader-title {
+  font-family: 'Megazine Poster', sans-serif;
   font-size: 56px;
   font-weight: 900;
   color: #ff00ff;
@@ -151,7 +152,7 @@
 }
 
 .loader-percentage {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Megazine Poster', sans-serif;
   font-size: 24px;
   color: #00ffff;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);

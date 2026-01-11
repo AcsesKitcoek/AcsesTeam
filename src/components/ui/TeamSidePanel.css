@@ -106,6 +106,7 @@
 
 /* Team Name */
 .panel-team-name {
+    font-family: 'Megazine Poster', sans-serif;
     font-size: 28px;
     font-weight: 800;
     color: #fff;
@@ -122,6 +123,7 @@
 }
 
 .section-title {
+    font-family: 'Megazine Poster', sans-serif;
     font-size: 13px;
     font-weight: 700;
     color: #00ffff;
@@ -141,6 +143,7 @@
 }
 
 .section-text {
+    font-family: 'Megazine Poster', sans-serif;
     font-size: 15px;
     line-height: 1.7;
     color: #cbd5e1;
@@ -199,6 +202,7 @@
 }
 
 .member-name {
+    font-family: 'Megazine Poster', sans-serif;
     font-size: 14px;
     color: #e2e8f0;
     font-weight: 500;

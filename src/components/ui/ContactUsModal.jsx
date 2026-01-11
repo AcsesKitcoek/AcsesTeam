@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-
 /**
  * Contact Us Modal Component
  * Displays a contact form in a modal overlay
@@ -93,7 +92,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
                         e.target.style.color = '#aa00ff'
                     }}
                 >
-                    ×
+                    X
                 </button>
 
                 {/* Title */}

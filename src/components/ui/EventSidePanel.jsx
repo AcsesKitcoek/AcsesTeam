@@ -3,12 +3,25 @@ import { X, Image } from 'lucide-react';
 import './EventSidePanel.css';
 
 export default function EventSidePanel({ isOpen, onClose, eventData }) {
+    // Internal state to trigger animation class after mount
+    const [animateOpen, setAnimateOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        if (isOpen) {
+            // Small delay to ensure DOM is painted before adding 'open' class
+            const timer = setTimeout(() => setAnimateOpen(true), 10);
+            return () => clearTimeout(timer);
+        } else {
+            setAnimateOpen(false);
+        }
+    }, [isOpen]);
+
     if (!eventData) return null;
 
     return (
         <>
-            <div className={`panel-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
-            <div className={`event-side-panel ${isOpen ? 'open' : ''}`}>
+            <div className={`panel-backdrop ${animateOpen ? 'open' : ''}`} onClick={onClose} />
+            <div className={`event-side-panel ${animateOpen ? 'open' : ''}`}>
                 {/* Close Button */}
                 <button className="panel-close-btn" onClick={onClose} aria-label="Close panel">
                     <X size={24} />
