@@ -20,7 +20,7 @@ export const TEAM_DATA = {
     },
     "Technical": {
         name: "Technical Team",
-        image: "/images/ACSES_Image.jpg",
+        image: "/images/teams/Technical.png",
         purpose: "Developing cutting-edge AI solutions for campus automation and student engagement. Our team focuses on creating innovative tools that enhance the learning experience.",
         mentors: [
             { name: "Abhishek Ujale", link: "https://www.linkedin.com/in/abhishek-ujale-916284257/" },

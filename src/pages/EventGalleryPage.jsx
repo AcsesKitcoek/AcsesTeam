@@ -11,11 +11,15 @@ import GalleryLighting from '../components/scene/GalleryLighting'
 import BackButton from '../components/ui/BackButton'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
+import EventSidePanel from '../components/ui/EventSidePanel'
+import { eventsData } from '../assets/eventInfo'
 
 
 export default function EventGalleryPage() {
     const [cameraPos, setCameraPos] = useState({ x: '0.00', y: '0.00', z: '0.00' })
     const [distance, setDistance] = useState('0.00')
+    const [selectedEvent, setSelectedEvent] = useState(null)
+    const [isPanelOpen, setIsPanelOpen] = useState(false)
     const platformLightRef = useRef()
     const isMobile = useMobileDetection()
     const navigate = useNavigate()
@@ -28,6 +32,23 @@ export default function EventGalleryPage() {
     const handleBackClick = useCallback(() => {
         navigate('/')
     }, [navigate])
+
+    const handleFrameSelect = useCallback((frameName) => {
+        console.log('EventGalleryPage: Frame selected ->', frameName)
+        const event = eventsData[frameName]
+        if (event) {
+            setSelectedEvent(event)
+            setIsPanelOpen(true)
+        } else {
+            console.warn(`No event data found for frame: ${frameName}`)
+        }
+    }, [])
+
+    const handleClosePanel = useCallback(() => {
+        setIsPanelOpen(false)
+        // delayed clear of selection to allow close animation to finish
+        setTimeout(() => setSelectedEvent(null), 500)
+    }, [])
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -55,7 +76,7 @@ export default function EventGalleryPage() {
                 <GalleryLighting isMobile={isMobile} platformLightRef={platformLightRef} />
 
                 <Suspense fallback={null}>
-                    <EventGallery onFrameSelect={(name) => console.log('EventGalleryPage: Frame selected ->', name)} />
+                    <EventGallery onFrameSelect={handleFrameSelect} />
                 </Suspense>
 
                 <OrbitControls
@@ -86,6 +107,12 @@ export default function EventGalleryPage() {
                     label="← Back to Campus"
                 />
             </div>
+
+            <EventSidePanel
+                isOpen={isPanelOpen}
+                onClose={handleClosePanel}
+                eventData={selectedEvent}
+            />
 
             {/* Camera Debug Panel - Hidden for production */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}

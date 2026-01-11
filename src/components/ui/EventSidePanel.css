@@ -1,0 +1,218 @@
+/* Backdrop Overlay */
+.panel-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.panel-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Event Side Panel Container */
+.event-side-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50%;
+    /* Wider than team panel */
+    height: 100vh;
+    background: linear-gradient(135deg,
+            rgba(15, 10, 30, 0.98) 0%,
+            rgba(20, 15, 35, 0.97) 50%,
+            rgba(10, 10, 26, 0.99) 100%);
+    backdrop-filter: blur(25px) saturate(1.2);
+    -webkit-backdrop-filter: blur(25px) saturate(1.2);
+    border-left: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.event-side-panel.open {
+    transform: translateX(0);
+}
+
+/* Close Button */
+.panel-close-btn {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.panel-close-btn:hover {
+    background: rgba(255, 0, 255, 0.2);
+    border-color: #ff00ff;
+    transform: rotate(90deg);
+}
+
+/* Event Image Container */
+.panel-image-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+}
+
+.panel-event-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(1.2);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(10, 10, 26, 0.9) 110%);
+}
+
+/* Panel Content */
+.panel-content {
+    padding: 30px 25px;
+    padding-bottom: 50px;
+}
+
+/* Event Name */
+.panel-event-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+/* Section Styling */
+.panel-section {
+    margin-bottom: 35px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #00ffff;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(0, 255, 255, 0.3), transparent);
+}
+
+.section-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #cbd5e1;
+    font-weight: 300;
+}
+
+/* --- Gallery Grid --- */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    aspect-ratio: 16/9;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.5);
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-image {
+    transform: scale(1.05);
+}
+
+/* Scrollbar */
+.event-side-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.event-side-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.event-side-panel::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 3px;
+}
+
+.event-side-panel::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .event-side-panel {
+        width: 70%;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-side-panel {
+        width: 100%;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
