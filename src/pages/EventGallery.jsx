@@ -4,11 +4,20 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { ModelWrapper } from '../components/scene/ModelWrapper';
+import { eventsData } from '../assets/eventInfo';
+
+const textureUrls = {};
+Object.keys(eventsData).forEach(key => {
+    if (eventsData[key].panelImage) {
+        textureUrls[key] = eventsData[key].panelImage;
+    }
+});
 
 export default function EventGallery({ onFrameSelect }) {
     const groupRef = useRef();
     const { camera, raycaster, gl } = useThree();
     const [acsesTexture] = useTexture(['/images/ACSES_Image.jpg']);
+    const eventTextures = useTexture(textureUrls);
     const isMobile = useMobileDetection();
     const [hoveredFrame, setHoveredFrame] = useState(null);
     const [animationPhase, setAnimationPhase] = useState('blackout');
@@ -80,13 +89,18 @@ export default function EventGallery({ onFrameSelect }) {
                 else if (child.name.match(/^Image_Plane_([1-8]|event)$/)) {
                     if (child.material) {
                         child.material = child.material.clone();
-                        const rotatedTexture = acsesTexture.clone();
+                        
+                        const texture = eventTextures[child.name] || acsesTexture;
+                        const rotatedTexture = texture.clone();
+                        
                         rotatedTexture.center.set(0.5, 0.5);
                         rotatedTexture.rotation = -Math.PI * 2;
                         rotatedTexture.repeat.set(-1, 1);
+                        rotatedTexture.colorSpace = THREE.SRGBColorSpace; // Ensure correct color space
                         rotatedTexture.needsUpdate = true;
+                        
                         child.material.map = rotatedTexture;
-                        child.material.emissive = new THREE.Color('#00ffff');
+                        child.material.emissive = new THREE.Color('#ffffff');
                         child.material.emissiveIntensity = 0;
                         child.material.emissiveMap = rotatedTexture.clone();
                         child.material.toneMapped = false;
@@ -94,9 +108,9 @@ export default function EventGallery({ onFrameSelect }) {
                         child.material.needsUpdate = true;
                         child.userData.clickable = true;
                         child.userData.frameName = child.name;
-                        child.userData.originalEmissive = new THREE.Color('#00ffff');
+                        child.userData.originalEmissive = new THREE.Color('#ffffff');
                         child.userData.originalIntensity = 0.6;
-                        imagePlaneMeshes.current.push({ mesh: child, name: child.name, originalIntensity: 0.6, originalEmissive: new THREE.Color('#00ffff') });
+                        imagePlaneMeshes.current.push({ mesh: child, name: child.name, originalIntensity: 0.6, originalEmissive: new THREE.Color('#ffffff') });
                     }
                 }
                 else if (!child.name.match(/^Image_Plane_[1-8]$/) && (child.name.includes('Frame') || child.name.includes('Photo') || child.name.includes('Picture'))) {

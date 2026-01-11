@@ -7,14 +7,14 @@ const FACULTY_DATA = [
     {
         role: "Head of Department",
         name: "Dr. Lingraj Hadimani",
-        image: "../../public/images/faculty/hod.jpg",
+        image: "/images/faculty/hod.jpg",
         linkedin: "https://www.linkedin.com/in/lingaraj-hadimani/",
         email: "hod@example.com"
     },
     {
         role: "Faculty Coordinator",
         name: "Mr. Anish Kshirsagar",
-        image: "../../public/images/faculty/anishk.jpg",
+        image: "/images/faculty/anishk.jpg",
         linkedin: "https://www.linkedin.com/in/anesh-kshirsagar-738469195/",
         email: "faculty@example.com"
     }
