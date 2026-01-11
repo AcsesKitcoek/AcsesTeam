@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { ModelWrapper } from '../components/scene/ModelWrapper';
 
-export default function EventGallery() {
+export default function EventGallery({ onFrameSelect }) {
     const groupRef = useRef();
     const { camera, raycaster, gl } = useThree();
     const [acsesTexture] = useTexture(['/images/ACSES_Image.jpg']);
@@ -64,7 +64,7 @@ export default function EventGallery() {
                         emissiveMeshesList.push({ mesh: child, name: child.name, originalIntensity: isWarm ? 3.5 : 2.0, originalEmissive: child.material.emissive.clone(), originalToneMapped: false });
                     }
                 }
-                else if (child.name.match(/^Image_Case_[1-8]$/)) {
+                else if (child.name.match(/^Image_Case_([1-8]|event)$/)) {
                     if (child.material) {
                         child.material = child.material.clone();
                         child.material.emissive = new THREE.Color('#ff00ff');
@@ -77,7 +77,7 @@ export default function EventGallery() {
                         emissiveMeshesList.push({ mesh: child, name: child.name, originalIntensity: 4.0, originalEmissive: new THREE.Color('#ff00ff'), originalToneMapped: false });
                     }
                 }
-                else if (child.name.match(/^Image_Plane_[1-8]$/)) {
+                else if (child.name.match(/^Image_Plane_([1-8]|event)$/)) {
                     if (child.material) {
                         child.material = child.material.clone();
                         const rotatedTexture = acsesTexture.clone();
@@ -210,8 +210,29 @@ export default function EventGallery() {
 
     const handleClick = useCallback((event) => {
         if (animationPhase !== 'done' || !groupRef.current) return;
-        // Click logic remains the same...
-    }, [animationPhase, gl, raycaster, camera]);
+
+        const rect = gl.domElement.getBoundingClientRect();
+        const x = isMobile && event.changedTouches ? event.changedTouches[0].clientX : event.clientX;
+        const y = isMobile && event.changedTouches ? event.changedTouches[0].clientY : event.clientY;
+
+        mouse.current.x = ((x - rect.left) / rect.width) * 2 - 1;
+        mouse.current.y = -((y - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse.current, camera);
+        const intersects = raycaster.intersectObject(groupRef.current, true);
+
+        if (intersects.length > 0) {
+            let clickableObject = intersects[0].object;
+            while (clickableObject && !clickableObject.userData.clickable) {
+                clickableObject = clickableObject.parent;
+            }
+            if (clickableObject) {
+                const frameName = clickableObject.userData.frameName || clickableObject.name;
+                console.log('Selected Frame:', frameName);
+                if (onFrameSelect) onFrameSelect(frameName);
+            }
+        }
+    }, [animationPhase, gl, raycaster, camera, isMobile, onFrameSelect]);
 
     return (
         <ModelWrapper

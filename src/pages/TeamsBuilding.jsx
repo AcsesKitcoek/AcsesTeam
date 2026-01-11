@@ -186,7 +186,6 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
             if (teamPositions.length > 0) {
                 const avgPos = teamPositions.reduce((acc, pos) => acc.add(pos), new THREE.Vector3(0, 0, 0));
                 avgPos.divideScalar(teamPositions.length);
-                console.log(`${team} Team Avg Position:`, avgPos.x.toFixed(2), avgPos.y.toFixed(2), avgPos.z.toFixed(2));
                 newTeamZones[team] = avgPos;
             }
         });
@@ -308,8 +307,8 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
                     position={zone.toArray()}
                     size={teamZoneConfig.size}
                     onClick={() => onTeamClick(team, { position: zone, size: teamZoneConfig.size })}
-                    onPointerEnter={(e) => { console.log(`Entering zone: ${team}`); onZoneHover(true, team, e); }}
-                    onPointerLeave={(e) => { console.log(`Leaving zone: ${team}`); onZoneHover(false, team, e); }}
+                    onPointerEnter={(e) => { onZoneHover(true, team, e); }}
+                    onPointerLeave={(e) => { onZoneHover(false, team, e); }}
                     onPointerMove={(e) => onZoneMove(e)}
                     debug
                     color={teamZoneConfig.colors[team]}
