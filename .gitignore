@@ -25,3 +25,5 @@ dist-ssr
 
 context.txt
 errorfile.txt
+
+.env

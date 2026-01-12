@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { X } from 'lucide-react'
+import emailjs from '@emailjs/browser'
+import Toast from './Toast'
 /**
  * Contact Us Modal Component
  * Displays a contact form in a modal overlay
@@ -9,6 +12,9 @@ const ContactUsModal = React.memo(({ onClose }) => {
         email: '',
         message: ''
     })
+    
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' })
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleChange = (e) => {
         setFormData({
@@ -17,13 +23,56 @@ const ContactUsModal = React.memo(({ onClose }) => {
         })
     }
 
+    const showToast = (message, type = 'success') => {
+        setToast({ show: true, message, type })
+        setTimeout(() => {
+            setToast(prev => ({ ...prev, show: false }))
+        }, 3000)
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log('Form submitted:', formData)
-        // TODO: Add your form submission logic here
-        alert('Message sent! (This is a demo)')
-        setFormData({ name: '', email: '', message: '' })
-        onClose()
+        setIsSubmitting(true)
+        
+        const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+        const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+        if (!serviceID || !templateID || !publicKey) {
+            showToast('Configuration Error: Missing environment variables', 'error')
+            setIsSubmitting(false)
+            return
+        }
+
+        if (serviceID === 'your_service_id' || templateID === 'your_template_id' || publicKey === 'your_public_key') {
+            showToast('Configuration Error: Placeholders detected', 'error')
+            setIsSubmitting(false)
+            return
+        }
+
+        const templateParams = {
+            from_name: formData.name,
+            from_email: formData.email,
+            message: formData.message,
+            to_name: 'ACSES Team',
+            ...formData
+        }
+
+        emailjs.send(serviceID, templateID, templateParams, publicKey)
+            .then(() => {
+                showToast('Message sent successfully!')
+                setFormData({ name: '', email: '', message: '' })
+                // Close modal after a short delay so user sees the toast
+                setTimeout(() => {
+                    onClose()
+                }, 2000)
+            })
+            .catch((error) => {
+                showToast('Failed to send message', 'error')
+            })
+            .finally(() => {
+                setIsSubmitting(false)
+            })
     }
 
     return (
@@ -63,6 +112,9 @@ const ContactUsModal = React.memo(({ onClose }) => {
                     position: 'relative',
                     animation: 'slideUp 0.4s ease-out'
                 }}>
+                
+                <Toast message={toast.message} type={toast.type} isVisible={toast.show} />
+
                 {/* Close Button */}
                 <button
                     onClick={onClose}
@@ -92,7 +144,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
                         e.target.style.color = '#aa00ff'
                     }}
                 >
-                    X
+                    <X size={24} />
                 </button>
 
                 {/* Title */}
@@ -253,10 +305,11 @@ const ContactUsModal = React.memo(({ onClose }) => {
                     <button
                         className="w-full"
                         type="submit"
+                        disabled={isSubmitting}
                         style={{
                             width: '100%',
                             padding: '14px 24px',
-                            background: 'linear-gradient(135deg, #6a0dad, #00bfff)',
+                            background: isSubmitting ? 'rgba(106, 13, 173, 0.5)' : 'linear-gradient(135deg, #6a0dad, #00bfff)',
                             border: 'none',
                             borderRadius: '12px',
                             color: '#ffffff',
@@ -264,21 +317,26 @@ const ContactUsModal = React.memo(({ onClose }) => {
                             fontWeight: '700',
                             textTransform: 'uppercase',
                             letterSpacing: '1px',
-                            cursor: 'pointer',
+                            cursor: isSubmitting ? 'not-allowed' : 'pointer',
                             transition: 'all 0.3s',
                             boxShadow: '0 4px 15px rgba(170, 0, 255, 0.4)',
-                            whiteSpace: 'nowrap'
+                            whiteSpace: 'nowrap',
+                            opacity: isSubmitting ? 0.7 : 1
                         }}
                         onMouseEnter={(e) => {
-                            e.target.style.transform = 'translateY(-2px)'
-                            e.target.style.boxShadow = '0 6px 25px rgba(170, 0, 255, 0.6)'
+                            if (!isSubmitting) {
+                                e.target.style.transform = 'translateY(-2px)'
+                                e.target.style.boxShadow = '0 6px 25px rgba(170, 0, 255, 0.6)'
+                            }
                         }}
                         onMouseLeave={(e) => {
-                            e.target.style.transform = 'translateY(0px)'
-                            e.target.style.boxShadow = '0 4px 15px rgba(170, 0, 255, 0.4)'
+                            if (!isSubmitting) {
+                                e.target.style.transform = 'translateY(0px)'
+                                e.target.style.boxShadow = '0 4px 15px rgba(170, 0, 255, 0.4)'
+                            }
                         }}
                     >
-                        Send Message
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
                 </form>
             </div>

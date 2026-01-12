@@ -115,7 +115,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
             child.material = child.material.clone();
             child.material.emissive = new THREE.Color('#aa00ff');
             child.material.emissiveIntensity = 5.8;
-            child.material.color = new THREE.Color('#ff00ff');
+            child.material.color = new THREE.Color('#aa00ff');
             child.material.toneMapped = false;
             child.material.transparent = true;
             child.material.opacity = 0.95;
