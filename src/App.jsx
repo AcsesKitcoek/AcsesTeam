@@ -7,6 +7,7 @@ import ContactUsPage from './pages/ContactUsPage';
 import EventGalleryPage from './pages/EventGalleryPage';
 import AboutACSESPage from './pages/AboutACSESPage';
 import { SmartLoader } from './components/ui/SmartLoader'; // Import the new SmartLoader
+import { imageManifest } from './assets/imageManifest';
 import './App.css';
 
 // --- Global Asset Preloader ---
@@ -17,7 +18,10 @@ const modelUrls = [
   '/models/event-gallery.glb',
   '/models/about-acses.glb',
 ];
-const textureUrls = ['/images/ACSES_Image.jpg'];
+const textureUrls = [
+  '/images/ACSES_Image.jpg',
+  ...imageManifest
+];
 
 // Preload all assets. This will start downloading them in the background.
 useGLTF.preload(modelUrls);

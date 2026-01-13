@@ -90,13 +90,13 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
                         rotatedTexture.repeat.set(-1, 1);
                         rotatedTexture.needsUpdate = true;
                         child.material.map = rotatedTexture;
-                        child.material.emissive = new THREE.Color('#00ffff');
-                        child.material.emissiveIntensity = 10;
+                        child.material.emissive = new THREE.Color('#ffffff');
+                        child.material.emissiveIntensity = 1;
                         child.material.emissiveMap = rotatedTexture.clone();
                         child.material.toneMapped = false;
                         child.material.color = new THREE.Color('#000000');
                         child.material.needsUpdate = true;
-                        screenList.push({ mesh: child, name: child.name, originalIntensity: 10 });
+                        screenList.push({ mesh: child, name: child.name, originalIntensity: 1 });
                         child.material.emissiveIntensity = 0;
                     }
                 }

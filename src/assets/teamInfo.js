@@ -51,7 +51,7 @@ export const TEAM_DATA = {
         ],
         coreMembers: [],
         members: [
-            { name: "Somesh Otari", link: "https://linkedin.com/in/example" },
+            { name: "Member", link: "https://linkedin.com/in/example" },
         ]
     },
     "Registration": {
@@ -65,7 +65,7 @@ export const TEAM_DATA = {
         ],
         coreMembers: [],
         members: [
-            { name: "Somesh Otari", link: "https://linkedin.com/in/example" },
+            { name: "Member", link: "https://linkedin.com/in/example" },
         ]
     },
     "Media": {
@@ -81,7 +81,7 @@ export const TEAM_DATA = {
             { name: "Saifulla Pendhari", link: "https://linkedin.com/in/example" },
         ],
         members: [
-            { name: "Somesh Otari", link: "https://linkedin.com/in/example" },
+            { name: "Member", link: "https://linkedin.com/in/example" },
         ]
     },
     "Publicity": {
@@ -109,7 +109,7 @@ export const TEAM_DATA = {
         ],
         coreMembers: [],
         members: [
-            { name: "Somesh Otari", link: "https://linkedin.com/in/example" },
+            { name: "Member", link: "https://linkedin.com/in/example" },
         ]
     },
     "Logistics": {
@@ -123,7 +123,7 @@ export const TEAM_DATA = {
         ],
         coreMembers: [],
         members: [
-            { name: "Somesh Otari", link: "https://linkedin.com/in/example" },
+            { name: "Member", link: "https://linkedin.com/in/example" },
         ]
     },
 };
