@@ -12,7 +12,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
         email: '',
         message: ''
     })
-    
+
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' })
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -33,7 +33,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
     const handleSubmit = (e) => {
         e.preventDefault()
         setIsSubmitting(true)
-        
+
         const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID
         const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
         const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
@@ -112,11 +112,12 @@ const ContactUsModal = React.memo(({ onClose }) => {
                     position: 'relative',
                     animation: 'slideUp 0.4s ease-out'
                 }}>
-                
+
                 <Toast message={toast.message} type={toast.type} isVisible={toast.show} />
 
                 {/* Close Button */}
                 <button
+                    className="modal-close-button"
                     onClick={onClose}
                     style={{
                         position: 'absolute',
@@ -314,7 +315,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
                             borderRadius: '12px',
                             color: '#ffffff',
                             fontSize: '16px',
-                            fontWeight: '700',
+                            fontWeight: 'normal',
                             textTransform: 'uppercase',
                             letterSpacing: '1px',
                             cursor: isSubmitting ? 'not-allowed' : 'pointer',
@@ -397,15 +398,15 @@ const ContactUsModal = React.memo(({ onClose }) => {
                     }
 
                     .contact-modal-container button[type="submit"] {
-                        padding: 12px 20px !important;
+                        padding: 12px 16px !important;
                         font-size: 13px !important;
                         border-radius: 10px !important;
                         letter-spacing: 0.5px !important;
                         white-space: nowrap !important;
                     }
 
-                    .contact-modal-container button:first-of-type {
-                        width: 32   px !important;
+                    .contact-modal-container .modal-close-button {
+                        width: 32px !important;
                         height: 32px !important;
                         font-size: 20px !important;
                         top: 16px !important;

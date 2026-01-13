@@ -103,6 +103,7 @@ export default function TeamsBuildingPage() {
                     target={[0, 17, -31]}
                     enablePan={false}
                     enableZoom={false}
+                    enableRotate={false}
                     enableDamping={false}
                 />
 

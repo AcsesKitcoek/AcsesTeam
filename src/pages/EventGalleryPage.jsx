@@ -83,7 +83,7 @@ export default function EventGalleryPage() {
                     target={[-5, 11, 0]}
                     enablePan={true}
                     enableZoom={true}
-                    enableRotate={true}
+                    enableRotate={false}
                     enableDamping={false}
                 />
 
