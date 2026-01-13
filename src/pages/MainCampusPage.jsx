@@ -82,7 +82,7 @@ export default function MainCampusPage() {
                 {/* Post-processing for Enhanced Neon Glow - MOBILE BLOOM ENABLED */}
                 <EffectComposer>
                     <Bloom
-                        intensity={isMobile ? 0.35 : 0.3}
+                        intensity={isMobile ? 0.35 : 1}
                         luminanceThreshold={isMobile ? 0.6 : 0.95}
                         luminanceSmoothing={0.5}
                         radius={isMobile ? 0.6 : 0.5}

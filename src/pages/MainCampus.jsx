@@ -113,9 +113,9 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
 
           if (child.material) {
             child.material = child.material.clone();
-            child.material.emissive = new THREE.Color('#aa00ff');
-            child.material.emissiveIntensity = 5.8;
-            child.material.color = new THREE.Color('#aa00ff');
+            child.material.emissive = new THREE.Color('#9d87df');
+            child.material.emissiveIntensity = 2.8;
+            child.material.color = new THREE.Color('#9d87df');
             child.material.toneMapped = false;
             child.material.transparent = true;
             child.material.opacity = 0.95;
@@ -125,8 +125,8 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
             emissiveMeshesList.push({
               mesh: child,
               name: 'Billboard_plane',
-              originalIntensity: 5.8,
-              originalEmissive: new THREE.Color('#aa00ff'),
+              originalIntensity: 2.3,
+              originalEmissive: new THREE.Color('#9d87df'),
               originalToneMapped: false
             });
           }
@@ -137,7 +137,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         else if (child.material && child.material.emissive) {
           const emissiveHex = child.material.emissive.getHex();
 
-          if (emissiveHex === 0x00e5ff || emissiveHex === 0x00ffff) {
+          if (emissiveHex === 0x9d87df || emissiveHex === 0x00ffff) {
             child.material = child.material.clone();
             child.material.emissiveIntensity = 1.7;
             child.material.toneMapped = false;
@@ -151,7 +151,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
               originalToneMapped: false
             });
           }
-          else if (emissiveHex === 0xaa00ff || emissiveHex === 0xff00ff) {
+          else if (emissiveHex === 0x9d87df || emissiveHex === 0xff00ff) {
             child.material = child.material.clone();
             child.material.emissiveIntensity = 5;
             child.material.toneMapped = true;

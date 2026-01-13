@@ -30,6 +30,19 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
     const screenMeshes = useRef([]);
     const activationSchedule = useRef([]);
     const [acsesTexture] = useTexture(['/images/ACSES_Image.jpg']);
+
+    // Load specific textures for each team
+    const teamTextures = useTexture({
+        Management: '/images/teams/Management.png',
+        Technical: '/images/teams/Technical.png',
+        Design: '/images/teams/Design.png',
+        Registration: '/images/teams/Registration.png',
+        Media: '/images/teams/Media.png',
+        Publicity: '/images/teams/Publicity.png',
+        Documentation: '/images/teams/Documentation.png',
+        Logistics: '/images/teams/Logistics.png',
+    });
+
     const isMobile = useMobileDetection();
 
     useEffect(() => {
@@ -84,19 +97,37 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
                     screensFound++;
                     if (child.material) {
                         child.material = child.material.clone();
-                        const rotatedTexture = acsesTexture.clone();
+
+                        // Determine which texture to use based on the mesh name
+                        let textureToUse = acsesTexture;
+                        const teams = ['Management', 'Technical', 'Design', 'Registration', 'Media', 'Publicity', 'Documentation', 'Logistics', 'Logistic']; // Added 'Logistic' for typo safety
+
+                        // If the mesh name contains any team name, use the corresponding texture
+                        // for (const team of teams) {
+                        //     if (child.name.includes(team)) {
+                        //         // Handle the 'Logistic' vs 'Logistics' naming potential mismatch
+                        //         const key = team === 'Logistic' ? 'Logistics' : team;
+                        //         if (teamTextures[key]) {
+                        //             textureToUse = teamTextures[key];
+                        //         }
+                        //         break;
+                        //     }
+                        // }
+
+                        const rotatedTexture = textureToUse.clone();
                         rotatedTexture.center.set(0.5, 0.5);
                         rotatedTexture.rotation = Math.PI / 2;
                         rotatedTexture.repeat.set(-1, 1);
                         rotatedTexture.needsUpdate = true;
+
                         child.material.map = rotatedTexture;
-                        child.material.emissive = new THREE.Color('#00ffff');
-                        child.material.emissiveIntensity = 10;
+                        child.material.emissive = new THREE.Color('#ffffff4f');
+                        child.material.emissiveIntensity = 1;
                         child.material.emissiveMap = rotatedTexture.clone();
                         child.material.toneMapped = false;
                         child.material.color = new THREE.Color('#000000');
                         child.material.needsUpdate = true;
-                        screenList.push({ mesh: child, name: child.name, originalIntensity: 10 });
+                        screenList.push({ mesh: child, name: child.name, originalIntensity: 1 });
                         child.material.emissiveIntensity = 0;
                     }
                 }
