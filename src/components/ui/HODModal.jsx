@@ -13,7 +13,7 @@ const FACULTY_DATA = [
     },
     {
         role: "Faculty Coordinator",
-        name: "Mr. Anish Kshirsagar",
+        name: "Mr. Anesh Kshirsagar",
         image: "/images/faculty/anishk.jpg",
         linkedin: "https://www.linkedin.com/in/anesh-kshirsagar-738469195/",
         email: "faculty@example.com"

@@ -121,7 +121,7 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
                         rotatedTexture.needsUpdate = true;
 
                         child.material.map = rotatedTexture;
-                        child.material.emissive = new THREE.Color('#ffffff4f');
+                        child.material.emissive = new THREE.Color('#ffffff');
                         child.material.emissiveIntensity = 1;
                         child.material.emissiveMap = rotatedTexture.clone();
                         child.material.toneMapped = false;
@@ -201,25 +201,6 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
             Documentation: ['Chair_Documentation', 'Table_Documentation', 'Human_Documentaion', 'Computer_Documentation', 'Screen_Documentation', 'NamePlane_Documentation'],
             Logistics: ['Chair_Logistic', 'Table_Logistic', 'Computer_Logistic', 'Screen_Logistic', 'NamePlane_Logistics'],
         };
-
-        const newTeamZones = {};
-
-        Object.entries(teamMeshGroups).forEach(([team, meshNames]) => {
-            const teamPositions = [];
-            modelScene.traverse((child) => {
-                if (child.isMesh && meshNames.includes(child.name)) {
-                    const worldPos = new THREE.Vector3();
-                    child.getWorldPosition(worldPos);
-                    teamPositions.push(worldPos);
-                }
-            });
-
-            if (teamPositions.length > 0) {
-                const avgPos = teamPositions.reduce((acc, pos) => acc.add(pos), new THREE.Vector3(0, 0, 0));
-                avgPos.divideScalar(teamPositions.length);
-                newTeamZones[team] = avgPos;
-            }
-        });
 
         // Set hardcoded positions based on user's manual adjustment and logs
         setTeamZones({
@@ -337,9 +318,9 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
                     key={team}
                     position={zone.toArray()}
                     size={teamZoneConfig.size}
-                    onClick={() => onTeamClick(team, { position: zone, size: teamZoneConfig.size })}
-                    onPointerEnter={(e) => { onZoneHover(true, team, e); }}
-                    onPointerLeave={(e) => { onZoneHover(false, team, e); }}
+                    onClick={(e) => { onTeamClick(team, { position: zone, size: teamZoneConfig.size }); e.stopPropagation() }}
+                    onPointerEnter={(e) => { onZoneHover(true, team, e); e.stopPropagation() }}
+                    onPointerLeave={(e) => { onZoneHover(false, team, e); e.stopPropagation() }}
                     onPointerMove={(e) => onZoneMove(e)}
                     debug
                     color={teamZoneConfig.colors[team]}

@@ -14,10 +14,19 @@
 
 body {
   font-family: 'Megazine Poster', sans-serif;
+
+  /* --- ADD THESE LINES HERE --- */
+  font-variant-ligatures: none;
+  -webkit-font-variant-ligatures: none;
+  /* For Safari/Chrome compatibility */
+  font-feature-settings: "liga" 0;
+  /* Extra fallback */
+  /* ---------------------------- */
+
   background: #000000;
   overflow: hidden;
-  touch-action: none; /* Prevent mobile zoom and pan gestures */
-  -webkit-user-select: none; /* Prevent text selection on iOS */
+  touch-action: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -26,11 +35,27 @@ body {
   height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6, .subtitle, .modal-title, .panel-title, .section-title, .panel-team-name, .panel-event-name, .photo-modal-title {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.subtitle,
+.modal-title,
+.panel-title,
+.section-title,
+.panel-team-name,
+.panel-event-name,
+.photo-modal-title {
   font-family: 'Megazine Poster', sans-serif;
   letter-spacing: 1px;
 }
 
-button, .member-name, .section-text, .panel-text, .modal-text {
+button,
+.member-name,
+.section-text,
+.panel-text,
+.modal-text {
   font-family: 'Megazine Poster', sans-serif;
 }
