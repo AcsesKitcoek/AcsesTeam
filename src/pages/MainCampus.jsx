@@ -469,6 +469,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
       const firstIntersect = allIntersects[0].object;
       if (firstIntersect === hodZoneRef.current || firstIntersect === fcZoneRef.current) {
         if (onHODClick) onHODClick();
+        event.stopPropagation();
         return;
       }
 
@@ -480,6 +481,7 @@ export default function MainCampus({ onBuildingClick, onHODClick }) {
         const { route, action } = clickableObject.userData;
         if (action === 'hod') {
           if (onHODClick) onHODClick();
+          event.stopPropagation();
         } else if (route && route !== 'modal') {
           navigate(route);
           if (onBuildingClick) onBuildingClick(route);
