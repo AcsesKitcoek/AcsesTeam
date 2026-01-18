@@ -16,27 +16,38 @@ import {
 } from 'lucide-react';
 import './TeamSidePanel.css';
 
+// New Component for rendering each member item
+const MemberListItem = ({ member, Icon, label, className = '' }) => {
+    const isObject = typeof member === 'object' && member !== null;
+    const name = isObject ? member.name : member;
+    const link = isObject ? member.link : null;
+
+    const content = (
+        <>
+            <Icon size={18} className="member-icon-svg" aria-label={label} />
+            <span className="member-name">{name}</span>
+            {link && <ExternalLink size={14} className="member-link-icon" />}
+        </>
+    );
+
+    if (link) {
+        return (
+            <a href={link} target="_blank" rel="noopener noreferrer" className={`member-item ${className}`}>
+                {content}
+            </a>
+        );
+    }
+
+    return (
+        <div className={`member-item ${className}`}>
+            {content}
+        </div>
+    );
+};
+
+
 export default function TeamSidePanel({ isOpen, onClose, teamData }) {
     if (!teamData) return null;
-
-    // Helper to render links with icons cleanly
-    const renderMemberLink = (member, IconComponent, label) => {
-        const isObject = typeof member === 'object';
-        const name = isObject ? member.name : member;
-        const link = isObject ? member.link : null;
-
-        return (
-            <>
-                <IconComponent size={18} className="member-icon-svg" aria-label={label} />
-                <span className="member-name">{name}</span>
-                {link && (
-                    <a href={link} target="_blank" rel="noopener noreferrer" className="member-link-anchor">
-                        <ExternalLink size={14} />
-                    </a>
-                )}
-            </>
-        );
-    };
 
     // Helper to determine grid class based on item count
     // Returns 'single-col' if there is exactly 1 item, ensuring it takes full width
@@ -83,9 +94,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                             {teamData.president && (
                                 <div className="panel-section">
                                     <h3 className="section-title">President</h3>
-                                    <div className="member-item president-item">
-                                        {renderMemberLink(teamData.president, Crown, "President")}
-                                    </div>
+                                    <MemberListItem member={teamData.president} Icon={Crown} label="President" className="president-item" />
                                 </div>
                             )}
 
@@ -93,9 +102,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                             {teamData.vice_president && (
                                 <div className="panel-section">
                                     <h3 className="section-title">Vice President</h3>
-                                    <div className="member-item vp-item">
-                                        {renderMemberLink(teamData.vice_president, Star, "Vice President")}
-                                    </div>
+                                    <MemberListItem member={teamData.vice_president} Icon={Star} label="Vice President" className="vp-item" />
                                 </div>
                             )}
 
@@ -105,14 +112,10 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Executives</h3>
                                     <div className="member-grid">
                                         {teamData.event_coordinator && (
-                                            <div className="member-item coordinator-item">
-                                                {renderMemberLink(teamData.event_coordinator, CalendarCheck, "Event Coordinator")}
-                                            </div>
+                                            <MemberListItem member={teamData.event_coordinator} Icon={CalendarCheck} label="Event Coordinator" className="coordinator-item" />
                                         )}
                                         {teamData.treasurer && (
-                                            <div className="member-item treasurer-item">
-                                                {renderMemberLink(teamData.treasurer, Banknote, "Treasurer")}
-                                            </div>
+                                            <MemberListItem member={teamData.treasurer} Icon={Banknote} label="Treasurer" className="treasurer-item" />
                                         )}
                                     </div>
                                 </div>
@@ -124,9 +127,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Secretaries</h3>
                                     <div className={getGridClass(teamData.secretary, "member-grid")}>
                                         {teamData.secretary.map((sec, index) => (
-                                            <div key={index} className="member-item secretary-item">
-                                                {renderMemberLink(sec, FileText, "Secretary")}
-                                            </div>
+                                            <MemberListItem key={index} member={sec} Icon={FileText} label="Secretary" className="secretary-item" />
                                         ))}
                                     </div>
                                 </div>
@@ -138,9 +139,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Joint Treasurers</h3>
                                     <div className={getGridClass(teamData.joint_treasurer, "member-grid")}>
                                         {teamData.joint_treasurer.map((jt, index) => (
-                                            <div key={index} className="member-item joint-treasurer-item">
-                                                {renderMemberLink(jt, Banknote, "Joint Treasurer")}
-                                            </div>
+                                            <MemberListItem key={index} member={jt} Icon={Banknote} label="Joint Treasurer" className="joint-treasurer-item" />
                                         ))}
                                     </div>
                                 </div>
@@ -155,9 +154,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Mentors</h3>
                                     <div className={getGridClass(teamData.mentors, "member-list")}>
                                         {teamData.mentors.map((mentor, index) => (
-                                            <div key={index} className="member-item mentor-item">
-                                                {renderMemberLink(mentor, GraduationCap, "Mentor")}
-                                            </div>
+                                            <MemberListItem key={index} member={mentor} Icon={GraduationCap} label="Mentor" className="mentor-item" />
                                         ))}
                                     </div>
                                 </div>
@@ -167,9 +164,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                             {teamData.teamHead && (
                                 <div className="panel-section">
                                     <h3 className="section-title">Team Head</h3>
-                                    <div className="member-item head-item">
-                                        {renderMemberLink(teamData.teamHead, ShieldCheck, "Team Head")}
-                                    </div>
+                                    <MemberListItem member={teamData.teamHead} Icon={ShieldCheck} label="Team Head" className="head-item" />
                                 </div>
                             )}
 
@@ -179,9 +174,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Co-Head{teamData.coHeads.length > 1 ? 's' : ''}</h3>
                                     <div className={getGridClass(teamData.coHeads, "member-list")}>
                                         {teamData.coHeads.map((coHead, index) => (
-                                            <div key={index} className="member-item cohead-item">
-                                                {renderMemberLink(coHead, Shield, "Co-Head")}
-                                            </div>
+                                            <MemberListItem key={index} member={coHead} Icon={Shield} label="Co-Head" className="cohead-item" />
                                         ))}
                                     </div>
                                 </div>
@@ -193,9 +186,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Core Team</h3>
                                     <div className={getGridClass(teamData.coreMembers, "member-list")}>
                                         {teamData.coreMembers.map((member, index) => (
-                                            <div key={index} className="member-item core-item">
-                                                {renderMemberLink(member, Cpu, "Core Member")}
-                                            </div>
+                                            <MemberListItem key={index} member={member} Icon={Cpu} label="Core Member" className="core-item" />
                                         ))}
                                     </div>
                                 </div>
@@ -207,9 +198,7 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                                     <h3 className="section-title">Members</h3>
                                     <div className="member-list">
                                         {teamData.members.map((member, index) => (
-                                            <div key={index} className="member-item">
-                                                {renderMemberLink(member, User, "Member")}
-                                            </div>
+                                            <MemberListItem key={index} member={member} Icon={User} label="Member" />
                                         ))}
                                     </div>
                                 </div>
