@@ -6,19 +6,19 @@ export const TEAM_DATA = {
         "purpose": "The core governing body of ACSES responsible for overall leadership, financial management, strategic planning, and the successful coordination of flagship events like PIONEER and Code Wizard.",
         "president": {
             "name": "Siddhi Shah",
-            "link": "https://www.linkedin.com/in/example"
+            "link": "https://www.linkedin.com/in/siddhi-shah-2a7639245"
         },
         "vice_president": {
             "name": "Omkar Kore",
-            "link": "https://www.linkedin.com/in/example"
+            "link": "https://www.linkedin.com/in/omkarkore09"
         },
         "event_coordinator": {
             "name": "Shreyash Sargar",
-            "link": "https://www.linkedin.com/in/example"
+            "link": "https://www.linkedin.com/in/shreyash-sargar"
         },
         "treasurer": {
             "name": "Utkarsha Nigade",
-            "link": "https://www.linkedin.com/in/example"
+            "link": "https://www.linkedin.com/in/utkarsha-nigade-20283a307"
         },
         "secretary": [
             {
@@ -45,7 +45,12 @@ export const TEAM_DATA = {
         "name": "Technical Team",
         "image": "/images/teams/Technical.png",
         "purpose": "Responsible for the creation and setting of technical & coding questions, handling the coding platform, and monitoring/solving student queries during competitions like Code Wizard.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Abhishek Ujale",
+                "link": "https://www.linkedin.com/in/abhishekujale/"
+            }
+        ],
         "teamHead": {
             "name": "Parth Gaikwad",
             "link": "https://parthgaikwad-portfolio.vercel.app/"
@@ -101,7 +106,12 @@ export const TEAM_DATA = {
         "name": "Design Team",
         "image": "/images/teams/Design.png",
         "purpose": "Tasked with designing posters and stories, creating social media posts, and using design skills to attract attention for club events.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Dheeraj Vaswani",
+                "link": "https://www.linkedin.com/in/dheeraj-vaswani-dv"
+            }
+        ],
         "teamHead": {
             "name": "Harshvardhan Sathe",
             "link": ""
@@ -144,7 +154,12 @@ export const TEAM_DATA = {
         "name": "Registration Team",
         "image": "/images/teams/Registration.png",
         "purpose": "Handles all registration details including generating Google forms, sending emails, creating draft messages, and tracking participant data.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Sayali Patil",
+                "link": "https://www.linkedin.com/in/sayali-patil-73b75628b"
+            }
+        ],
         "teamHead": {
             "name": "Neha Kulkarni",
             "link": "https://www.linkedin.com/in/neha-kulkarni-9807362b0"
@@ -179,7 +194,12 @@ export const TEAM_DATA = {
         "name": "Media Team",
         "image": "/images/teams/Media.png",
         "purpose": "Focuses on content creation, handling social media accounts, event coverage, promotion, and making event videos in collaboration with the design team.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Shubham Goni",
+                "link": ""
+            }
+        ],
         "teamHead": {
             "name": "Om Dhanal",
             "link": "https://www.linkedin.com/in/om-dhanal-b00a2a27a"
@@ -219,7 +239,12 @@ export const TEAM_DATA = {
         "name": "Publicity Team",
         "image": "/images/teams/Publicity.png",
         "purpose": "Responsible for campaigning, handling social media accounts, generating creative ideas for sponsors, and working with the design team to promote events.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Mahi Bhosale",
+                "link": "https://www.linkedin.com/in/mahi-bhosale"
+            }
+        ],
         "teamHead": {
             "name": "Sahil Chile",
             "link": "https://www.linkedin.com/in/sahilchile12/"
@@ -271,7 +296,12 @@ export const TEAM_DATA = {
         "name": "Documentation Team",
         "image": "/images/teams/Documentation.png",
         "purpose": "Manages all documentation including sponsorship letters, campaign letters, banners, and structured event documents.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Shreya Jadhav",
+                "link": "https://www.linkedin.com/in/shreya-jadhav5636"
+            }
+        ],
         "teamHead": {
             "name": "Pratiksha Bavannavar",
             "link": "https://www.linkedin.com/in/pratiksha-bavannavar-7531b02b0"
@@ -318,7 +348,12 @@ export const TEAM_DATA = {
         "name": "Logistics Team",
         "image": "/images/teams/Logistics.png",
         "purpose": "Oversees event arrangements, technical setup for presentations, and manages logistics regarding locations and wholesale market information.",
-        "mentors": [],
+        "mentors": [
+            {
+                "name": "Hadinoaman Makandar",
+                "link": "https://www.linkedin.com/in/hadinaoman-makandar-bb616b1b2"
+            }
+        ],
         "teamHead": {
             "name": "Vishvajeet Karkar",
             "link": "https://www.linkedin.com/in/vishvajeet-karkar-2290b2322"
