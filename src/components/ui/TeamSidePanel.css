@@ -211,20 +211,23 @@
     text-overflow: ellipsis;
 }
 
-.member-link-anchor {
+/* Reset anchor styles when it's a member item */
+a.member-item {
+    text-decoration: none;
+    color: inherit;
+}
+
+.member-link-icon {
     margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #64748b;
-    padding: 5px;
-    border-radius: 4px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
-.member-link-anchor:hover {
-    cursor: pointer;
-    background: rgba(0, 255, 255, 0.1);
+.member-item:hover .member-link-icon {
     color: #00ffff;
 }
 
