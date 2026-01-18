@@ -6,7 +6,7 @@ import './HODModal.css';
 const FACULTY_DATA = [
     {
         role: "Head of Department",
-        name: "Dr. Lingraj Hadimani",
+        name: "Dr. Lingaraj Hadimani",
         image: "/images/faculty/hod.jpg",
         linkedin: "https://www.linkedin.com/in/lingaraj-hadimani/",
     },
