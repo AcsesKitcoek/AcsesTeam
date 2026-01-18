@@ -341,7 +341,10 @@ a.member-item {
 @media (max-width: 768px) {
     .team-side-panel {
         width: 100%;
-        /* Full screen on mobile */
+        height: 100%;
+        max-height: 100vh;
+        bottom: 0;
+        top: auto;
     }
 
     .panel-image-container {
