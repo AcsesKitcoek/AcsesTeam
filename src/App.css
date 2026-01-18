@@ -41,7 +41,7 @@ body {
   font-size: 72px;
   font-weight: 900;
   text-shadow: 0 0 30px rgba(255, 0, 255, 0.8), 0 0 60px rgba(255, 0, 255, 0.4);
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   pointer-events: auto;
   letter-spacing: 8px;
   text-align: center;

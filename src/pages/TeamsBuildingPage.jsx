@@ -100,7 +100,7 @@ export default function TeamsBuildingPage() {
                 </Suspense>
 
                 <OrbitControls
-                    target={[0, 17, -31]}
+                    target={[0, 19.3, -31]}
                     enablePan={false}
                     enableZoom={false}
                     enableRotate={false}
@@ -121,7 +121,7 @@ export default function TeamsBuildingPage() {
 
             <div className="ui-overlay" style={{ marginTop: isMobile ? '80px' : '0' }}>
                 <h1>TEAMS</h1>
-                <p className="subtitle" style={{ padding: '10px' }}>Meet Our Amazing Teams</p>
+                <p className="subtitle" style={{ padding: '0px' }}>Meet Our Amazing Teams</p>
 
                 <BackButton
                     onClick={handleBackClick}
