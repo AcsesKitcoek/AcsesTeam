@@ -81,8 +81,8 @@ export default function EventGalleryPage() {
 
                 <OrbitControls
                     target={[-5, 12, 0]}
-                    enablePan={true}
-                    enableZoom={true}
+                    enablePan={false}
+                    enableZoom={false}
                     enableRotate={false}
                     enableDamping={false}
                 />

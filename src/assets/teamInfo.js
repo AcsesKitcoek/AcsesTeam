@@ -33,7 +33,7 @@ export const TEAM_DATA = {
         "joint_treasurer": [
             {
                 "name": "Dhiren Ade",
-                "link": ""
+                "link": "https://www.linkedin.com/in/dhiren-ade-92b7372b0"
             },
             {
                 "name": "Mrunali Patil",
@@ -114,7 +114,7 @@ export const TEAM_DATA = {
         ],
         "teamHead": {
             "name": "Harshvardhan Sathe",
-            "link": ""
+            "link": "https://www.linkedin.com/in/harshvardhan-sathe-787218295"
         },
         "coHeads": [
             {
@@ -130,7 +130,7 @@ export const TEAM_DATA = {
             },
             {
                 "name": "Rasika Mule",
-                "link": ""
+                "link": "https://www.linkedin.com/in/rasika-mule-7a281433b"
             },
             {
                 "name": "Shrutika Patil",
@@ -138,7 +138,7 @@ export const TEAM_DATA = {
             },
             {
                 "name": "Sofiya Ladaji",
-                "link": ""
+                "link": "https://www.linkedin.com/in/sofiya-ladaji-700bb7378"
             },
             {
                 "name": "Shivanjali Shinde",
@@ -178,7 +178,7 @@ export const TEAM_DATA = {
             },
             {
                 "name": "Renuka Jadhav",
-                "link": ""
+                "link": "https://www.linkedin.com/in/renukajadhav9899583a1"
             },
             {
                 "name": "Nikhil Mengane",
@@ -213,7 +213,7 @@ export const TEAM_DATA = {
         "coreMembers": [
             {
                 "name": "Saifulla Pendhari",
-                "link": ""
+                "link": "https://www.linkedin.com/in/saiffulla-pendhari-8387b339"
             }
         ],
         "members": [
@@ -223,7 +223,7 @@ export const TEAM_DATA = {
             },
             {
                 "name": "Sarthak Sankpal",
-                "link": ""
+                "link": "https://www.linkedin.com/in/sarthaksankpal4466"
             },
             {
                 "name": "Bhairavi Bamane",
@@ -258,7 +258,7 @@ export const TEAM_DATA = {
         "coreMembers": [
             {
                 "name": "Mitali Dhonukshe",
-                "link": ""
+                "link": "https://www.linkedin.com/in/mitali-dhonukshe-6379b53a6"
             }
         ],
         "members": [
