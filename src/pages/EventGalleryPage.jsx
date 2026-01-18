@@ -80,7 +80,7 @@ export default function EventGalleryPage() {
                 </Suspense>
 
                 <OrbitControls
-                    target={[-5, 11, 0]}
+                    target={[-5, 12, 0]}
                     enablePan={true}
                     enableZoom={true}
                     enableRotate={false}

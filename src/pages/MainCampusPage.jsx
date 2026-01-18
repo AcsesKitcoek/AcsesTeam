@@ -72,7 +72,7 @@ export default function MainCampusPage() {
                 </Suspense>
 
                 <OrbitControls
-                    target={[1.2, 4, 0]}
+                    target={[1.2, 4.7, 0]}
                     enablePan={false}
                     enableZoom={false}
                     enableRotate={false}
