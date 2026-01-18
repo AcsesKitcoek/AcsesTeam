@@ -17,6 +17,7 @@ export default function MainCampusPage() {
     const [cameraPos, setCameraPos] = useState({ x: '16.02', y: '9.71', z: '18.25' })
     const [distance, setDistance] = useState('27.74')
     const [showHODModal, setShowHODModal] = useState(false)
+    const [modalOpenTime, setModalOpenTime] = useState(0)
     const isMobile = useMobileDetection()
 
     const handleCameraUpdate = useCallback((pos, dist) => {
@@ -29,6 +30,7 @@ export default function MainCampusPage() {
     }, [])
 
     const handleHODClick = useCallback(() => {
+        setModalOpenTime(Date.now());
         setShowHODModal(true)
     }, [])
 
@@ -101,7 +103,7 @@ export default function MainCampusPage() {
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
 
             {showHODModal && (
-                <HODModal onClose={handleModalClose} />
+                <HODModal onClose={handleModalClose} openTime={modalOpenTime} />
             )}
         </div>
     )

@@ -141,60 +141,37 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: filter 0.4s ease, transform 0.4s ease;
 }
 
-.hod-card:hover .hod-profile-image {
-    filter: blur(4px) brightness(0.6);
-    transform: scale(1.05);
-}
-
-/* --- LinkedIn Overlay --- */
-.hod-linkedin-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    /* FIX: Visibility ensures it's unclickable when hidden */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-
-    z-index: 2;
-    cursor: pointer;
+/* --- New Card Link Wrapper --- */
+.hod-card-link {
     text-decoration: none;
-    /* Removes underline if any */
+    color: inherit;
+    display: block; /* Makes the link a block-level element */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px; /* Match the card's border-radius */
 }
 
-/* Hover: Show the link */
-.hod-card:hover .hod-linkedin-overlay {
-    opacity: 1;
-    visibility: visible;
-    /* Makes it clickable only on hover */
+.hod-card-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.linkedin-icon-box {
-    width: 45px;
-    /* Smaller icon box */
-    height: 45px;
-    background: #0077b5;
-    border-radius: 50%;
+/* --- New LinkedIn Username Style --- */
+.hod-linkedin-username {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    box-shadow: 0 0 15px rgba(0, 119, 181, 0.6);
-    transform: translateY(15px);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    gap: 6px;
+    margin-top: 8px;
+    color: #94a3b8; /* A less prominent color */
+    font-size: 13px;
+    font-weight: 500;
 }
 
-.hod-card:hover .linkedin-icon-box {
-    transform: translateY(0);
+.linkedin-username-icon {
+    stroke-width: 2px;
+    color: #0077b5; /* LinkedIn blue */
 }
 
 /* --- Info Section --- */
