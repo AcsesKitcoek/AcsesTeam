@@ -9,14 +9,12 @@ const FACULTY_DATA = [
         name: "Dr. Lingraj Hadimani",
         image: "/images/faculty/hod.jpg",
         linkedin: "https://www.linkedin.com/in/lingaraj-hadimani/",
-        email: "hod@example.com"
     },
     {
         role: "Faculty Coordinator",
         name: "Mr. Anesh Kshirsagar",
         image: "/images/faculty/anishk.jpg",
         linkedin: "https://www.linkedin.com/in/anesh-kshirsagar-738469195/",
-        email: "faculty@example.com"
     }
 ];
 
@@ -63,13 +61,6 @@ const HODModal = React.memo(({ onClose }) => {
                             <div className="hod-info">
                                 <h3 className="hod-role">{person.role}</h3>
                                 <p className="hod-name">{person.name}</p>
-
-                                <div className="hod-contact-details">
-                                    <div className="contact-row">
-                                        <Mail size={14} className="contact-icon" />
-                                        <span>{person.email}</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     ))}
