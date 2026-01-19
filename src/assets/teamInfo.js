@@ -70,7 +70,7 @@ export const TEAM_DATA = {
         "members": [
             {
                 "name": "Aabha Khire",
-                "link": ""
+                "link": "https://www.linkedin.com/in/aabha-khire-92b303326"
             },
             {
                 "name": "Pranav Shinde",
@@ -182,7 +182,7 @@ export const TEAM_DATA = {
             },
             {
                 "name": "Nikhil Mengane",
-                "link": ""
+                "link": "https://www.linkedin.com/in/nikhil-mengane-5ab07031b"
             },
             {
                 "name": "Srushti Pujari",
@@ -197,7 +197,7 @@ export const TEAM_DATA = {
         "mentors": [
             {
                 "name": "Shubham Goni",
-                "link": ""
+                "link": "https://www.linkedin.com/in/shubham-goni-0140263a7"
             }
         ],
         "teamHead": {
