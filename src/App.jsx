@@ -32,7 +32,7 @@ useTexture.preload(textureUrls);
  */
 function App() {
   return (
-    <>
+    <main>
       <Routes>
         <Route path="/" element={<MainCampusPage />} />
         <Route path="/teams" element={<TeamsBuildingPage />} />
@@ -43,7 +43,7 @@ function App() {
 
       {/* Render the new, self-contained Smart Loader */}
       <SmartLoader />
-    </>
+    </main>
   );
 }
 

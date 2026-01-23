@@ -9,11 +9,13 @@ import CameraTracker from '../components/scene/CameraTracker'
 import MainCampusLighting from '../components/scene/MainCampusLighting'
 import UIOverlay from '../components/ui/UIOverlay'
 import HODModal from '../components/ui/HODModal'
+import SEO from '../components/seo/SEO';
 import { useMobileDetection } from '../hooks/useMobileDetection'
 
 
 export default function MainCampusPage() {
     const [currentScene, setCurrentScene] = useState('main-campus')
+
     const [cameraPos, setCameraPos] = useState({ x: '16.02', y: '9.71', z: '18.25' })
     const [distance, setDistance] = useState('27.74')
     const [showHODModal, setShowHODModal] = useState(false)
@@ -43,7 +45,13 @@ export default function MainCampusPage() {
     }, [])
 
     return (
-        <div style={{ width: '100vw', height: '100vh' }}>
+        <main style={{ width: '100vw', height: '100vh' }}>
+            <SEO
+                title="Main Campus - ACSES KITCoEK"
+                description="Explore the 3D main campus of K. I. T. College of Engineering, Kolhapur, created by the Association of Computer Science and Engineering Students (ACSES)."
+                canonicalUrl="/"
+                keywords="3D, main campus, KITCoEK, ACSES, virtual tour"
+            />
             <Canvas
                 camera={{
                     position: isMobile ? [28, 18, 34] : [14.71, 8.68, 18.02],
@@ -95,6 +103,7 @@ export default function MainCampusPage() {
             <UIOverlay
                 title="ACSES"
                 subtitle="Association of Computer Science & Engineering Students"
+                additionalSubtitle="Department: Computer Science and Engineering, KITCoEK"
                 showBackButton={currentScene !== 'main-campus'}
                 onBackClick={handleBackClick}
             />
@@ -105,6 +114,6 @@ export default function MainCampusPage() {
             {showHODModal && (
                 <HODModal onClose={handleModalClose} openTime={modalOpenTime} />
             )}
-        </div>
+        </main>
     )
 }

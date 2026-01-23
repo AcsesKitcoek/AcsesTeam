@@ -12,6 +12,7 @@ import BackButton from '../components/ui/BackButton'
 import AboutSidePanel from '../components/ui/AboutSidePanel'
 import TeamPhotoModal from '../components/ui/TeamPhotoModal'
 import { useMobileDetection } from '../hooks/useMobileDetection'
+import SEO from '../components/seo/SEO';
 import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
 
 
@@ -53,7 +54,13 @@ export default function AboutACSESPage() {
     }, []);
 
     return (
-        <div style={{ width: '100vw', height: '100vh' }}>
+        <main style={{ width: '100vw', height: '100vh' }}>
+            <SEO
+                title="About ACSES KITCoEK"
+                description="Learn about the vision and mission of the Association of Computer Science and Engineering Students (ACSES) at K. I. T. College of Engineering, Kolhapur."
+                canonicalUrl="/about"
+                keywords="about ACSES, vision, mission, student association, KITCoEK"
+            />
             <Canvas
                 camera={{
                     position: isMobile ? [48.21, 18.39, 59.71] : [31.72, 14.12, 33.19],
@@ -109,11 +116,11 @@ export default function AboutACSESPage() {
                     label="← Back to Campus"
                 />
             </div>
-            
-            <AboutSidePanel 
-                isOpen={isPanelOpen} 
-                onClose={handleClosePanel} 
-                section={selectedSection} 
+
+            <AboutSidePanel
+                isOpen={isPanelOpen}
+                onClose={handleClosePanel}
+                section={selectedSection}
             />
 
             <TeamPhotoModal
@@ -123,6 +130,6 @@ export default function AboutACSESPage() {
 
             {/* Camera Debug Panel - Hidden for production */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
-        </div>
+        </main>
     )
 }

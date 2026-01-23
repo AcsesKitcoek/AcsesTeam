@@ -40,9 +40,9 @@ export default function FloatingContactForm({ position = [0, 2, 0], scale = 1 })
                 opacity: 1
             }}
         >
-            <div className="floating-contact-form">
+            <section className="floating-contact-form">
                 <div className="form-glow-bg"></div>
-                <div className="form-content">
+                <article className="form-content">
                     <h2 className="form-title">Contact Us</h2>
                     <p className="form-subtitle">Get in touch with ACSES</p>
 
@@ -91,8 +91,8 @@ export default function FloatingContactForm({ position = [0, 2, 0], scale = 1 })
                             <span className="btn-glow"></span>
                         </button>
                     </form>
-                </div>
-            </div>
+                </article>
+            </section>
         </Html>
     )
 }

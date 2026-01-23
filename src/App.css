@@ -71,6 +71,21 @@ body {
   z-index: 11;
 }
 
+.ui-overlay .additional-subtitle {
+  font-family: 'Megazine Poster', sans-serif;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 8px;
+  pointer-events: auto;
+  letter-spacing: 1.5px;
+  text-align: center;
+  opacity: 0.8;
+  filter: none !important;
+  position: relative;
+  z-index: 11;
+}
+
 /* Loading indicator (optional) */
 .loading {
   position: fixed;
@@ -94,5 +109,11 @@ body {
   .ui-overlay .subtitle {
     font-size: 12px;
     letter-spacing: 1.5px;
+  }
+
+  .ui-overlay .additional-subtitle {
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-top: 6px;
   }
 }

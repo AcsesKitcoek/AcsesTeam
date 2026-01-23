@@ -151,19 +151,25 @@
 }
 
 /* --- UPDATED: Member List to GRID --- */
-.member-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* Default 2 columns */
-    gap: 12px;
-}
-
 /* --- Management Grid (Shared) --- */
 .member-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     /* Default 2 columns */
     gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Default 2 columns */
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 /* --- NEW: Dynamic Single Column Override --- */

@@ -61,88 +61,88 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
     return (
         <>
             <div className={`panel-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
-            <div className={`team-side-panel ${isOpen ? 'open' : ''} ${isManagement ? 'management-panel' : ''}`}>
+            <aside className={`team-side-panel ${isOpen ? 'open' : ''} ${isManagement ? 'management-panel' : ''}`}>
                 {/* Close Button */}
                 <button className="panel-close-btn" onClick={onClose} aria-label="Close panel">
                     <X size={24} />
                 </button>
 
                 {/* Team Image */}
-                <div className="panel-image-container">
+                <figure className="panel-image-container">
                     <img
                         src={teamData.image}
                         alt={teamData.name}
                         className="panel-team-image"
                     />
                     <div className="image-overlay"></div>
-                </div>
+                </figure>
 
                 {/* Team Content */}
-                <div className="panel-content">
+                <article className="panel-content">
                     {/* Team Name */}
                     <h2 className="panel-team-name">{teamData.name}</h2>
 
                     {/* Purpose Section */}
-                    <div className="panel-section">
+                    <section className="panel-section">
                         <h3 className="section-title">Purpose</h3>
                         <p className="section-text">{teamData.purpose}</p>
-                    </div>
+                    </section>
 
                     {isManagement ? (
                         <>
                             {/* President */}
                             {teamData.president && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">President</h3>
                                     <MemberListItem member={teamData.president} Icon={Crown} label="President" className="president-item" />
-                                </div>
+                                </section>
                             )}
 
                             {/* Vice President */}
                             {teamData.vice_president && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Vice President</h3>
                                     <MemberListItem member={teamData.vice_president} Icon={Star} label="Vice President" className="vp-item" />
-                                </div>
+                                </section>
                             )}
 
                             {/* Executive Roles Grid (Coordinator & Treasurer) */}
                             {(teamData.event_coordinator || teamData.treasurer) && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Executives</h3>
-                                    <div className="member-grid">
+                                    <ul className="member-grid">
                                         {teamData.event_coordinator && (
-                                            <MemberListItem member={teamData.event_coordinator} Icon={CalendarCheck} label="Event Coordinator" className="coordinator-item" />
+                                            <li><MemberListItem member={teamData.event_coordinator} Icon={CalendarCheck} label="Event Coordinator" className="coordinator-item" /></li>
                                         )}
                                         {teamData.treasurer && (
-                                            <MemberListItem member={teamData.treasurer} Icon={Banknote} label="Treasurer" className="treasurer-item" />
+                                            <li><MemberListItem member={teamData.treasurer} Icon={Banknote} label="Treasurer" className="treasurer-item" /></li>
                                         )}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
 
                             {/* Secretary - GRID */}
                             {teamData.secretary && teamData.secretary.length > 0 && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Secretaries</h3>
-                                    <div className={getGridClass(teamData.secretary, "member-grid")}>
+                                    <ul className={getGridClass(teamData.secretary, "member-grid")}>
                                         {teamData.secretary.map((sec, index) => (
-                                            <MemberListItem key={index} member={sec} Icon={FileText} label="Secretary" className="secretary-item" />
+                                            <li key={index}><MemberListItem member={sec} Icon={FileText} label="Secretary" className="secretary-item" /></li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
 
                             {/* Joint Treasurer - GRID */}
                             {teamData.joint_treasurer && teamData.joint_treasurer.length > 0 && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Joint Treasurers</h3>
-                                    <div className={getGridClass(teamData.joint_treasurer, "member-grid")}>
+                                    <ul className={getGridClass(teamData.joint_treasurer, "member-grid")}>
                                         {teamData.joint_treasurer.map((jt, index) => (
-                                            <MemberListItem key={index} member={jt} Icon={Banknote} label="Joint Treasurer" className="joint-treasurer-item" />
+                                            <li key={index}><MemberListItem member={jt} Icon={Banknote} label="Joint Treasurer" className="joint-treasurer-item" /></li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
                         </>
                     ) : (
@@ -150,63 +150,63 @@ export default function TeamSidePanel({ isOpen, onClose, teamData }) {
                         <>
                             {/* Mentors */}
                             {teamData.mentors && teamData.mentors.length > 0 && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Mentors</h3>
-                                    <div className={getGridClass(teamData.mentors, "member-list")}>
+                                    <ul className={getGridClass(teamData.mentors, "member-list")}>
                                         {teamData.mentors.map((mentor, index) => (
-                                            <MemberListItem key={index} member={mentor} Icon={GraduationCap} label="Mentor" className="mentor-item" />
+                                            <li key={index}><MemberListItem member={mentor} Icon={GraduationCap} label="Mentor" className="mentor-item" /></li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
 
                             {/* Team Head */}
                             {teamData.teamHead && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Team Head</h3>
                                     <MemberListItem member={teamData.teamHead} Icon={ShieldCheck} label="Team Head" className="head-item" />
-                                </div>
+                                </section>
                             )}
 
                             {/* Co-Heads */}
                             {teamData.coHeads && teamData.coHeads.length > 0 && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Co-Head{teamData.coHeads.length > 1 ? 's' : ''}</h3>
-                                    <div className={getGridClass(teamData.coHeads, "member-list")}>
+                                    <ul className={getGridClass(teamData.coHeads, "member-list")}>
                                         {teamData.coHeads.map((coHead, index) => (
-                                            <MemberListItem key={index} member={coHead} Icon={Shield} label="Co-Head" className="cohead-item" />
+                                            <li key={index}><MemberListItem member={coHead} Icon={Shield} label="Co-Head" className="cohead-item" /></li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
 
                             {/* Core Team */}
                             {teamData.coreMembers && teamData.coreMembers.length > 0 && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Core Team</h3>
-                                    <div className={getGridClass(teamData.coreMembers, "member-list")}>
+                                    <ul className={getGridClass(teamData.coreMembers, "member-list")}>
                                         {teamData.coreMembers.map((member, index) => (
-                                            <MemberListItem key={index} member={member} Icon={Cpu} label="Core Member" className="core-item" />
+                                            <li key={index}><MemberListItem member={member} Icon={Cpu} label="Core Member" className="core-item" /></li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
 
                             {/* Members - ALWAYS MULTI COLUMN (Default behavior) */}
                             {teamData.members && teamData.members.length > 0 && (
-                                <div className="panel-section">
+                                <section className="panel-section">
                                     <h3 className="section-title">Members</h3>
-                                    <div className="member-list">
+                                    <ul className="member-list">
                                         {teamData.members.map((member, index) => (
-                                            <MemberListItem key={index} member={member} Icon={User} label="Member" />
+                                            <li key={index}><MemberListItem member={member} Icon={User} label="Member" /></li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ul>
+                                </section>
                             )}
                         </>
                     )}
-                </div>
-            </div>
+                </article>
+            </aside>
         </>
     );
 }

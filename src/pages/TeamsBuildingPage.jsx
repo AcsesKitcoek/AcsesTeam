@@ -14,6 +14,7 @@ import Tooltip from '../components/ui/Tooltip'; // Import the new Tooltip
 import TeamSidePanel from '../components/ui/TeamSidePanel';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { TEAM_DATA } from '../assets/teamInfo'
+import SEO from '../components/seo/SEO';
 
 
 export default function TeamsBuildingPage() {
@@ -67,7 +68,13 @@ export default function TeamsBuildingPage() {
     }, []);
 
     return (
-        <div style={{ width: '100vw', height: '100vh' }}>
+        <main style={{ width: '100vw', height: '100vh' }}>
+            <SEO
+                title="Our Teams - ACSES KITCoEK"
+                description="Meet the dedicated teams of the Association of Computer Science and Engineering Students (ACSES) at K. I. T. College of Engineering, Kolhapur."
+                canonicalUrl="/teams"
+                keywords="ACSES teams, student teams, technical team, design team, documentation team, logistics team, management team, media team, publicity team, registration team"
+            />
             <Canvas
                 camera={{
                     position: isMobile ? [80, 40, 50] : [67.63, 33.55, 42.28],
@@ -159,6 +166,6 @@ export default function TeamsBuildingPage() {
                 onClose={() => setIsPanelOpen(false)}
                 teamData={selectedTeam}
             />
-        </div>
+        </main>
     )
 }

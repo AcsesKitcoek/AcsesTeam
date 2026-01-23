@@ -97,7 +97,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
                 pointerEvents: 'auto',
                 animation: 'fadeIn 0.3s ease-out'
             }}>
-            <div
+            <section
                 className="contact-modal-container"
                 style={{
                     background: 'linear-gradient(135deg, rgba(42, 0, 84, 0.95), rgba(20, 0, 40, 0.95))',
@@ -340,7 +340,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
                         {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
                 </form>
-            </div>
+            </section>
 
             <style>{`
                 @keyframes fadeIn {
@@ -418,7 +418,7 @@ const ContactUsModal = React.memo(({ onClose }) => {
                     }
                 }
             `}</style>
-        </div>
+        </div >
     )
 })
 

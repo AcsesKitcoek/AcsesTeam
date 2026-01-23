@@ -25,7 +25,7 @@ We also organize technical workshops based on various programming languages.`
 
 export default function AboutSidePanel({ isOpen, onClose, section }) {
     const content = contentData[section];
-    
+
     // Internal state to trigger animation class after mount
     const [animateOpen, setAnimateOpen] = React.useState(false);
 
@@ -38,7 +38,7 @@ export default function AboutSidePanel({ isOpen, onClose, section }) {
             setAnimateOpen(false);
         }
     }, [isOpen]);
-    
+
     // Determine direction based on section
     // 'about' -> Left panel
     // 'vision' -> Right panel
@@ -50,31 +50,31 @@ export default function AboutSidePanel({ isOpen, onClose, section }) {
     return (
         <>
             <div className={`panel-backdrop ${animateOpen ? 'open' : ''}`} onClick={onClose} />
-            
-            <div className={`about-side-panel ${direction} ${animateOpen ? 'open' : ''}`}>
+
+            <aside className={`about-side-panel ${direction} ${animateOpen ? 'open' : ''}`}>
                 {/* Close Button */}
                 <button className="panel-close-btn" onClick={onClose} aria-label="Close panel">
                     <X size={24} />
                 </button>
 
                 {/* Header Image */}
-                <div className="panel-image-container">
+                <figure className="panel-image-container">
                     <img
                         src={content.image}
                         alt={content.title}
                         className="panel-header-image"
                     />
                     <div className="image-overlay"></div>
-                </div>
+                </figure>
 
                 {/* Content */}
-                <div className="panel-content">
+                <article className="panel-content">
                     <h2 className="panel-title">{content.title}</h2>
                     <div className="panel-text">
                         {content.text}
                     </div>
-                </div>
-            </div>
+                </article>
+            </aside>
         </>
     );
 }
