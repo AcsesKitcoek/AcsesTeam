@@ -38,7 +38,7 @@ body {
 .ui-overlay h1 {
   font-family: 'Megazine Poster', sans-serif;
   color: #ff00ff;
-  font-size: 72px;
+  font-size: 62px;
   font-weight: 900;
   text-shadow: 0 0 30px rgba(255, 0, 255, 0.8), 0 0 60px rgba(255, 0, 255, 0.4);
   margin-bottom: 0px;
@@ -56,7 +56,7 @@ body {
 .ui-overlay .subtitle {
   font-family: 'Megazine Poster', sans-serif;
   color: #00ffff;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   margin-top: 0;
@@ -74,7 +74,7 @@ body {
 .ui-overlay .additional-subtitle {
   font-family: 'Megazine Poster', sans-serif;
   color: #ffffff;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
   margin-top: 8px;
   pointer-events: auto;

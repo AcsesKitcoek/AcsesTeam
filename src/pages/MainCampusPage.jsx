@@ -82,7 +82,7 @@ export default function MainCampusPage() {
                 </Suspense>
 
                 <OrbitControls
-                    target={[1.2, 4.7, 0]}
+                    target={[1.2, 5.1, 0]}
                     enablePan={false}
                     enableZoom={false}
                     enableRotate={false}
@@ -103,7 +103,7 @@ export default function MainCampusPage() {
             <UIOverlay
                 title="ACSES"
                 subtitle="Association of Computer Science & Engineering Students"
-                additionalSubtitle="Department: Computer Science and Engineering, KITCoEK"
+                additionalSubtitle="Department of Computer Science and Engineering, KITCoEK"
                 showBackButton={currentScene !== 'main-campus'}
                 onBackClick={handleBackClick}
             />
