@@ -107,7 +107,7 @@ export default function TeamsBuildingPage() {
                 </Suspense>
 
                 <OrbitControls
-                    target={[0, 19.3, -31]}
+                    target={[0, 17.8, -31]}
                     enablePan={false}
                     enableZoom={false}
                     enableRotate={false}
