@@ -38,47 +38,51 @@ const HODModal = React.memo(({ onClose, openTime }) => {
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className="hod-modal-content">
+            <section className="hod-modal-content">
                 <button className="hod-close-btn" onClick={onClose} aria-label="Close">
                     <X size={24} />
                 </button>
 
                 <h2 className="hod-modal-title">HOD CABIN</h2>
 
-                <div className="hod-card-container">
+                <ul className="hod-card-container">
                     {FACULTY_DATA.map((person, index) => (
                         // The entire card is now a link
-                        <a
+                        <li
                             key={index}
-                            href={person.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hod-card-link"
-                            onClick={handleLinkClick}
+                            className="hod-card-item"
                         >
-                            <div className="hod-card">
-                                <div className="hod-image-wrapper">
-                                    <img
-                                        src={person.image}
-                                        alt={person.name}
-                                        className="hod-profile-image"
-                                    />
-                                </div>
-                                <div className="hod-info">
-                                    <h3 className="hod-role">{person.role}</h3>
-                                    <p className="hod-name">{person.name}</p>
-                                    {/* LinkedIn username display */}
-                                    <div className="hod-linkedin-username">
-                                        <Linkedin size={14} className="linkedin-username-icon" />
-                                        <span>{person.linkedinUsername}</span>
+                            <a
+                                href={person.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hod-card-link"
+                                onClick={handleLinkClick}
+                            >
+                                <article className="hod-card">
+                                    <figure className="hod-image-wrapper">
+                                        <img
+                                            src={person.image}
+                                            alt={person.name}
+                                            className="hod-profile-image"
+                                        />
+                                    </figure>
+                                    <div className="hod-info">
+                                        <h3 className="hod-role">{person.role}</h3>
+                                        <p className="hod-name">{person.name}</p>
+                                        {/* LinkedIn username display */}
+                                        <div className="hod-linkedin-username">
+                                            <Linkedin size={14} className="linkedin-username-icon" />
+                                            <span>{person.linkedinUsername}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </a>
+                                </article>
+                            </a>
+                        </li>
                     ))}
-                </div>
-            </div>
-        </div>
+                </ul>
+            </section>
+        </div >
     );
 });
 

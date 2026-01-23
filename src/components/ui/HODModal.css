@@ -108,6 +108,9 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 /* --- The Card --- */
@@ -147,9 +150,11 @@
 .hod-card-link {
     text-decoration: none;
     color: inherit;
-    display: block; /* Makes the link a block-level element */
+    display: block;
+    /* Makes the link a block-level element */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 12px; /* Match the card's border-radius */
+    border-radius: 12px;
+    /* Match the card's border-radius */
 }
 
 .hod-card-link:hover {
@@ -164,14 +169,16 @@
     justify-content: center;
     gap: 6px;
     margin-top: 8px;
-    color: #94a3b8; /* A less prominent color */
+    color: #94a3b8;
+    /* A less prominent color */
     font-size: 13px;
     font-weight: 500;
 }
 
 .linkedin-username-icon {
     stroke-width: 2px;
-    color: #0077b5; /* LinkedIn blue */
+    color: #0077b5;
+    /* LinkedIn blue */
 }
 
 /* --- Info Section --- */

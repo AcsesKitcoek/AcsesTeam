@@ -140,6 +140,24 @@
     text-align: justify;
 }
 
+/* Scrollbar */
+.about-side-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.about-side-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.about-side-panel::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 3px;
+}
+
+.about-side-panel::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .about-side-panel {

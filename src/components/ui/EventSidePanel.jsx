@@ -21,56 +21,58 @@ export default function EventSidePanel({ isOpen, onClose, eventData }) {
     return (
         <>
             <div className={`panel-backdrop ${animateOpen ? 'open' : ''}`} onClick={onClose} />
-            <div className={`event-side-panel ${animateOpen ? 'open' : ''}`}>
+            <aside className={`event-side-panel ${animateOpen ? 'open' : ''}`}>
                 {/* Close Button */}
                 <button className="panel-close-btn" onClick={onClose} aria-label="Close panel">
                     <X size={24} />
                 </button>
 
                 {/* Event Header Image */}
-                <div className="panel-image-container">
+                <figure className="panel-image-container">
                     <img
                         src={eventData.panelImage}
                         alt={eventData.title}
                         className="panel-event-image"
                     />
                     <div className="image-overlay"></div>
-                </div>
+                </figure>
 
                 {/* Panel Content */}
-                <div className="panel-content">
+                <article className="panel-content">
                     {/* Event Name */}
                     <h2 className="panel-event-name">{eventData.title}</h2>
 
                     {/* Description Section */}
-                    <div className="panel-section">
+                    <section className="panel-section">
                         <h3 className="section-title">About the Event</h3>
                         <p className="section-text">{eventData.description}</p>
-                    </div>
+                    </section>
 
                     {/* Gallery Grid */}
                     {eventData.galleryImages && eventData.galleryImages.length > 0 && (
-                        <div className="panel-section">
+                        <section className="panel-section">
                             <h3 className="section-title">
                                 <Image size={18} style={{ marginRight: '8px' }} />
                                 Gallery
                             </h3>
-                            <div className="gallery-grid">
+                            <ul className="gallery-grid">
                                 {eventData.galleryImages.map((imgSrc, index) => (
-                                    <div key={index} className="gallery-item">
-                                        <img
-                                            src={imgSrc}
-                                            alt={`${eventData.title} ${index + 1}`}
-                                            className="gallery-image"
-                                            loading="lazy"
-                                        />
-                                    </div>
+                                    <li key={index} className="gallery-item-container">
+                                        <figure className="gallery-item">
+                                            <img
+                                                src={imgSrc}
+                                                alt={`${eventData.title} ${index + 1}`}
+                                                className="gallery-image"
+                                                loading="lazy"
+                                            />
+                                        </figure>
+                                    </li>
                                 ))}
-                            </div>
-                        </div>
+                            </ul>
+                        </section>
                     )}
-                </div>
-            </div>
+                </article>
+            </aside>
         </>
     );
 }

@@ -11,6 +11,7 @@ import BackButton from '../components/ui/BackButton'
 import ContactUsModal from '../components/ui/ContactUsModal'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
+import SEO from '../components/seo/SEO';
 
 
 export default function ContactUsPage() {
@@ -38,7 +39,13 @@ export default function ContactUsPage() {
     }, [])
 
     return (
-        <div style={{ width: '100vw', height: '100vh' }}>
+        <main style={{ width: '100vw', height: '100vh' }}>
+            <SEO
+                title="Contact ACSES KITCoEK"
+                description="Get in touch with the Association of Computer Science and Engineering Students (ACSES) at K. I. T. College of Engineering, Kolhapur."
+                canonicalUrl="/contact"
+                keywords="contact ACSES, get in touch, student association, KITCoEK"
+            />
             <Canvas
                 camera={{
                     // Adjust based on your ContactUs model size and position
@@ -100,6 +107,6 @@ export default function ContactUsPage() {
             {showContactModal && (
                 <ContactUsModal onClose={handleModalClose} />
             )}
-        </div>
+        </main>
     )
 }

@@ -13,6 +13,7 @@ import { useMobileDetection } from '../hooks/useMobileDetection'
 import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
 import EventSidePanel from '../components/ui/EventSidePanel'
 import { eventsData } from '../assets/eventInfo'
+import SEO from '../components/seo/SEO';
 
 
 export default function EventGalleryPage() {
@@ -51,7 +52,13 @@ export default function EventGalleryPage() {
     }, [])
 
     return (
-        <div style={{ width: '100vw', height: '100vh' }}>
+        <main style={{ width: '100vw', height: '100vh' }}>
+            <SEO
+                title="Event Gallery - ACSES KITCoEK"
+                description="Explore past events and memorable moments from the Association of Computer Science and Engineering Students (ACSES) at K. I. T. College of Engineering, Kolhapur."
+                canonicalUrl="/gallery"
+                keywords="event gallery, ACSES events, past events, KITCoEK events"
+            />
             <Canvas
                 camera={{
                     position: isMobile ? [34.69, 48.77, 41.51] : [23.45, 36.43, 28.35],
@@ -116,6 +123,6 @@ export default function EventGalleryPage() {
 
             {/* Camera Debug Panel - Hidden for production */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
-        </div>
+        </main>
     )
 }
