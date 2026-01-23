@@ -12,7 +12,7 @@ export default defineConfig({
         '/',
         '/about',
         '/contact',
-        '/gallery',
+        '/events',
         '/teams'
       ]
     })
