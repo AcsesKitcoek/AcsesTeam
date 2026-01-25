@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://acses-3d.pages.dev/sitemap.xml

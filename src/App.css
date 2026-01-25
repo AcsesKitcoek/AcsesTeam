@@ -101,18 +101,18 @@ body {
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .ui-overlay h1 {
-    font-size: 36px;
-    letter-spacing: 4px;
+    font-size: 46px;
+    letter-spacing: 2px;
     text-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.4);
   }
 
   .ui-overlay .subtitle {
-    font-size: 12px;
+    font-size: 16px;
     letter-spacing: 1.5px;
   }
 
   .ui-overlay .additional-subtitle {
-    font-size: 10px;
+    font-size: 14px;
     letter-spacing: 1px;
     margin-top: 6px;
   }

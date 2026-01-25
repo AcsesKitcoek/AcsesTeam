@@ -16,6 +16,17 @@ import { useMobileDetection } from '../hooks/useMobileDetection';
 import { TEAM_DATA } from '../assets/teamInfo'
 import SEO from '../components/seo/SEO';
 
+const hiddenStyle = {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: 0,
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0
+};
 
 export default function TeamsBuildingPage() {
     const [cameraPos, setCameraPos] = useState({ x: '62.78', y: '54.16', z: '36.34' });
@@ -166,6 +177,29 @@ export default function TeamsBuildingPage() {
                 onClose={() => setIsPanelOpen(false)}
                 teamData={selectedTeam}
             />
+
+            {/* SEO Shadow Content */}
+            <div style={hiddenStyle}>
+                {Object.values(TEAM_DATA).map(team => (
+                    <article key={team.name}>
+                        <h2>{team.name}</h2>
+                        <p>{team.purpose}</p>
+                        <ul>
+                            {team.president && <li>President: {team.president.name}</li>}
+                            {team.vice_president && <li>Vice President: {team.vice_president.name}</li>}
+                            {team.event_coordinator && <li>Event Coordinator: {team.event_coordinator.name}</li>}
+                            {team.treasurer && <li>Treasurer: {team.treasurer.name}</li>}
+                            {team.secretary && team.secretary.map(m => <li key={m.name}>Secretary: {m.name}</li>)}
+                            {team.joint_treasurer && team.joint_treasurer.map(m => <li key={m.name}>Joint Treasurer: {m.name}</li>)}
+                            {team.mentors && team.mentors.map(m => <li key={m.name}>Mentor: {m.name}</li>)}
+                            {team.teamHead && <li>Team Head: {team.teamHead.name}</li>}
+                            {team.coHeads && team.coHeads.map(m => <li key={m.name}>Co-Head: {m.name}</li>)}
+                            {team.coreMembers && team.coreMembers.map(m => <li key={m.name}>Core Member: {m.name}</li>)}
+                            {team.members && team.members.map(m => <li key={m.name}>Member: {m.name}</li>)}
+                        </ul>
+                    </article>
+                ))}
+            </div>
         </main>
     )
 }

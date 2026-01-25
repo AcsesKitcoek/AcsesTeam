@@ -3,7 +3,7 @@ import { X, Linkedin } from 'lucide-react';
 import './HODModal.css';
 
 // Updated data with linkedinUsername
-const FACULTY_DATA = [
+export const FACULTY_DATA = [
     {
         role: "Head of Department",
         name: "Dr. Lingaraj Hadimani",

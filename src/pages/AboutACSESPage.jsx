@@ -9,12 +9,23 @@ import SolidPurpleBackground from '../components/scene/SolidPurpleBackground'
 import CameraTracker from '../components/scene/CameraTracker'
 import AboutLighting from '../components/scene/AboutLighting'
 import BackButton from '../components/ui/BackButton'
-import AboutSidePanel from '../components/ui/AboutSidePanel'
+import AboutSidePanel, { contentData } from '../components/ui/AboutSidePanel'
 import TeamPhotoModal from '../components/ui/TeamPhotoModal'
 import { useMobileDetection } from '../hooks/useMobileDetection'
 import SEO from '../components/seo/SEO';
 import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
 
+const hiddenStyle = {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: 0,
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0
+};
 
 export default function AboutACSESPage() {
     const [cameraPos, setCameraPos] = useState({ x: '0.00', y: '0.00', z: '0.00' })
@@ -130,6 +141,16 @@ export default function AboutACSESPage() {
 
             {/* Camera Debug Panel - Hidden for production */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
+
+            {/* SEO Shadow Content */}
+            <div style={hiddenStyle}>
+                {Object.values(contentData).map(section => (
+                    <article key={section.title}>
+                        <h2>{section.title}</h2>
+                        <p>{section.text}</p>
+                    </article>
+                ))}
+            </div>
         </main>
     )
 }
