@@ -15,6 +15,17 @@ import EventSidePanel from '../components/ui/EventSidePanel'
 import { eventsData } from '../assets/eventInfo'
 import SEO from '../components/seo/SEO';
 
+const hiddenStyle = {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: 0,
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0
+};
 
 export default function EventGalleryPage() {
     const [cameraPos, setCameraPos] = useState({ x: '0.00', y: '0.00', z: '0.00' })
@@ -123,6 +134,16 @@ export default function EventGalleryPage() {
 
             {/* Camera Debug Panel - Hidden for production */}
             {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
+
+            {/* SEO Shadow Content */}
+            <div style={hiddenStyle}>
+                {Object.values(eventsData).map(event => (
+                    <article key={event.id}>
+                        <h2>{event.title}</h2>
+                        <p>{event.description}</p>
+                    </article>
+                ))}
+            </div>
         </main>
     )
 }

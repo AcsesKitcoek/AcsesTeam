@@ -2,7 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import './AboutSidePanel.css';
 
-const contentData = {
+export const contentData = {
     'about': {
         title: "ABOUT ACSES",
         image: "/images/ACSES_Image.jpg",

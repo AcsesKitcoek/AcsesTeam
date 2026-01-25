@@ -8,10 +8,21 @@ import SolidPurpleBackground from '../components/scene/SolidPurpleBackground'
 import CameraTracker from '../components/scene/CameraTracker'
 import MainCampusLighting from '../components/scene/MainCampusLighting'
 import UIOverlay from '../components/ui/UIOverlay'
-import HODModal from '../components/ui/HODModal'
+import HODModal, { FACULTY_DATA } from '../components/ui/HODModal'
 import SEO from '../components/seo/SEO';
 import { useMobileDetection } from '../hooks/useMobileDetection'
 
+const hiddenStyle = {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: 0,
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0
+};
 
 export default function MainCampusPage() {
     const [currentScene, setCurrentScene] = useState('main-campus')
@@ -114,6 +125,15 @@ export default function MainCampusPage() {
             {showHODModal && (
                 <HODModal onClose={handleModalClose} openTime={modalOpenTime} />
             )}
+
+            {/* SEO Shadow Content */}
+            <div style={hiddenStyle}>
+                {FACULTY_DATA.map(person => (
+                    <article key={person.name}>
+                        <h2>{person.role} - {person.name}</h2>
+                    </article>
+                ))}
+            </div>
         </main>
     )
 }
