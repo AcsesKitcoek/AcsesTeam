@@ -7,16 +7,17 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
   <meta name="google-site-verification" content="kFt1KMPqnNBR8gOOv2oVFw5e5v-4XKEC78iuWlCZJtI" />
-  <title>ACSES - KITCoEK</title>
+  <title>ACSES KITCoEK | Association of Computer Science & Engineering Students, KIT Kolhapur</title>
   <meta name="description"
-    content="The Association of Computer Science and Engineering Students (ACSES) is a vibrant, student-driven organization at KITCoEK dedicated to fostering innovation and collaboration in the CSE department." />
+    content="Official website of ACSES (Association of Computer Science and Engineering Students) at KIT's College of Engineering (Autonomous), Kolhapur. Explore our 3D campus, events, and teams." />
 
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="ACSES KITCoEK" />
+  <meta property="og:title" content="ACSES KITCoEK | KIT Kolhapur" />
   <meta property="og:description"
-    content="The Association of Computer Science and Engineering Students (ACSES) is a vibrant, student-driven organization at KITCoEK dedicated to fostering innovation and collaboration in the CSE department." />
+    content="Official website of the Association of Computer Science and Engineering Students at KIT's College of Engineering (Autonomous), Kolhapur." />
   <meta property="og:image" content="https://acses-3d.pages.dev/images/ACSES_logo.png" />
   <meta property="og:url" content="https://acses-3d.pages.dev/" />
+  <meta property="og:site_name" content="ACSES KITCoEK" />
   <meta property="og:type" content="website" />
 
   <!-- JSON-LD Structured Data -->
@@ -27,7 +28,18 @@
       "name": "ACSES KITCoEK",
       "url": "https://acses-3d.pages.dev/",
       "logo": "https://acses-3d.pages.dev/images/ACSES_logo.png",
-      "sameAs": []
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Gokul Shirgaon",
+        "addressLocality": "Kolhapur",
+        "addressRegion": "Maharashtra",
+        "postalCode": "416234",
+        "addressCountry": "IN"
+      },
+      "sameAs": [
+        "https://www.instagram.com/acses.kitcoek/?hl=en",
+        "https://www.linkedin.com/company/acses-kitcoek"
+      ]
     }
     </script>
   <script type="application/ld+json">
@@ -42,7 +54,32 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Initial Content for SEO and fast rendering perception -->
+    <header style="visibility: hidden; position: absolute; width: 1px; height: 1px; overflow: hidden;">
+      <h1>ACSES KITCoEK - Association of Computer Science and Engineering Students</h1>
+      <p>The official website of ACSES (Association of Computer Science and Engineering Students) at KIT's College of Engineering (Autonomous), Kolhapur.</p>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About ACSES</a></li>
+          <li><a href="/events">Events</a></li>
+          <li><a href="/teams">Our Team</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+  <noscript>
+    <h1>ACSES KITCoEK</h1>
+    <p>The Association of Computer Science and Engineering Students (ACSES) is a vibrant, student-driven organization at KITCoEK.</p>
+    <p>We organize technical events, workshops, and seminars to foster innovation in the CSE department.</p>
+    <ul>
+      <li><a href="/about">About Us</a></li>
+      <li><a href="/events">Events</a></li>
+      <li><a href="/teams">Committee Members</a></li>
+    </ul>
+  </noscript>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

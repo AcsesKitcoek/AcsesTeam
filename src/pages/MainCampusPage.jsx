@@ -58,10 +58,10 @@ export default function MainCampusPage() {
     return (
         <main style={{ width: '100vw', height: '100vh' }}>
             <SEO
-                title="Main Campus - ACSES KITCoEK"
-                description="Explore the 3D main campus of K. I. T. College of Engineering, Kolhapur, created by the Association of Computer Science and Engineering Students (ACSES)."
+                title="Main Campus - KIT Kolhapur"
+                description="Explore the 3D main campus of KIT's College of Engineering (Autonomous), Kolhapur, created by the Association of Computer Science and Engineering Students (ACSES)."
                 canonicalUrl="/"
-                keywords="3D, main campus, KITCoEK, ACSES, virtual tour"
+                keywords="3D campus, KITCoEK, ACSES, virtual tour, KIT Kolhapur, CSE department"
             />
             <Canvas
                 camera={{

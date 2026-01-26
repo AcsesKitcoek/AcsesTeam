@@ -9,11 +9,11 @@ const SEO = ({
   keywords,
 }) => {
   const defaultTitle = 'ACSES KITCoEK - Association of Computer Science and Engineering Students';
-  const defaultDescription = 'Official website of the Association of Computer Science and Engineering Students (ACSES) at K. I. T. College of Engineering, Kolhapur.';
+  const defaultDescription = 'Official website of the Association of Computer Science and Engineering Students (ACSES) at KIT\'s College of Engineering (Autonomous), Kolhapur (KITCoEK).';
   const defaultOgType = 'website';
   const defaultOgImage = 'https://acses-3d.pages.dev/images/ACSES_logo.png';
   const siteUrl = 'https://acses-3d.pages.dev';
-  const defaultKeywords = 'ACSES, KITCoEK, Computer Science, Engineering, Kolhapur, Association, Students, Tech, Events';
+  const defaultKeywords = 'ACSES, KITCoEK, KIT Kolhapur, KITCE, KIT College of Engineering, Computer Science, Engineering, Kolhapur, Student Association, CSE Department, KIT CoE Kolhapur';
 
   const pageTitle = title ? `${title} | ACSES` : defaultTitle;
   const pageDescription = description || defaultDescription;

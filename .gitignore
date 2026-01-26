@@ -27,3 +27,5 @@ context.txt
 errorfile.txt
 
 .env
+.gemini/
+gha-creds-*.json
