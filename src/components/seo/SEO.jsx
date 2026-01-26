@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const SEO = ({
   title,
@@ -8,8 +8,8 @@ const SEO = ({
   ogImage,
   keywords,
 }) => {
-  const defaultTitle = 'ACSES KITCoEK - Association of Computer Science and Engineering Students';
-  const defaultDescription = 'Official website of the Association of Computer Science and Engineering Students (ACSES) at KIT\'s College of Engineering (Autonomous), Kolhapur (KITCoEK).';
+  const defaultTitle = 'ACSES KITCoEK | Association of Computer Science & Engineering Students, KIT Kolhapur';
+  const defaultDescription = 'Official website of ACSES (Association of Computer Science and Engineering Students) at KIT\'s College of Engineering (Autonomous), Kolhapur. Explore our 3D campus, events, and teams.';
   const defaultOgType = 'website';
   const defaultOgImage = 'https://acses-3d.pages.dev/images/ACSES_logo.png';
   const siteUrl = 'https://acses-3d.pages.dev';
@@ -21,30 +21,52 @@ const SEO = ({
   const pageOgImage = ogImage || defaultOgImage;
   const pageCanonicalUrl = `${siteUrl}${canonicalUrl || ''}`;
 
-  return (
-    <>
-      <title>{pageTitle}</title>
-      <meta name="description" content={pageDescription} />
-      <meta name="keywords" content={pageKeywords} />
-      <meta name="author" content="ACSES Tech Team" />
-      <meta name="robots" content="index, follow" />
-      
-      {canonicalUrl && <link rel="canonical" href={pageCanonicalUrl} />}
-      
-      <meta property="og:type" content={ogType || defaultOgType} />
-      <meta property="og:title" content={pageTitle} />
-      <meta property="og:description" content={pageDescription} />
-      <meta property="og:image" content={pageOgImage} />
-      <meta property="og:url" content={pageCanonicalUrl} />
-      <meta property="og:site_name" content="ACSES KITCoEK" />
+  useEffect(() => {
+    // Update Title
+    document.title = pageTitle;
 
-      {/* Twitter Card Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={pageTitle} />
-      <meta name="twitter:description" content={pageDescription} />
-      <meta name="twitter:image" content={pageOgImage} />
-    </>
-  );
+    // Helper to update meta tags
+    const updateMeta = (selector, attribute, value) => {
+      let element = document.querySelector(selector);
+      if (!element) {
+        element = document.createElement('meta');
+        
+        // Parse selector to set initial attributes (basic support)
+        if (selector.includes('name=')) element.setAttribute('name', selector.match(/name="([^"]+)"/)[1]);
+        if (selector.includes('property=')) element.setAttribute('property', selector.match(/property="([^"]+)"/)[1]);
+        
+        document.head.appendChild(element);
+      }
+      element.setAttribute(attribute, value);
+    };
+
+    // Update Metas
+    updateMeta('meta[name="description"]', 'content', pageDescription);
+    updateMeta('meta[name="keywords"]', 'content', pageKeywords);
+    
+    updateMeta('meta[property="og:title"]', 'content', pageTitle);
+    updateMeta('meta[property="og:description"]', 'content', pageDescription);
+    updateMeta('meta[property="og:image"]', 'content', pageOgImage);
+    updateMeta('meta[property="og:url"]', 'content', pageCanonicalUrl);
+    updateMeta('meta[property="og:type"]', 'content', ogType || defaultOgType);
+    
+    updateMeta('meta[name="twitter:title"]', 'content', pageTitle);
+    updateMeta('meta[name="twitter:description"]', 'content', pageDescription);
+    updateMeta('meta[name="twitter:image"]', 'content', pageOgImage);
+    
+    // Canonical
+    let link = document.querySelector('link[rel="canonical"]');
+    if (canonicalUrl) {
+        if (!link) {
+            link = document.createElement('link');
+            link.setAttribute('rel', 'canonical');
+            document.head.appendChild(link);
+        }
+        link.setAttribute('href', pageCanonicalUrl);
+    }
+  }, [pageTitle, pageDescription, pageKeywords, pageOgImage, pageCanonicalUrl, ogType, defaultOgType]);
+
+  return null;
 };
 
 export default SEO;
