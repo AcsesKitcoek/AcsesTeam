@@ -103,8 +103,10 @@ export default function AboutACSESPage() {
                     target={[-3.8, 7, 0]}
                     enablePan={false}
                     enableZoom={false}
-                    enableRotate={false}
-                    enableDamping={false}
+                    enableRotate={true}
+                    enableDamping={true}
+                    maxPolarAngle={Math.PI / 2}
+                    minPolarAngle={Math.PI / 6}
                 />
 
                 <EffectComposer>

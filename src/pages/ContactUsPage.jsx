@@ -75,8 +75,10 @@ export default function ContactUsPage() {
                     target={[0, 1.2, 0.26]}
                     enablePan={false}
                     enableZoom={false}
-                    enableRotate={false}
-                    enableDamping={false}
+                    enableRotate={true}
+                    enableDamping={true}
+                    maxPolarAngle={Math.PI / 2}
+                    minPolarAngle={Math.PI / 6}
                 />
 
                 <EffectComposer>

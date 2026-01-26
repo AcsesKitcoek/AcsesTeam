@@ -96,8 +96,10 @@ export default function MainCampusPage() {
                     target={[1.2, 5.1, 0]}
                     enablePan={false}
                     enableZoom={false}
-                    enableRotate={false}
-                    enableDamping={false}
+                    enableRotate={true}
+                    enableDamping={true}
+                    maxPolarAngle={Math.PI / 2}
+                    minPolarAngle={Math.PI / 6}
                 />
 
                 {/* Post-processing for Enhanced Neon Glow - MOBILE BLOOM ENABLED */}
