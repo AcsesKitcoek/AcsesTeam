@@ -107,6 +107,24 @@ export default function ContactUsPage() {
             {showContactModal && (
                 <ContactUsModal onClose={handleModalClose} />
             )}
+            {/* SEO Shadow Content */}
+            <div style={{
+                position: 'absolute',
+                width: '1px',
+                height: '1px',
+                padding: 0,
+                margin: '-1px',
+                overflow: 'hidden',
+                clip: 'rect(0, 0, 0, 0)',
+                whiteSpace: 'nowrap',
+                border: 0
+            }}>
+                <h2>Contact ACSES KITCoEK</h2>
+                <p>Address: K. I. T. College of Engineering (Autonomous), Kolhapur. Gokul Shirgaon, Kolhapur - 416234, Maharashtra, India.</p>
+                <p>Department: Computer Science and Engineering</p>
+                <p>Association: Association of Computer Science and Engineering Students (ACSES)</p>
+                <p>Get in touch with us for collaborations, technical events, workshops, and seminars.</p>
+            </div>
         </main>
     )
 }
