@@ -121,8 +121,10 @@ export default function TeamsBuildingPage() {
                     target={[0, 17.8, -31]}
                     enablePan={false}
                     enableZoom={false}
-                    enableRotate={false}
-                    enableDamping={false}
+                    enableRotate={true}
+                    enableDamping={true}
+                    maxPolarAngle={Math.PI / 2}
+                    minPolarAngle={Math.PI / 6}
                 />
 
                 <EffectComposer>
