@@ -204,14 +204,14 @@ export default function TeamsBuilding({ onTeamClick, onZoneHover, onZoneMove }) 
 
         // Set hardcoded positions based on user's manual adjustment and logs
         setTeamZones({
-            Management: new THREE.Vector3(18, 39, 0.22), // User's value
-            Technical: new THREE.Vector3(30.68, 39, -11.7),
-            Design: new THREE.Vector3(18, 28.2, 0.22),
-            Registration: new THREE.Vector3(30.68, 28.3, -11.7),
-            Media: new THREE.Vector3(18, 17.5, 0.22),
-            Publicity: new THREE.Vector3(30.68, 17.5, -11.7),
-            Documentation: new THREE.Vector3(18, 6.63, 0.22),
-            Logistics: new THREE.Vector3(30.68, 6.63, -11.7),
+            Management: new THREE.Vector3(-3, 39, 9), // User's value
+            Technical: new THREE.Vector3(9.45, 39, -2.5),
+            Design: new THREE.Vector3(-3, 28.2, 9),
+            Registration: new THREE.Vector3(9.45, 28.3, -2.5),
+            Media: new THREE.Vector3(-3, 17.5, 9),
+            Publicity: new THREE.Vector3(9.45, 17.5, -2.5),
+            Documentation: new THREE.Vector3(-3, 6.63, 9),
+            Logistics: new THREE.Vector3(9.45, 6.63, -2.5),
         });
 
     }, [groupRef.current, acsesTexture, isMobile]);
