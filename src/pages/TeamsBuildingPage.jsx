@@ -15,6 +15,7 @@ import TeamSidePanel from '../components/ui/TeamSidePanel';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { TEAM_DATA } from '../assets/teamInfo'
 import SEO from '../components/seo/SEO';
+import CameraDebugOverlay from '../components/ui/CameraDebugOverlay'
 
 const hiddenStyle = {
     position: 'absolute',
@@ -88,7 +89,7 @@ export default function TeamsBuildingPage() {
             />
             <Canvas
                 camera={{
-                    position: isMobile ? [80, 40, 50] : [67.63, 33.55, 42.28],
+                    position: isMobile ? [80, 40, 50] : [48.81, 35.82, 52.21],
                     fov: isMobile ? 60 : 50,
                     near: 0.1,
                     far: 1000
@@ -118,7 +119,7 @@ export default function TeamsBuildingPage() {
                 </Suspense>
 
                 <OrbitControls
-                    target={[0, 17.8, -31]}
+                    target={[0, 24, 0]}
                     enablePan={false}
                     enableZoom={false}
                     enableRotate={true}
@@ -179,6 +180,7 @@ export default function TeamsBuildingPage() {
                 onClose={() => setIsPanelOpen(false)}
                 teamData={selectedTeam}
             />
+            {/* <CameraDebugOverlay cameraPosition={cameraPos} distance={distance} /> */}
 
             {/* SEO Shadow Content */}
             <div style={hiddenStyle}>
