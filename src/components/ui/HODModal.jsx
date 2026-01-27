@@ -14,7 +14,7 @@ export const FACULTY_DATA = [
     {
         role: "Faculty Coordinator",
         name: "Mr. Anesh Kshirsagar",
-        image: "/images/faculty/anishk.jpg",
+        image: "/images/faculty/aneshk.jpeg",
         linkedin: "https://www.linkedin.com/in/anesh-kshirsagar-738469195/",
         linkedinUsername: "anesh-kshirsagar"
     }
