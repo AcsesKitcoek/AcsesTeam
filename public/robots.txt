@@ -4,4 +4,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://acses-3d.pages.dev/sitemap.xml
+Sitemap: https://acseskitcoek.pages.dev/sitemap.xml
