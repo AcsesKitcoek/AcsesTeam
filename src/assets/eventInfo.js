@@ -77,10 +77,11 @@ export const eventsData = {
         galleryImages: []
     },
     "Image_Plane_event": {
-        id: "coming_soon",
-        title: "Coming Soon",
-        description: "Coming Soon on Pioneer 2026",
-        panelImage: "/images/events/coming_soon.jpg",
+        id: "stranger_code",
+        title: "STRANGER CODE: ESCAPE THE UPSIDE DOWN",
+        description: "Prepare to code your way out of the Upside Down in 'Stranger Code: Escape the Upside Down', a National Level Coding Competition where logic, speed, and code decide your survival. Scheduled for February 21, 2026, at KIT's College Of Engineering, Kolhapur, this offline event features three intense rounds: 'Hawkins Hack' testing aptitude and logic, 'Mindflayer' challenging you with debugging and puzzles, and 'The Final Gate' where you code in any language to escape. With a prize pool of ₹10,000 and a registration fee of just ₹100, are you ready to join, code, and survive?",
+        panelImage: "/images/events/StrangerCode.png",
+        registrationLink: "https://forms.gle/qAzudaBNFqpWnGww6",
         galleryImages: []
     }
 };

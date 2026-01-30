@@ -48,6 +48,20 @@ export default function EventSidePanel({ isOpen, onClose, eventData }) {
                         <p className="section-text">{eventData.description}</p>
                     </section>
 
+                    {/* Registration Button */}
+                    {eventData.registrationLink && (
+                        <section className="panel-section registration-section">
+                            <a 
+                                href={eventData.registrationLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="register-btn"
+                            >
+                                Register Now
+                            </a>
+                        </section>
+                    )}
+
                     {/* Gallery Grid */}
                     {eventData.galleryImages && eventData.galleryImages.length > 0 && (
                         <section className="panel-section">

@@ -13,6 +13,7 @@ export const imageManifest = [
   "/images/events/Sankalpan_1.png",
   "/images/events/WordPress_2.png",
   "/images/events/coming_soon.jpg",
+  "/images/events/StrangerCode.png",
   "/images/events/CodeWizard_1.png",
   "/images/events/WordPress_Panel.png",
   "/images/events/PosterMaking_1.png",
